@@ -1,5 +1,5 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 /*
 | -------------------------------------------------------------------
 | LAVALust - a lightweight PHP MVC Framework is free software:
@@ -29,17 +29,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 /*
  * ------------------------------------------------------
- *  XSS Clean Function
- * ------------------------------------------------------
- */
-function xss_clean($str, $is_image = FALSE)
-{ 
-	$security =& load_class('Security', 'core');
-	return $security->xss_clean($str, $is_image);
-}
-
-/*
- * ------------------------------------------------------
  *  Class Loader Function
  * ------------------------------------------------------
  */
@@ -47,12 +36,12 @@ if ( ! function_exists('load_class'))
 {
 	function &load_class($class, $directory = '', $params = NULL) {
 
-		$r = Registry::getInstance();
+		$LAVA = Registry::get_instance();
 		$className = ucfirst(strtolower($class));
 
 		//if the object already exists in the registry
-		if($r->getObject($className) != NULL) {
-			$object = $r->getObject($className);
+		if($LAVA->getObject($className) != NULL) {
+			$object = $LAVA->getObject($className);
 			return $object;
 		}
 		
@@ -63,68 +52,126 @@ if ( ! function_exists('load_class'))
 		}
 		
 		//put it in the registry
-		$r->storeObject($class, new $className($params));
+		$LAVA->storeObject($class, isset($params) ? new $className($params) : new $className());
 		
-		$object = $r->getObject($class);
+		$object = $LAVA->getObject($class);
 		return $object;
 	}
 }
 
-/*
- * ------------------------------------------------------
- *  404 Error / Can be modified
- * ------------------------------------------------------
- */
-function show_404($heading, $message, $page = NULL)
+if ( ! function_exists('show_404'))
 {
-	$errors =& load_class('Errors', 'core');
-	return $errors->show_404($heading, $message, $page);
-}
-
-/*
- * ------------------------------------------------------
- * Showing errors for debuging
- * ------------------------------------------------------
- */
-function show_error($heading,$message,$error_code)
-{
-  	$errors =& load_class('Errors', 'core');
-  	return $errors->show_error($heading,$message,$template = 'custom_errors',$error_code);
-}
-
-/*
- * ------------------------------------------------------
- * Showing errors for debuging
- * ------------------------------------------------------
- */
-function shutdown()
-{
-	$last_error = error_get_last();
-	if (isset($last_error) &&
-		($last_error['type'] & (E_ERROR | E_PARSE | E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_COMPILE_WARNING)))
+	/*
+	 * ------------------------------------------------------
+	 *  404 Error / Can be modified
+	 * ------------------------------------------------------
+	 */
+	function show_404($heading, $message, $page = NULL)
 	{
-		errors($last_error['type'], $last_error['message'], $last_error['file'], $last_error['line']);
+		$errors =& load_class('Errors', SYSTEM_DIR . 'core');
+		return $errors->show_404($heading, $message, $page);
 	}
 }
-/*
- * ------------------------------------------------------
- * Showing errors for debuging
- * ------------------------------------------------------
- */
 
-function exceptions($e)
+if ( ! function_exists('show_error'))
 {
-	$exception =& load_class('Errors', 'core');
-	$exception->show_exception($e);
+	/*
+	 * ------------------------------------------------------
+	 * Showing errors for debuging
+	 * ------------------------------------------------------
+	 */
+	function show_error($heading,$message,$error_code)
+	{
+	  	$errors =& load_class('Errors', SYSTEM_DIR . 'core');
+	  	return $errors->show_error($heading,$message,$template = 'custom_errors',$error_code);
+	}
 }
 
-/*
- * ------------------------------------------------------
- * Showing errors for debuging
- * ------------------------------------------------------
- */
-function errors($errno, $errstr, $errfile, $errline)
+if ( ! function_exists('shutdown'))
 {
-	$error =& load_class('Errors', 'core');
-	$error->show_php_error($errno, $errstr, $errfile, $errline);
+	/*
+	 * ------------------------------------------------------
+	 * Showing errors for debuging
+	 * ------------------------------------------------------
+	 */
+	function shutdown()
+	{
+		$last_error = error_get_last();
+		if (isset($last_error) &&
+			($last_error['type'] & (E_ERROR | E_PARSE | E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_COMPILE_WARNING)))
+		{
+			errors($last_error['type'], $last_error['message'], $last_error['file'], $last_error['line']);
+		}
+	}
+}
+
+if ( ! function_exists('exceptions'))
+{
+	/*
+	 * ------------------------------------------------------
+	 * Showing errors for debuging
+	 * ------------------------------------------------------
+	 */
+	function exceptions($e)
+	{
+		$exception =& load_class('Errors', SYSTEM_DIR . 'core');
+		$exception->show_exception($e);
+	}
+}
+
+if ( ! function_exists('errors'))
+{
+	/*
+	 * ------------------------------------------------------
+	 * Showing errors for debuging
+	 * ------------------------------------------------------
+	 */
+	function errors($errno, $errstr, $errfile, $errline)
+	{
+		$error =& load_class('Errors', SYSTEM_DIR . 'core');
+		$error->show_php_error($errno, $errstr, $errfile, $errline);
+	}
+}
+
+if ( ! function_exists('noXSS'))
+{
+	/*
+	 * ------------------------------------------------------
+	 *  XSS Protection / Based on HTMLawed
+	 * ------------------------------------------------------
+	 */
+	function noXSS($str, $is_image = FALSE)
+	{ 
+		$security =& load_class('Security', SYSTEM_DIR . 'core');
+		return $security->xss_clean($str, $is_image);
+	}
+}
+
+if ( ! function_exists('html_escape'))
+{
+	/*
+	 * ------------------------------------------------------
+	 *  Returns HTML escaped variable
+	 * ------------------------------------------------------
+	 */
+	function html_escape($var, $double_encode = TRUE)
+	{
+		global $config;
+		if (empty($var))
+		{
+			return $var;
+		}
+
+		if (is_array($var))
+		{
+			foreach (array_keys($var) as $key)
+			{
+				$var[$key] = html_escape($var[$key], $double_encode);
+			}
+
+			return $var;
+		}
+
+		return htmlspecialchars($var, ENT_QUOTES, $config['charset'], $double_encode);
+	}
 }

@@ -1,5 +1,5 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 
 class Welcome extends Controller {
 
@@ -9,8 +9,9 @@ class Welcome extends Controller {
 	function __construct()
 	{
 		parent:: __construct();
-		global $Input;
-		$this->input = $Input;
+		$this->load->helper('cookie');
+		//global $Input;
+		//$this->input = $Input;
 
 		$this->load->model('sample');
 	}
@@ -39,7 +40,7 @@ class Welcome extends Controller {
 
 	public function userDetails(){
 	    // POST data
-	    $postData = $this->input->post('username');
+	    $postData = $this->input->post('username', TRUE);
 	    //echo $postData;
 	    //die;
 	    // get data
@@ -55,25 +56,41 @@ class Welcome extends Controller {
 		echo xss_clean(SQLError());
 	}
 
-	function covid()
+	function m3()
 	{
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-	curl_setopt($ch, CURLOPT_URL,"https://coronavirus-ph-api.now.sh/cases");
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	$response = curl_exec ($ch);
-	$result = json_decode($response);
-	//return $this->result; 
-	curl_close ($ch);
-
-	//var_dump($result);
-	$this->load->view('main3', array('result' => $result));
+		$this->load->view('main3');
 	}
 
 	function try()
 	{
 		$this->load->view('covid');
+	}
+
+	function vuesample()
+	{
+		$this->load->view('vue');
+	}
+
+	function cookie()
+	{
+		$cookie= array(
+
+           'name'   => 'remember_me',
+           'value'  => 'test',                            
+           'expire' => '300',                                                                                   
+           'secure' => TRUE
+
+       );
+		
+		set_cookie($cookie);
+
+       	//echo "Congratulation Cookie Set";
+       	return $cookie;
+	}
+
+	function xss()
+	{
+		echo html_escape("<script>alert('xd')</script>");
 	}
 }
 ?>

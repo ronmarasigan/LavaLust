@@ -1,5 +1,5 @@
 <?php
-
+defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 /*
 htmLawed 1.2.5, 24 September 2019
 Copyright Santosh Patnaik

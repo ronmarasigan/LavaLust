@@ -27,12 +27,44 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 |
 */
 
-define('LANG', [
-    'Welcome' => 'Welcome',
-    'Hello' => 'Hello',
-    'Subscribe' => 'Subscribe',
-		'Active Users' => 'Aktibong Miyembro',
-		'SMS Servers' => 'SMS Servers',
-]);
+if ( ! function_exists('set_cookie'))
+{
+	/*
+	* ------------------------------------------------------
+	*  Setting up cookie
+	* ------------------------------------------------------
+	*/
+	function set_cookie($name, $value = '', $expire = '', $domain = '', $path = '/', $prefix = '', $secure = NULL, $httponly = NULL)
+	{
+		// Set the config file options
+		get_instance()->input->set_cookie($name, $value, $expire, $domain, $path, $prefix, $secure, $httponly);
+	}
+}
 
-?>
+if ( ! function_exists('get_cookie'))
+{
+	/*
+	* ------------------------------------------------------
+	*  Get cookie value
+	* ------------------------------------------------------
+	*/
+	function get_cookie($index, $xss_clean = FALSE)
+	{
+		global $config;
+		$prefix = isset($_COOKIE[$index]) ? '' : $config['cookie_prefix'];
+		return get_instance()->input->cookie($prefix.$index, $xss_clean);
+	}
+}
+
+if ( ! function_exists('delete_cookie'))
+{
+	/*
+	* ------------------------------------------------------
+	*  Delete cookie
+	* ------------------------------------------------------
+	*/
+	function delete_cookie($name, $domain = '', $path = '/', $prefix = '')
+	{
+		set_cookie($name, '', '', $domain, $path, $prefix);
+	}
+}

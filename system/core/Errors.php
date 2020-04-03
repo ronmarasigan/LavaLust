@@ -1,5 +1,5 @@
 <?php
-defined('BASEPATH') OR exit('Direct script access not allowed');
+defined('PREVENT_DIRECT_ACCESS') OR exit('Direct script access not allowed');
 /*
 | -------------------------------------------------------------------
 | LAVALust - a lightweight PHP MVC Framework is free software:

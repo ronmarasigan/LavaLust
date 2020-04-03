@@ -1,4 +1,5 @@
 <?php
+define('PREVENT_DIRECT_ACCESS', TRUE);
 /*
 | -------------------------------------------------------------------
 | LAVALust - a lightweight PHP MVC Framework is free software:
@@ -26,35 +27,37 @@
 |
 */
 
-/***** Prevent direct access to include file *****/
-define('BASEPATH', true);
-
-/***** Define Constants *****/
+/*
+ * ------------------------------------------------------
+ * Define Application Constants
+ * ------------------------------------------------------
+ */
 define('DIR',DIRECTORY_SEPARATOR);
 define('ROOT_DIR',  __DIR__ . DIR);
 define('APP_DIR', ROOT_DIR . 'application' . DIR);
 define('SYSTEM_DIR', ROOT_DIR . 'system' . DIR);
 
-/***** Required Files *****/
+/*
+ * ------------------------------------------------------
+ * Load all Config
+ * ------------------------------------------------------
+ */
 foreach (glob(ROOT_DIR . 'application/config/*.php') as $CFG) {
 	require_once $CFG;
 }
 
-/***** Base URL *****/
+/*
+ * ------------------------------------------------------
+ * BASE URL of your APPLICATION
+ * ------------------------------------------------------
+ */
 define('BASE_URL', $config['base_url']);
 
-/***** Route *****/
-require_once(SYSTEM_DIR . 'LAVALust.php');
-$LAVALust = new LAVALust();
-
-/***** Auto load Base Class *****/
-$LAVALust->autoload();
-
-/***** Security / Input *****/
-$Security =& load_class('Security', SYSTEM_DIR . 'core');
-$Input =& load_class('Input', SYSTEM_DIR . 'core');
-
-/***** Create route *****/
-$LAVALust->initiate();
+/*
+ * ------------------------------------------------------
+ * Setup done? Then Hurray!
+ * ------------------------------------------------------
+ */
+require_once(SYSTEM_DIR . 'core/LAVALust.php');
 
 ?>

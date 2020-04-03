@@ -1,5 +1,5 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 /*
 | -------------------------------------------------------------------
 | LAVALust - a lightweight PHP MVC Framework is free software:
@@ -41,8 +41,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |	['password'] The password used to connect to the database
 |	['database'] The name of the database you want to connect to
 */
-$db['hostname'] = '';
-$db['username'] = '';
+$db['hostname'] = 'localhost';
+$db['username'] = 'root';
 $db['password'] = '';
-$db['database'] = '';
+$db['database'] = 'dummy';
 ?>

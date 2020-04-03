@@ -1,10 +1,3 @@
-LAVALust - a lightweight PHP MVC Framework the version BABAERON PHP MVC Framework (my first attempt).
- It is more likely developed based on the structure introduced by CodeIgniter.
- It is not a professional framework but it could help other people specially students who are new to PHP and OOP.
- It can be used to develop a small to medium size web application.
- 
- Features are include in the documentation of this Software
-
 Update
 
 1. Ability to load models and libraries in view
@@ -15,3 +8,5 @@ Update
 5. Input is the core (need to check for update)
 6. Files inside core can call class from libraries and models by using load function of by autoloading
 7. Helpers are now functions which can be called anywhere
+8. Fix class locations in load_class function
+9. Can call get_instance(function from controller and lavalust) in controller and view

@@ -1,5 +1,5 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 /*
 | -------------------------------------------------------------------
 |	BABAERON - a basic PHP MVC Framework is free software:
@@ -28,12 +28,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 */
 
 define('LANG', [
-	'Summary of COVID-19 cases in the Philippines' => 'Summary of COVID-19 cases in the Philippines',
-	'Confirmed cases of Filipino nationals outside the Philippines' => 'Confirmed cases of Filipino nationals outside the Philippines',
-	'Number of Suspected Cases' => 'Number of Suspected Cases',
-	'Cases Under Observation' => 'Cases Under Observation',
-	'Checkpoints / Metro Manila' => 'Checkpoints / Metro Manila',
-	'Sources' => 'Sources',
+    'Welcome' => 'Welcome',
+    'Hello' => 'Hello',
+    'Subscribe' => 'Subscribe',
+		'Active Users' => 'Active Users',
+		'Curriculum' => 'Curriculum',
+		'SMS Servers' => 'SMS Servers'
 ]);
 
 ?>

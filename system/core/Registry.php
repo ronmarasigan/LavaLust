@@ -1,5 +1,5 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 /*
 | -------------------------------------------------------------------
 | LAVALust - a lightweight PHP MVC Framework is free software:
@@ -46,7 +46,7 @@ class Registry
     *  Get Instance
     * ------------------------------------------------------
     */
-    public static function getInstance()
+    public static function get_instance()
     {
     	if(!isset(self::$_instance))
         {
@@ -87,7 +87,7 @@ class Registry
     */
     static function getObject($key)
     {
-		return self::getInstance()->get($key);
+		return self::get_instance()->get($key);
 	}
 
     /*
@@ -97,7 +97,7 @@ class Registry
     */
 	static function storeObject($key, $object)
 	{
-		return self::getInstance()->set($key,$object);
+		return self::get_instance()->set($key,$object);
 	}
 }
 

@@ -1,5 +1,5 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 /*
 | -------------------------------------------------------------------
 | LAVALust - a lightweight PHP MVC Framework is free software:
@@ -39,7 +39,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | Default Environment
 | -------------------------------------------------------------------
 */
-$config['ENV']                     = 'production';
+$config['ENV']                     = 'development';
 
 /*
 | -------------------------------------------------------------------
@@ -61,7 +61,7 @@ date_default_timezone_set('Asia/Manila');
 | WARNING: You MUST set this value!
 |
 */
-$config['base_url'] 				= 'http://techron.info/';
+$config['base_url'] 				= 'http://lavalust.local/';
 
 /*
 |--------------------------------------------------------------------------
@@ -83,8 +83,17 @@ $config['base_url'] 				= 'http://techron.info/';
 | DO NOT CHANGE THIS UNLESS YOU FULLY UNDERSTAND THE REPERCUSSIONS!!
 |
 */
-$config['permitted_uri_chars']     = 'a-z 0-9~%.:_\-';
+$config['permitted_uri_chars']		= 'a-z 0-9~%.:_\-';
 
+/*
+|--------------------------------------------------------------------------
+| Default Character Set
+|--------------------------------------------------------------------------
+|
+| This config will be use in database and html_escape function
+|
+*/
+$config['charset']					= 'UTF-8';
 /*
 |--------------------------------------------------------------------------
 | Default Controllers and Methods
@@ -93,7 +102,7 @@ $config['permitted_uri_chars']     = 'a-z 0-9~%.:_\-';
 | This config will be used in the babaeron.php file inside core.
 |
 */
-$config['default_controller'] 		= 'Main';
+$config['default_controller'] 		= 'Welcome';
 $config['default_method'] 			= 'index';
 
 /*
@@ -104,7 +113,7 @@ $config['default_method'] 			= 'index';
 | application/views/errors/ directory.  Use a full server path with trailing slash.
 |
 */
-$config['error_view_path']         	= APP_DIR . 'views'.DIR.'errors'.DIR;
+$config['error_view_path']         	= APP_DIR . 'views' . DIR . 'errors' . DIR;
 /*
 |--------------------------------------------------------------------------
 | Default Language

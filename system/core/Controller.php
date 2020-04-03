@@ -1,5 +1,5 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 /*
 | -------------------------------------------------------------------
 | LAVALust - a lightweight PHP MVC Framework is free software:
@@ -40,14 +40,14 @@ class Loader {
 	 */
 	public function model($classes)
 	{
-		$c = Controller::getInstance();
+		$LAVA = Controller::get_instance();
 		if(is_array($classes))
 		{
 			foreach($classes as $class)
-				$c->$class =& load_class($class . '_model', APP_DIR . 'models');	
+				$LAVA->$class =& load_class($class . '_model', APP_DIR . 'models');	
 		}
 		else
-			$c->$classes =& load_class($classes . '_model', APP_DIR . 'models');	
+			$LAVA->$classes =& load_class($classes . '_model', APP_DIR . 'models');	
 	}
 	
 	/*
@@ -104,14 +104,14 @@ class Loader {
 	 */
 	public function library($classes)
 	{
-		$c = Controller::getInstance();
+		$LAVA = Controller::get_instance();
 		if(is_array($classes))
 		{
 			foreach($classes as $class)
-				$c->$class =& load_class($class, SYSTEM_DIR . 'libraries');
+				$LAVA->$class =& load_class($class, SYSTEM_DIR . 'libraries');
 		}
 		else
-			$c->$classes =& load_class($classes, SYSTEM_DIR . 'libraries');
+			$LAVA->$classes =& load_class($classes, SYSTEM_DIR . 'libraries');
 	}
 }
 /*
@@ -128,6 +128,7 @@ class Controller extends Loader
 	{
 		$this->load = $this;
 		self::$instance = $this->load;
+		$this->input =& load_class('Input', SYSTEM_DIR . 'core');
 
 		global $autoload;
 
@@ -144,7 +145,7 @@ class Controller extends Loader
 			$this->load->helper($autoload['helpers']); 
 	}
 	
-	public static function getInstance()
+	public static function &get_instance()
 	{
 		return self::$instance;
 	}

@@ -1,5 +1,5 @@
 <?php
-defined('BASEPATH') OR exit('Direct script access not allowed');
+defined('PREVENT_DIRECT_ACCESS') OR exit('Direct script access not allowed');
 /*
 | -------------------------------------------------------------------
 | LAVALust - a lightweight PHP MVC Framework is free software:
@@ -38,11 +38,5 @@ defined('BASEPATH') OR exit('Direct script access not allowed');
  */
 
 $route['404_override']       = '';
-//$route['default_controller'] = 'Main/index';
-//$route['number/:num/:num'] = 'Welcome/index/$1/$2';
-$route['Covid-19/Case-in-PH'] = 'Main/caseph';
-$route['Covid-19/Case-out-PH'] = 'Main/caseoutph';
-$route['Covid-19/Suspected-Cases'] = 'Main/suspectedcases';
-$route['Covid-19/Under-Observation-Cases'] = 'Main/underobservation';
-$route['Covid-19/Checkpoints'] = 'Main/checkpoints';
-$route['Covid-19/Information-Sources'] = 'Main/sources';
+$route['default_controller'] = 'Welcome/index';
+$route['number/:num/:num'] = 'Welcome/index/$1/$2';
