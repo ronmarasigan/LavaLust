@@ -1,31 +1,39 @@
 <?php
 defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
-/*
-| -------------------------------------------------------------------
-| LAVALust - a lightweight PHP MVC Framework is free software:
-| -------------------------------------------------------------------	
-| you can redistribute it and/or modify it under the terms of the
-| GNU General Public License as published
-| by the Free Software Foundation, either version 3 of the License,
-| or (at your option) any later version.
-|
-| LAVALust - a lightweight PHP MVC Framework is distributed in the hope
-| that it will be useful, but WITHOUT ANY WARRANTY;
-| without even the implied warranty of
-| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-| GNU General Public License for more details.
-|
-| You should have received a copy of the GNU General Public License
-| along with LAVALust - a lightweight PHP MVC Framework.
-| If not, see <https://www.gnu.org/licenses/>.
-|
-| @author 		Ronald M. Marasigan
-| @copyright	Copyright (c) 2020, LAVALust - a lightweight PHP Framework
-| @license		https://www.gnu.org/licenses
-| GNU General Public License V3.0
-| @link		https://github.com/BABAERON/LAVALust-MVC-Framework
-|
-*/
+/**
+ * ------------------------------------------------------------------
+ * LavaLust - an opensource lightweight PHP MVC Framework
+ * ------------------------------------------------------------------
+ *
+ * MIT License
+ * 
+ * Copyright (c) 2020 Ronald M. Marasigan
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ * @package LavaLust
+ * @author Ronald M. Marasigan <ronald.marasigan@yahoo.com>
+ * @copyright Copyright 2020 (https://techron.info)
+ * @version Version 1.2
+ * @link https://lavalust.com
+ * @license https://opensource.org/licenses/MIT MIT License
+ */
 
 /*
 | -------------------------------------------------------------------
@@ -90,10 +98,11 @@ $config['permitted_uri_chars']		= 'a-z 0-9~%.:_\-';
 | Default Character Set
 |--------------------------------------------------------------------------
 |
-| This config will be use in database and html_escape function
+| This config will be use html_escape function
 |
 */
 $config['charset']					= 'UTF-8';
+
 /*
 |--------------------------------------------------------------------------
 | Default Controllers and Methods
@@ -135,15 +144,11 @@ $config['language'] 				= 'en';
 |
 |--------------------------------------------------------------------------
 */
-$config['encryption_key']          = 'E0i3SfNtntaypu2owlxqdmXBtZ6i0NDm';
-$config['sess_driver']             = ''; // Options: database or file
-$config['sess_cookie_name']        = 'kiss_session';
-$config['sess_expiration']         = 7200;
-$config['sess_save_path']          = ''; // APPPATH.'sessions' or kiss_sessions
-$config['sess_match_ip']           = FALSE;
-$config['sess_time_to_update']     = 300;
-$config['sess_regenerate_destroy'] = FALSE;
-$config['sess_expire_on_close']    = FALSE;
+$config['sess_cookie_name'] 		= 'lava_session';
+$config['sess_expiration'] 			= 7200;
+$config['sess_timeout'] 			= 1800;
+$config['sess_save_path'] 			= APP_DIR . 'cache';
+$config['sess_time_to_update'] 		= 300;
 
 /*
 |--------------------------------------------------------------------------
@@ -158,6 +163,6 @@ $config['cookie_prefix']           = '';
 $config['cookie_domain']           = '';
 $config['cookie_path']             = '/';
 $config['cookie_secure']           = FALSE;
-$config['cookie_expiration']       = 86400; // 86400 - Seconds in 1 day
+$config['cookie_expiration']       = 86400;
 $config['cookie_httponly']         = TRUE;
 ?>

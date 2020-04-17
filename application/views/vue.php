@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>LAVALust and View</title>
+	<title>LAVALust and Vue</title>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<script src="<?php echo BASE_URL; ?>assets/js/vue.js"></script>
 </head>
 <body>
-<script src="<?php echo BASE_URL; ?>assets/js/vue.js"></script>	
 	<div id="root">
 		<h1>{{ message }}</h1>
 		<input type="text" v-model="message">
@@ -30,21 +30,5 @@
 
 	</div>
 </body>
-<script type="text/javascript">
-	new Vue({
-		el: "#root",
-		data: {
-			message: "Hello",
-			intro: "Hello <small>Ron</small>",
-			s1: true,
-			s2: true,
-			title: new Date(),
-			url: '<?php echo BASE_URL; ?>assets/img/image.jpg ?>',
-			cars: [
-				{ brand: "Honda", model: "City", image: "<?php echo BASE_URL; ?>assets/img/image.jpg ?>", similar: "Civic" }
-			]
-		},
-		
-	})
-</script>
+<script src="<?php echo BASE_URL; ?>assets/js/app.js"></script>	
 </html>

@@ -1,32 +1,45 @@
 <?php
 defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
-/*
-| -------------------------------------------------------------------
-| LAVALust - a lightweight PHP MVC Framework is free software:
-| -------------------------------------------------------------------	
-| you can redistribute it and/or modify it under the terms of the
-| GNU General Public License as published
-| by the Free Software Foundation, either version 3 of the License,
-| or (at your option) any later version.
-|
-| LAVALust - a lightweight PHP MVC Framework is distributed in the hope
-| that it will be useful, but WITHOUT ANY WARRANTY;
-| without even the implied warranty of
-| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-| GNU General Public License for more details.
-|
-| You should have received a copy of the GNU General Public License
-| along with LAVALust - a lightweight PHP MVC Framework.
-| If not, see <https://www.gnu.org/licenses/>.
-|
-| @author 		Ronald M. Marasigan
-| @copyright	Copyright (c) 2020, LAVALust - a lightweight PHP Framework
-| @license		https://www.gnu.org/licenses
-| GNU General Public License V3.0
-| @link		https://github.com/BABAERON/LAVALust-MVC-Framework
-|
-*/
+/**
+ * ------------------------------------------------------------------
+ * LavaLust - an opensource lightweight PHP MVC Framework
+ * ------------------------------------------------------------------
+ *
+ * MIT License
+ * 
+ * Copyright (c) 2020 Ronald M. Marasigan
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ * @package LavaLust
+ * @author Ronald M. Marasigan <ronald.marasigan@yahoo.com>
+ * @copyright Copyright 2020 (https://techron.info)
+ * @version Version 1.2
+ * @link https://lavalust.com
+ * @license https://opensource.org/licenses/MIT MIT License
+ */
 
+/*
+* ------------------------------------------------------
+*  Class Router
+* ------------------------------------------------------
+*/
 class Router
 {
 	protected $url = array();
@@ -35,6 +48,11 @@ class Router
 	protected $method;
 	protected $params = array();
 
+	/*
+	 * ------------------------------------------------------
+	 *  Function for re-routing
+	 * ------------------------------------------------------
+	 */
 	public function remapUrl($url, $route)
     {
         foreach($route as $pattern => $replacement)
@@ -49,9 +67,15 @@ class Router
         return $this->url_string;
     }
 
+    /*
+	 * ------------------------------------------------------
+	 *  Function for URL Parsing using $_SERVER['REQUEST_URI']
+	 * ------------------------------------------------------
+	 */
 	public function parseUrl()
 	{
-		global $config, $route;
+		$config = get_config();
+		$route = route_config();
 		$request_url = (isset($_SERVER['REQUEST_URI'])) ? $_SERVER['REQUEST_URI'] : '';
 		$script_url  = (isset($_SERVER['PHP_SELF'])) ? $_SERVER['PHP_SELF'] : '';
 
@@ -75,9 +99,15 @@ class Router
 			return $this->url;				
 	}
 
+	/*
+	 * ------------------------------------------------------
+	 *  Initiate Routing
+	 * ------------------------------------------------------
+	 */
 	public function initiate()
 	{
-		global $config, $autoload;
+		$config = get_config(); 
+		$autoload = autoload_config();
 
 		$this->controller = $config['default_controller'];
 		$this->method = $config['default_method'];
@@ -101,7 +131,11 @@ class Router
 				$script_index = 1;
 		}
 		
-		/***** Language Setting *****/
+		/*
+		 * ------------------------------------------------------
+		 *  Function for Available Language
+		 * ------------------------------------------------------
+		 */
 		if(in_array($segments[$script_index], $autoload['language'])) {
 			if(file_exists(SYSTEM_DIR . 'language/' . strtolower($segments[$controller_index]) . '_lang.php'))
 				require(SYSTEM_DIR . 'language/' . strtolower($segments[$controller_index]) . '_lang.php');
@@ -110,7 +144,12 @@ class Router
 
 			setcookie('language', strtolower($segments[$controller_index]), time() + (60*60*24*30));
 			unset($segments[$controller_index]);
-			/***** set the segment of controller and action if language is available *****/
+
+			/*
+			 * ------------------------------------------------------
+			 *  Function for setting segment if language is available
+			 * ------------------------------------------------------
+			 */
 			$controller_index += 1;
 			$method_index += 1;
 		}
@@ -133,14 +172,22 @@ class Router
 			if(method_exists($this->controller, $this->method))
 				unset($segments[$method_index]);
 			else
-				/***** You can set this to default method if you like *****/
+				/*
+				 * ------------------------------------------------------
+				 *  You can set this to default method if you like
+				 * ------------------------------------------------------
+				 */
 				show_404('404 Page Not Found', 'The requested page does not found.');
 
 			$this->params = $segments ? array_values($segments) : [];
 				call_user_func_array([new $this->controller, $this->method], $this->params);
 
 		} else {
-			/***** You can set this to default controller if you like *****/
+			/*
+			 * ------------------------------------------------------
+			 *  You can set this to default conroller if you like
+			 * ------------------------------------------------------
+			 */
 			show_404('404 Page Not Found', 'The requested page does not found.');
 		}	
 	}

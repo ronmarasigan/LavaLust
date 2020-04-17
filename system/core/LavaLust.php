@@ -1,31 +1,39 @@
 <?php
 defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
-/*
-| -------------------------------------------------------------------
-| LAVALust - a lightweight PHP MVC Framework is free software:
-| -------------------------------------------------------------------	
-| you can redistribute it and/or modify it under the terms of the
-| GNU General Public License as published
-| by the Free Software Foundation, either version 3 of the License,
-| or (at your option) any later version.
-|
-| LAVALust - a lightweight PHP MVC Framework is distributed in the hope
-| that it will be useful, but WITHOUT ANY WARRANTY;
-| without even the implied warranty of
-| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-| GNU General Public License for more details.
-|
-| You should have received a copy of the GNU General Public License
-| along with LAVALust - a lightweight PHP MVC Framework.
-| If not, see <https://www.gnu.org/licenses/>.
-|
-| @author 		Ronald M. Marasigan
-| @copyright	Copyright (c) 2020, LAVALust - a lightweight PHP Framework
-| @license		https://www.gnu.org/licenses
-| GNU General Public License V3.0
-| @link		https://github.com/BABAERON/LAVALust-MVC-Framework
-|
-*/
+/**
+ * ------------------------------------------------------------------
+ * LavaLust - an opensource lightweight PHP MVC Framework
+ * ------------------------------------------------------------------
+ *
+ * MIT License
+ * 
+ * Copyright (c) 2020 Ronald M. Marasigan
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ * @package LavaLust
+ * @author Ronald M. Marasigan <ronald.marasigan@yahoo.com>
+ * @copyright Copyright 2020 (https://techron.info)
+ * @version Version 1.2
+ * @link https://lavalust.com
+ * @license https://opensource.org/licenses/MIT MIT License
+ */
 
 /*
  * ------------------------------------------------------
@@ -37,14 +45,33 @@ require_once SYSTEM_DIR . 'core/Common.php';
 
 /*
  * ------------------------------------------------------
+ *  Load App Default Configs
+ * ------------------------------------------------------
+ */
+$config =& get_config();
+
+/*
+ * ------------------------------------------------------
+ * LavaLust BASE URL of your APPLICATION
+ * ------------------------------------------------------
+ */
+define('BASE_URL', $config['base_url']);
+
+/*
+ * ------------------------------------------------------
+ * LavaLust Deployment Environment
+ * ------------------------------------------------------
+ */
+
+/*
+ * ------------------------------------------------------
  *  Deployment Environment
  * ------------------------------------------------------
  */
-global $config;
 switch ($config['ENV'])
 {
 	case 'development':
-		error_handlers();
+		_handlers();
 		error_reporting(-1);
 		ini_set('display_errors', 1);	
 	break;
@@ -56,44 +83,43 @@ switch ($config['ENV'])
 	break;
 
 	default :
-		error_handlers();
+		_handlers();
 		error_reporting(-1);
 		ini_set('display_errors', 1);
 }
 
 /*
  * ------------------------------------------------------
- *  Error Classes to log errors
+ *  Error Classes to show errors
  * ------------------------------------------------------
  */
 
-function error_handlers()
+function _handlers()
 {
-	set_error_handler('errors');
-	set_exception_handler('exceptions');
-	register_shutdown_function('shutdown');
+	set_error_handler('_error_handler');
+	set_exception_handler('_exception_handler');
+	register_shutdown_function('_shutdown_handler');
 }
-
 /*
  * ------------------------------------------------------
  *  Instantiate the routing class and set the routing
  * ------------------------------------------------------
  */
-$Router =& load_class('Router', SYSTEM_DIR . 'core');
+$Router =& load_class('Router', 'core');
 
 /*
  * ------------------------------------------------------
  *  Instantiate the Load the security class for xss and csrf support
  * ------------------------------------------------------
  */
-$Security =& load_class('Security', SYSTEM_DIR . 'core');
+$Security =& load_class('Security', 'core');
 
 /*
  * ------------------------------------------------------
  *  Instantiate the routing class and set the routing
  * ------------------------------------------------------
  */
-$Input =& load_class('Input', SYSTEM_DIR . 'core');
+$Input =& load_class('Input', 'core');
 
 /*
  * ------------------------------------------------------

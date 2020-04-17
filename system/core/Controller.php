@@ -1,31 +1,39 @@
 <?php
 defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
-/*
-| -------------------------------------------------------------------
-| LAVALust - a lightweight PHP MVC Framework is free software:
-| -------------------------------------------------------------------	
-| you can redistribute it and/or modify it under the terms of the
-| GNU General Public License as published
-| by the Free Software Foundation, either version 3 of the License,
-| or (at your option) any later version.
-|
-| LAVALust - a lightweight PHP MVC Framework is distributed in the hope
-| that it will be useful, but WITHOUT ANY WARRANTY;
-| without even the implied warranty of
-| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-| GNU General Public License for more details.
-|
-| You should have received a copy of the GNU General Public License
-| along with LAVALust - a lightweight PHP MVC Framework.
-| If not, see <https://www.gnu.org/licenses/>.
-|
-| @author 		Ronald M. Marasigan
-| @copyright	Copyright (c) 2020, LAVALust - a lightweight PHP Framework
-| @license		https://www.gnu.org/licenses
-| GNU General Public License V3.0
-| @link		https://github.com/BABAERON/LAVALust-MVC-Framework
-|
-*/
+/**
+ * ------------------------------------------------------------------
+ * LavaLust - an opensource lightweight PHP MVC Framework
+ * ------------------------------------------------------------------
+ *
+ * MIT License
+ * 
+ * Copyright (c) 2020 Ronald M. Marasigan
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ * @package LavaLust
+ * @author Ronald M. Marasigan <ronald.marasigan@yahoo.com>
+ * @copyright Copyright 2020 (https://techron.info)
+ * @version Version 1.2
+ * @link https://lavalust.com
+ * @license https://opensource.org/licenses/MIT MIT License
+ */
 
 /*
  * ------------------------------------------------------
@@ -44,10 +52,10 @@ class Loader {
 		if(is_array($classes))
 		{
 			foreach($classes as $class)
-				$LAVA->$class =& load_class($class . '_model', APP_DIR . 'models');	
+				$LAVA->$class =& load_class($class . '_model', 'models');	
 		}
 		else
-			$LAVA->$classes =& load_class($classes . '_model', APP_DIR . 'models');	
+			$LAVA->$classes =& load_class($classes . '_model', 'models');	
 	}
 	
 	/*
@@ -55,7 +63,7 @@ class Loader {
 	 *  Load View
 	 * ------------------------------------------------------
 	 */
-	public function view($viewFile, $params=NULL, $val = NULL)
+	public function view($viewFile, $params = NULL, $val = NULL)
 	{
 		if(!empty($params))
 		{
@@ -81,17 +89,21 @@ class Loader {
 	public function helper($helper)
 	{
 		if ( is_array($helper) ) {
-			foreach( array(APP_DIR.'helpers',SYSTEM_DIR.'helpers') as $dir ) {
-				foreach( $helper as $hlpr ) {
-					if ( file_exists($dir.DIR.$hlpr.'_helper.php') ) {
-						require_once $dir.DIR.$hlpr.'_helper.php';
+			foreach( array(APP_DIR . 'helpers', SYSTEM_DIR . 'helpers') as $dir )
+			{
+				foreach( $helper as $hlpr )
+				{
+					if ( file_exists($dir . DIR . $hlpr . '_helper.php') ) {
+						require_once $dir . DIR . $hlpr . '_helper.php';
 					}
 				}
 			}
 		} else {
-			foreach( array(APP_DIR.'helpers',SYSTEM_DIR.'helpers') as $dir ) {
-				if ( file_exists($dir.DIR.$helper.'_helper.php') ) {
-					require_once $dir.DIR.$helper.'_helper.php';
+			foreach( array(APP_DIR . 'helpers', SYSTEM_DIR . 'helpers') as $dir )
+			{
+				if ( file_exists($dir . DIR . $helper . '_helper.php') )
+				{
+					require_once $dir . DIR . $helper . '_helper.php';
 				}
 			}
 		}
@@ -102,16 +114,16 @@ class Loader {
 	 *  Load Helper
 	 * ------------------------------------------------------
 	 */
-	public function library($classes)
+	public function library($classes, $params = array())
 	{
 		$LAVA = Controller::get_instance();
 		if(is_array($classes))
 		{
 			foreach($classes as $class)
-				$LAVA->$class =& load_class($class, SYSTEM_DIR . 'libraries');
+				$LAVA->$class =& load_class($class, 'libraries', $params);
 		}
 		else
-			$LAVA->$classes =& load_class($classes, SYSTEM_DIR . 'libraries');
+			$LAVA->$classes =& load_class($classes, 'libraries', $params);
 	}
 }
 /*
@@ -128,9 +140,9 @@ class Controller extends Loader
 	{
 		$this->load = $this;
 		self::$instance = $this->load;
-		$this->input =& load_class('Input', SYSTEM_DIR . 'core');
+		$this->input =& load_class('Input', 'core');
 
-		global $autoload;
+		$autoload =& autoload_config();
 
 		/*
 		 * ------------------------------------------------------

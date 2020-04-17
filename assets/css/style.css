@@ -1,0 +1,56 @@
+/* styles */
+html { font-size: 14px }
+/* Show it is fixed to the top */
+body {
+  min-height: 75rem;
+  padding-top: 4.5rem;
+  background-color: #eeeeee;
+}
+
+a {
+  color: #3b5998;
+}
+
+.navbar {
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+  height: 45px;
+}
+
+.navbar-default {
+  background-color: #3b5998;
+  border-color: #3b5998;
+}
+
+.navbar-default .navbar-brand {
+  color: #fff;
+}
+
+.navbar-default .navbar-brand:focus,
+.navbar-default .navbar-brand:hover {
+  color: #fff;
+}
+
+.navbar-default .navbar-nav>li>a {
+  color: #fff;
+  text-decoration: bold;
+}
+
+.navbar-default .navbar-nav>li>a:focus,
+.navbar-default .navbar-nav>li>a:hover {
+  color: #fff;
+}
+
+.btn-my-primary{
+  background-color: #3b5998;
+  border: none;
+  color: #ffffff;
+}
+
+.btn-my-primary:hover,
+.btn-my-primary:focus {
+  background-color: #273b65;
+  border: none;
+  color: #ffffff;
+}

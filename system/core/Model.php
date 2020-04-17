@@ -1,37 +1,45 @@
 <?php
 defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
-/*
-| -------------------------------------------------------------------
-| LAVALust - a lightweight PHP MVC Framework is free software:
-| -------------------------------------------------------------------   
-| you can redistribute it and/or modify it under the terms of the
-| GNU General Public License as published
-| by the Free Software Foundation, either version 3 of the License,
-| or (at your option) any later version.
-|
-| LAVALust - a lightweight PHP MVC Framework is distributed in the hope
-| that it will be useful, but WITHOUT ANY WARRANTY;
-| without even the implied warranty of
-| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-| GNU General Public License for more details.
-|
-| You should have received a copy of the GNU General Public License
-| along with LAVALust - a lightweight PHP MVC Framework.
-| If not, see <https://www.gnu.org/licenses/>.
-|
-| @author       Ronald M. Marasigan
-| @copyright    Copyright (c) 2020, LAVALust - a lightweight PHP Framework
-| @license      https://www.gnu.org/licenses
-| GNU General Public License V3.0
-| @link     https://github.com/BABAERON/LAVALust-MVC-Framework
-|
-*/
+/**
+ * ------------------------------------------------------------------
+ * LavaLust - an opensource lightweight PHP MVC Framework
+ * ------------------------------------------------------------------
+ *
+ * MIT License
+ * 
+ * Copyright (c) 2020 Ronald M. Marasigan
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ * @package LavaLust
+ * @author Ronald M. Marasigan <ronald.marasigan@yahoo.com>
+ * @copyright Copyright 2020 (https://techron.info)
+ * @version Version 1.2
+ * @link https://lavalust.com
+ * @license https://opensource.org/licenses/MIT MIT License
+ */
 
 class Model extends PDO
 {
+    private $charset, $dbhost, $dbname, $dbuser, $dbpass, $dsn;
     protected $_fetchMode = PDO::FETCH_ASSOC;
     protected $_transactionCount = 0;
-		private $dbuser, $dbname, $dbpass, $dbhost, $dsn;
 
     /**
      * Class constructor
@@ -44,18 +52,19 @@ class Model extends PDO
      */
     public function  __construct()
     {
-			global $db;
-			$this->dbhost = $db['hostname'];
-			$this->dbname = $db['database'];
-			$this->dbuser = $db['username'];
-			$this->dbpass = $db['password'];
-			$this->dsn = 'mysql:host='.$this->dbhost.';dbname='.$this->dbname.';charset=utf8';
+        $database_config =& database_config();
+        $this->charset = $database_config['charset'];
+		$this->dbhost = $database_config['hostname'];
+		$this->dbname = $database_config['database'];
+		$this->dbuser = $database_config['username'];
+		$this->dbpass = $database_config['password'];
+		$this->dsn = 'mysql:host=' . $this->dbhost . ';dbname=' . $this->dbname . ';charset=' . $this->charset;
 
         $driver_options = array(
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_PERSISTENT => true,
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
+            PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES ' . $this->charset
         );
         if(!empty($options)) {
             $driver_options = array_merge($driver_options, $options);
