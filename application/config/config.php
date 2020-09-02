@@ -64,7 +64,7 @@ $config['VERSION']                 = '1.2.9';
 | Default Environment
 | -------------------------------------------------------------------
 */
-$config['ENVIRONMENT']             = 'production';
+$config['ENVIRONMENT']             = 'development';
 
 /*
 | -------------------------------------------------------------------
