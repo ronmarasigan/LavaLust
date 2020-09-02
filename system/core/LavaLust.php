@@ -45,30 +45,24 @@ require_once SYSTEM_DIR . 'core/Common.php';
 
 /*
  * ------------------------------------------------------
- *  Load App Default Configs
+ *  APP constants accessible all over the site
  * ------------------------------------------------------
  */
-$config =& get_config();
+require_once(APP_DIR . 'config/constants.php');
 
 /*
  * ------------------------------------------------------
  * LavaLust BASE URL of your APPLICATION
  * ------------------------------------------------------
  */
-define('BASE_URL', $config['base_url']);
-
-/*
- * ------------------------------------------------------
- * LavaLust Deployment Environment
- * ------------------------------------------------------
- */
+define('BASE_URL', config_item('base_url'));
 
 /*
  * ------------------------------------------------------
  *  Deployment Environment
  * ------------------------------------------------------
  */
-switch ($config['ENV'])
+switch (config_item('ENVIRONMENT'))
 {
 	case 'development':
 		_handlers();
@@ -119,7 +113,7 @@ $Security =& load_class('Security', 'core');
  *  Instantiate the routing class and set the routing
  * ------------------------------------------------------
  */
-$Input =& load_class('Input', 'core');
+$IO =& load_class('IO', 'core');
 
 /*
  * ------------------------------------------------------

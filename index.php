@@ -36,14 +36,47 @@ define('PREVENT_DIRECT_ACCESS', TRUE);
  */
 
 /*
+ *---------------------------------------------------------------
+ * SYSTEM DIRECTORY NAME
+ *---------------------------------------------------------------
+ *
+ * This variable must contain the name of your "system" directory.
+ * Set the path if it is not in the same directory as this file.
+ * 
+ * NO TRAILING SLASH!
+ */
+	$system_path 			= 'system';
+
+/*
+ *---------------------------------------------------------------
+ * APPLICATION DIRECTORY NAME
+ *---------------------------------------------------------------
+ *
+ * If you want this front controller to use a different "application"
+ * directory than the default one you can set its name here.
+ *
+ * NO TRAILING SLASH!
+ */
+	$application_folder 	= 'application';
+
+/*
+ *---------------------------------------------------------------
+ * APPLICATION DIRECTORY NAME
+ *---------------------------------------------------------------
+ * This let you set up your public folder where css, js and other public,
+ * files will be visible
+ */
+	$public_folder			= 'assets';
+
+/*
  * ------------------------------------------------------
  * Define Application Constants
  * ------------------------------------------------------
  */
-define('DIR',DIRECTORY_SEPARATOR);
-define('ROOT_DIR',  __DIR__ . DIR);
-define('APP_DIR', ROOT_DIR . 'application' . DIR);
-define('SYSTEM_DIR', ROOT_DIR . 'system' . DIR);
+define('ROOT_DIR',  __DIR__ . DIRECTORY_SEPARATOR);
+define('SYSTEM_DIR', ROOT_DIR . $system_path . DIRECTORY_SEPARATOR);
+define('APP_DIR', ROOT_DIR . $application_folder . DIRECTORY_SEPARATOR);
+define('PUBLIC_DIR', $public_folder);
 
 /*
  * ------------------------------------------------------
@@ -51,5 +84,5 @@ define('SYSTEM_DIR', ROOT_DIR . 'system' . DIR);
  * ------------------------------------------------------
  */
 
-require_once(SYSTEM_DIR . 'core/LAVALust.php');
+require_once(SYSTEM_DIR . 'core/LavaLust.php');
 ?>

@@ -61,7 +61,7 @@ class Router
             $pattern = str_replace(":num", "(\d+)", $pattern);
             $pattern = '/' . str_replace("/", "\/", $pattern) . '/i';
             $route_url = preg_replace($pattern, $replacement, $url);
-            if($route_url !== $url && $route_url !== null)
+            if($route_url !== $url && $route_url !== NULL)
 				return $route_url;
         }
         return $this->url_string;
@@ -79,7 +79,7 @@ class Router
 		$request_url = (isset($_SERVER['REQUEST_URI'])) ? $_SERVER['REQUEST_URI'] : '';
 		$script_url  = (isset($_SERVER['PHP_SELF'])) ? $_SERVER['PHP_SELF'] : '';
 
-		if(strpos($request_url, '?') == true)
+		if(strpos($request_url, '?') == TRUE)
 		{
 			$exp = explode('?', $request_url);
 			$request_url = $exp[0];
@@ -157,7 +157,7 @@ class Router
 			require(SYSTEM_DIR . 'language/' . strtolower($config['language']) . '_lang.php');
 
 		if(isset($segments[$controller_index]) && !empty($segments[$controller_index]))
-			$this->controller = $segments[$controller_index];
+			$this->controller = ucfirst($segments[$controller_index]);
 		if(isset($segments[$method_index]) && !empty($segments[$method_index]))
 			$this->method = str_replace('-', '_', $segments[$method_index]);
 

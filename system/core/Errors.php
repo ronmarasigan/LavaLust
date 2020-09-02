@@ -49,7 +49,7 @@ class Errors
 	*/
 	public function show_404($heading, $message, $page = NULL)
 	{
-		$page = isset($page) ? $page : '404';
+		$page = isset($page) ? $page : 'error_404';
 		$heading = isset($heading) ? $heading : '404 Page Not Found';
 		$message = isset($message) ? $message : 'The page you requested was not found.';
 		$this->show_error($heading, $message, $page, 404);
@@ -60,14 +60,13 @@ class Errors
 	*  Show error for debugging
 	* ------------------------------------------------------
 	*/
-	public function show_error($heading, $message, $template = 'custom_errors', $error_lvl_code = 500)
+	public function show_error($heading, $message, $template = 'error_general', $error_lvl_code = 500)
 	{
-		$config =& get_config();
-		$template_path = $config['error_view_path'];
+		$template_path = config_item('error_view_path');
 
 		if (empty($template_path))
 		{
-			$template_path = APP_DIR.'views/errors'.DIR;
+			$template_path = APP_DIR.'views/errors'.DIRECTORY_SEPARATOR;
 		}
 		http_response_code($error_lvl_code);
 		require_once($template_path.$template.'.php');
@@ -81,11 +80,10 @@ class Errors
 
 	public function show_exception($exception)
 	{
-		$config =& get_config();
-		$template_path = $config['error_view_path'];
+		$template_path = config_item('error_view_path');
 		if (empty($template_path))
 		{
-			$template_path = APP_DIR.'views/errors'.DIR;
+			$template_path = APP_DIR.'views/errors'.DIRECTORY_SEPARATOR;
 		}
 
 		$message = $exception->getMessage();
@@ -94,7 +92,7 @@ class Errors
 			$message = '(null)';
 		}
 
-		require_once($template_path.'Exceptions.php');
+		require_once($template_path.'error_exception.php');
 		die();
 	}
 
@@ -105,13 +103,12 @@ class Errors
 	*/
 	public function show_php_error($severity, $message, $filepath, $line)
 	{
-		$config =& get_config();
-		$template_path = $config['error_view_path'];
+		$template_path = config_item('error_view_path');
 		if (empty($template_path))
 		{
-			$template_path = APP_DIR.'views/errors'.DIR;
+			$template_path = APP_DIR.'views/errors'.DIRECTORY_SEPARATOR;
 		}
-		require_once($template_path.'Errors.php');
+		require_once($template_path.'error_php.php');
 		die();
 	}
 

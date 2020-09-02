@@ -44,23 +44,27 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 class Email {
 
 	public $sender;
-
 	public $recipients = array();
-
 	public $reply_to;
-
 	public $subject;
-
 	public $attach_files = array();
-
 	public $emailContent;
 
-
+	/**
+	 * Check if email is in correct format
+	 * @param  string  $email Email to check
+	 * @return boolean        [description]
+	 */
 	public function isEmailValid($email)
 	{
 		return (bool) filter_var($email, FILTER_VALIDATE_EMAIL);
 	}
 
+	/**
+	 * Check Sender Email is Valid
+	 * @param string $sender Email of the sender
+	 * @return string Validated email
+	 */
 	public function setSender($sender)
 	{
 		if( ! empty($sender) && $this->isEmailValid($sender) )
@@ -72,6 +76,11 @@ class Email {
 		}
 	}
 
+	/**
+	 * Set recepient Email Addresses
+	 * @param string $recipient Email of the recipient
+	 * @return array Email Addresses
+	 */
 	public function setRecipient($recipient)
 	{
 		if( ! empty($recipient) && $this->isEmailValid($recipient) )
@@ -85,6 +94,11 @@ class Email {
 		}
 	}
 
+	/**
+	 * Set Reply to Email Address
+	 * @param string $recipient Email of the recipient
+	 * @return string Email Address
+	 */
 	public function setReply_to($reply_to)
 	{
 		if($this->isEmailValid($reply_to))
@@ -96,6 +110,11 @@ class Email {
 		}
 	}
 
+	/**
+	 * Set Email Subject
+	 * @param string $subject Email Subject
+	 * @return string Email Subject
+	 */
 	public function setSubject($subject)
 	{
 		if( ! empty($subject) )
@@ -107,13 +126,21 @@ class Email {
 		}
 	}
 
+	/**
+	 * Email Content
+	 * @param Email $emailContent Email Content
+	 */
 	public function setEmailContent($emailContent)
 	{
 		$emailContent = wordwrap($emailContent, 70, "\n");
         $this->emailContent = $emailContent;
 	}
 
-
+	/**
+	 * Email Attachment
+	 * @param [type] $attach_file [description]
+	 * @return array Email Attachments
+	 */
 	public function setAttachment($attach_file)
 	{
 		if( ! empty($attach_file) )
@@ -128,6 +155,11 @@ class Email {
 		}
 	}
 
+	/**
+	 * Recreate Attachment
+	 * @param  Stream File $attachment Attachment File
+	 * @return [type]             [description]
+	 */
 	public function recreateAttachment($attachment)
     {
         if(file_exists($attachment) === true)
@@ -150,6 +182,10 @@ class Email {
         return false;
     }
 
+    /**
+     * Send Email
+     * @return function Email Sending
+     */
 	public function send()
 	{
 		if(( ! is_array($this->recipients) ) || (count($this->recipients) < 1)) {
@@ -184,7 +220,6 @@ class Email {
 
         $contents .= $out.'--'.$bc.'--'.$out;
 
-        //echo ($this->recreateAttachment($this->attach_files[0])); die;
         foreach($this->attach_files as $attach_file) {
             $attachmentContent = $this->recreateAttachment($attach_file);
 

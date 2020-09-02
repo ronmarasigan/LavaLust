@@ -37,60 +37,75 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 
 if ( ! function_exists('redirect'))
 {
-	/*
-	* ------------------------------------------------------
-	*  Redirect to a location
-	* ------------------------------------------------------
-	*/
-	function redirect($loc)
+	/**
+	 * Redirect to a location
+	 * @param  string  $uri    Redirect URL
+	 * @param  string  $method Refresh or Location
+	 * @param  integer $sec    [description]
+	 * @return mixed
+	 */
+	function redirect($uri, $method = NULL, $sec = 0)
 	{
-		header('Location: '. BASE_URL . language_url($loc));
+		switch ($method)
+		{
+			case 'refresh':
+				header('Refresh:' .$sec. ';url='. site_url($uri));
+				break;
+			default:
+				header('Location: '. site_url($uri), TRUE);
+				break;
+		}
+		exit;
+
+		header('Location: '. site_url($uri));
 	}
 }
 
 if ( ! function_exists('load_js'))
 {
-	/*
-	* ------------------------------------------------------
-	*  Pre-loaded JS
-	* ------------------------------------------------------
-	*/
+	/**
+	 * Pre-loaded JS
+	 * @param  string $paths URL path
+	 * @return mixed
+	 */
 	function load_js($paths)
 	{
 		foreach ($paths as $path) {
-			echo '<script src="' . BASE_URL . 'assets/js/' . $path . '.js"></script>' . "\r\n";
+			echo '<script src="' . BASE_URL . PUBLIC_FOLDER . '/' . $path . '.js"></script>' . "\r\n";
 		}
 	}
 }
 
 if ( ! function_exists('load_css'))
 {
-	/*
-	* ------------------------------------------------------
-	*  Pre-loaded CSS
-	* ------------------------------------------------------
-	*/
+	/**
+	 * Pre-loaded CSS
+	 * @param  string $paths URL path
+	 * @return mixed
+	 */
 	function load_css($paths)
 	{
 		foreach ($paths as $path) {
-			echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/' . $path . '.css" type="text/css" />' . "\r\n";
+			echo '<link rel="stylesheet" href="' . BASE_URL . PUBLIC_FOLDER .'/' . $path . '.css" type="text/css" />' . "\r\n";
 		}
 	}
 }
 
 if ( ! function_exists('site_url'))
 {
-	/*
-	* ------------------------------------------------------
-	*  Site URL
-	* ------------------------------------------------------
-	*/
-	function site_url($url) {
+	/**
+	 * Site URL
+	 * @param  string $url
+	 * @return string
+	 */
+	function site_url($url='') {
+		$config = get_config();
 		if(isset($_COOKIE['language'])) {
-			return $_COOKIE['language'] . '/' . $url;
+			$url =  $_COOKIE['language'] . '/' . $url;
 		} else {
-			return $url;
+			$url =  $url;
 		}
+		return BASE_URL . $url;
 	}
 }
 
@@ -101,6 +116,11 @@ if ( ! function_exists('active'))
 	*  Active class for URL
 	* ------------------------------------------------------
 	*/
+	/**
+	 * Active class for URL
+	 * @param  string $currect_page
+	 * @return string
+	 */
 	function active($currect_page){
 	$url_array =  explode('/', $_SERVER['REQUEST_URI']) ;
 		if(count($url_array) > 1)
@@ -116,11 +136,11 @@ if ( ! function_exists('active'))
 
 if ( ! function_exists('segment'))
 {
-	/*
-	* ------------------------------------------------------
-	*  Segment
-	* ------------------------------------------------------
-	*/
+	/**
+	 * URI Segment
+	 * @param  string $seg URI Segment
+	 * @return int      Integer Part
+	 */
 	function segment($seg)
 	{
 		if(!is_int($seg)) return false;

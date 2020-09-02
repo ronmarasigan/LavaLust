@@ -47,4 +47,3 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('Direct script access not allowed');
 
 $route['404_override']       = '';
 $route['default_controller'] = 'Welcome/index';
-$route['number/:num/:num'] = 'Welcome/index/$1/$2';

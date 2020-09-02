@@ -35,98 +35,12 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
-/*
-* ------------------------------------------------------
-*  Class Form
-* ------------------------------------------------------
-*/
-class form
-{
-	function form_option($params = array(), $others = null)
-	{
-		$form = '<form ';
-		if(is_array($params))
-		{	
-			foreach($params as $param => $value)
-			{
-				$form .= $param . '=' . '"' . $value . '" ';
-			}
-		}
-		$form .= $others;
-		$form .= '>';
-		return $form;
-	}
-
-	function form_label($params = array())
-	{
-		$form = '<label ';
-		if (is_array($params))
-		{
-			foreach($params as $param => $value)
-			{
-				$form .= $param . '=' . '"' . $value . '" ';
-			}
-		}
-		$form .= ' />';
-		return $form;
-	}
-
-	function form_input($params = array(), $others = null)
-	{
-		$form = '<input ';
-		if(is_array($params))
-		{	
-			foreach($params as $param => $value)
-			{
-				$form .= $param . '=' . '"' . $value . '" ';
-			}
-		}
-		$form .= $others;
-		$form .= ' />';
-		return $form;
-	}
-
-	function form_submit($params = array(), $others = null)
-	{
-		$form = '<submit ';
-		if(is_array($params))
-		{	
-			foreach($params as $param => $value)
-			{
-				$form .= $param . '=' . '"' . $value . '" ';
-			}
-		}
-		$form .= $others;
-		$form .= ' />';
-		return $form;
-	}
-
-	function form_select($items = array(), $params = array(), $others = null)
-	{
-		$select = '';
-		$select = '<select ';
-		if(is_array($items))
-		{
-			foreach($params as $param => $value)
-			{
-				$select .= $param . '=' . '"' . $value . '" ';
-			}
-		}
-		$select .= ' />';
-		if (is_array($items)) {
-			foreach ($items as $item) {
-				$select .= '<option value="' . $item . '">' . ucfirst($item) . '</option>';
-			}
-		}
-		$form .= $others;
-		$select .= '</select>';
-		return $select;
-	}
-
-	public function form_close()
-	{
-		return '</form>';
-	}
+require_once 'Form/form.php';
+class Form extends Formr {
 	
+	public function __construct($params) {
+		$params = implode(',', $params);
+		parent::__construct($params);
+	}
 }
-
+?>

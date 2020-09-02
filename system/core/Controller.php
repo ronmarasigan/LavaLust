@@ -46,7 +46,7 @@ class Loader {
 	 *  Load Model
 	 * ------------------------------------------------------
 	 */
-	public function model($classes)
+	public function model($classes, $db_conn = FALSE)
 	{
 		$LAVA = Controller::get_instance();
 		if(is_array($classes))
@@ -55,7 +55,12 @@ class Loader {
 				$LAVA->$class =& load_class($class . '_model', 'models');	
 		}
 		else
-			$LAVA->$classes =& load_class($classes . '_model', 'models');	
+			$LAVA->$classes =& load_class($classes . '_model', 'models');
+
+		if ($db_conn !== FALSE && ! class_exists('Database', FALSE))
+		{
+			$this->database();
+		}
 	}
 	
 	/*
@@ -93,17 +98,17 @@ class Loader {
 			{
 				foreach( $helper as $hlpr )
 				{
-					if ( file_exists($dir . DIR . $hlpr . '_helper.php') ) {
-						require_once $dir . DIR . $hlpr . '_helper.php';
+					if ( file_exists($dir . DIRECTORY_SEPARATOR . $hlpr . '_helper.php') ) {
+						require_once $dir . DIRECTORY_SEPARATOR . $hlpr . '_helper.php';
 					}
 				}
 			}
 		} else {
 			foreach( array(APP_DIR . 'helpers', SYSTEM_DIR . 'helpers') as $dir )
 			{
-				if ( file_exists($dir . DIR . $helper . '_helper.php') )
+				if ( file_exists($dir . DIRECTORY_SEPARATOR . $helper . '_helper.php') )
 				{
-					require_once $dir . DIR . $helper . '_helper.php';
+					require_once $dir . DIRECTORY_SEPARATOR . $helper . '_helper.php';
 				}
 			}
 		}
@@ -111,7 +116,7 @@ class Loader {
 	
 	/*
 	 * ------------------------------------------------------
-	 *  Load Helper
+	 *  Load Library
 	 * ------------------------------------------------------
 	 */
 	public function library($classes, $params = array())
@@ -124,6 +129,31 @@ class Loader {
 		}
 		else
 			$LAVA->$classes =& load_class($classes, 'libraries', $params);
+	}
+
+	/*
+	 * ------------------------------------------------------
+	 *  Load Database
+	 * ------------------------------------------------------
+	 */
+	public function database()
+	{
+		$LAVA =& Controller::get_instance();
+		$database =& load_class('Database','database');
+		$database = $database::get_instance();
+		$LAVA->db = '';
+		$LAVA->db = $database;
+	    return $database;
+	}
+
+	/**
+	 * ------------------------------------------------------
+	 *  Check if Class is loaded
+	 * -----------------------------------------------------
+	 */
+	public function is_loaded($class)
+	{
+		return array_search(ucfirst($class), is_loaded(), TRUE);
 	}
 }
 /*
@@ -140,7 +170,8 @@ class Controller extends Loader
 	{
 		$this->load = $this;
 		self::$instance = $this->load;
-		$this->input =& load_class('Input', 'core');
+		$this->io =& load_class('IO', 'core');
+		$this->security =& load_class('Security', 'core');
 
 		$autoload =& autoload_config();
 

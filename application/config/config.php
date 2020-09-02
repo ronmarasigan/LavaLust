@@ -42,12 +42,29 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 | This file is for setting-up default settings.
 |
 */
+
+/*
+| -------------------------------------------------------------------
+|  Your Own Configs
+| -------------------------------------------------------------------
+| For easy access on your config, just put them below
+| You can simple get configs using config_item() function anywhere
+| My Configs:
+*/
+
+/*
+| -------------------------------------------------------------------
+| LavaLust Version
+| -------------------------------------------------------------------
+*/
+$config['VERSION']                 = '1.2.9';
+
 /*
 | -------------------------------------------------------------------
 | Default Environment
 | -------------------------------------------------------------------
 */
-$config['ENV']                     = 'development';
+$config['ENVIRONMENT']             = 'development';
 
 /*
 | -------------------------------------------------------------------
@@ -69,7 +86,7 @@ date_default_timezone_set('Asia/Manila');
 | WARNING: You MUST set this value!
 |
 */
-$config['base_url'] 				= 'http://lavalust.local/';
+$config['base_url'] 				= 'http://loacalhost/LAVALust-MVC-Framework';
 
 /*
 |--------------------------------------------------------------------------
@@ -122,7 +139,7 @@ $config['default_method'] 			= 'index';
 | application/views/errors/ directory.  Use a full server path with trailing slash.
 |
 */
-$config['error_view_path']         	= APP_DIR . 'views' . DIR . 'errors' . DIR;
+$config['error_view_path']         	= APP_DIR . 'views' . DIRECTORY_SEPARATOR . 'errors' . DIRECTORY_SEPARATOR;
 /*
 |--------------------------------------------------------------------------
 | Default Language
@@ -144,11 +161,15 @@ $config['language'] 				= 'en';
 |
 |--------------------------------------------------------------------------
 */
-$config['sess_cookie_name'] 		= 'lava_session';
-$config['sess_expiration'] 			= 7200;
-$config['sess_timeout'] 			= 1800;
-$config['sess_save_path'] 			= APP_DIR . 'cache';
-$config['sess_time_to_update'] 		= 300;
+$config['encryption_key']          = 'E0i3SfNtntaypu2owlxqdmXBtZ6i0NDm';
+$config['sess_driver']             = 'file';
+$config['sess_cookie_name']        = 'lava_session';
+$config['sess_expiration']         = 7200;
+$config['sess_save_path']          = '';
+$config['sess_match_ip']           = FALSE;
+$config['sess_time_to_update']     = 300;
+$config['sess_regenerate_destroy'] = FALSE;
+$config['sess_expire_on_close']    = FALSE;
 
 /*
 |--------------------------------------------------------------------------
@@ -165,4 +186,16 @@ $config['cookie_path']             = '/';
 $config['cookie_secure']           = FALSE;
 $config['cookie_expiration']       = 86400;
 $config['cookie_httponly']         = TRUE;
+
+/*
+|--------------------------------------------------------------------------
+| Cache                      
+|--------------------------------------------------------------------------
+|
+|Settings for Cache
+|
+|--------------------------------------------------------------------------
+*/
+$config['cache_dir'] = APP_DIR . 'cache/';
+$config['cache_default_expires'] = 0;
 ?>

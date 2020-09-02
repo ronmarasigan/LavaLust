@@ -49,8 +49,8 @@ class Security
 	*/
 	public function xss_clean($string)
 	{
-		$htmlawed =& load_class('Htmlawed', 'libraries');
-		return $htmlawed->filter($string);
+		$escaper =& load_class('Escaper', 'libraries');
+		return $escaper->filter($string);
 	}
 	
 	/*

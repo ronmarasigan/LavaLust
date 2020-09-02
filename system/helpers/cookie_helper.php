@@ -37,29 +37,36 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 
 if ( ! function_exists('set_cookie'))
 {
-	/*
-	* ------------------------------------------------------
-	*  Setting up cookie
-	* ------------------------------------------------------
-	*/
+	/**
+	 * [set_cookie description]
+	 * @param mixed $name
+	 * @param string $value    the value of the cookie
+	 * @param string $expire   the number of seconds until expiration
+	 * @param string $domain   the cookie domain.  Usually:  .yourdomain.com
+	 * @param string $path     the cookie path
+	 * @param string $prefix   the cookie prefix
+	 * @param [type] $secure   true makes the cookie secure
+	 * @param [type] true makes the cookie accessible via http(s) only (no javascript)
+	 * @return void
+	 */
 	function set_cookie($name, $value = '', $expire = '', $domain = '', $path = '/', $prefix = '', $secure = NULL, $httponly = NULL)
 	{
 		// Set the config file options
-		get_instance()->input->set_cookie($name, $value, $expire, $domain, $path, $prefix, $secure, $httponly);
+		get_instance()->io->set_cookie($name, $value, $expire, $domain, $path, $prefix, $secure, $httponly);
 	}
 }
 
 if ( ! function_exists('get_cookie'))
 {
-	/*
-	* ------------------------------------------------------
-	*  Get cookie value
-	* ------------------------------------------------------
-	*/
+	/**
+	 * Fetch an item from the COOKIE array
+	 * @param  string  $index
+	 * @param  boolean $xss_clean
+	 * @return mixed
+	 */
 	function get_cookie($index, $xss_clean = FALSE)
 	{
-		$config = get_config();
-		$prefix = isset($_COOKIE[$index]) ? '' : $config['cookie_prefix'];
+		$prefix = isset($_COOKIE[$index]) ? '' : config_item('cookie_prefix');
 		return get_instance()->input->cookie($prefix.$index, $xss_clean);
 	}
 }
@@ -71,6 +78,14 @@ if ( ! function_exists('delete_cookie'))
 	*  Delete cookie
 	* ------------------------------------------------------
 	*/
+	/**
+	 * Delete a cookie
+	 * @param  [type] $name   [description]
+	 * @param  string $domain the cookie domain. Usually: .yourdomain.com
+	 * @param  string $path   the cookie path
+	 * @param  string $prefix the cookie prefix
+	 * @return void
+	 */
 	function delete_cookie($name, $domain = '', $path = '/', $prefix = '')
 	{
 		set_cookie($name, '', '', $domain, $path, $prefix);

@@ -35,74 +35,104 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
-/*
- * ------------------------------------------------------
- *  Class Loader Function
- * ------------------------------------------------------
- */
 if ( ! function_exists('load_class'))
 {
+	/**
+	 * Class Loader to load all classes
+	 * @param  string $class
+	 * @param  string $directory Class directory
+	 * @param  array $params    Class parameters if present
+	 * @return void
+	 */
 	function &load_class($class, $directory = '', $params = NULL) {
 
 		$LAVA = Registry::get_instance();
 		$className = ucfirst(strtolower($class));
 
-		//if the object already exists in the registry
-		if($LAVA->getObject($className) != NULL) {
-			$object = $LAVA->getObject($className);
+		if($LAVA->getObject($class) != NULL) {
+			$object = $LAVA->getObject($class);
 			return $object;
 		}
+
 		foreach (array(APP_DIR, SYSTEM_DIR) as $path)
     	{
-			$fullPathName = $path . $directory  . DIR . $className . '.php';
+			$fullPathName = $path . $directory  . DIRECTORY_SEPARATOR . $className . '.php';
 					
 			if (file_exists($fullPathName)) {
-				require_once $fullPathName;
+				if( ! class_exists($className)) {
+					require_once $fullPathName;
+				}
 			}
 		}
 		
-		//put it in the registry
+		is_loaded($class);
 		$LAVA->storeObject($class, isset($params) ? new $className($params) : new $className());
-		
 		$object = $LAVA->getObject($class);
 		return $object;
 	}
 }
 
+// --------------------------------------------------------------------
+
+if ( ! function_exists('is_loaded'))
+{
+	/**
+	 * Keeps track of which libraries have been loaded. This function is
+	 * called by the load_class() function above
+	 *
+	 * @param	string
+	 * @return	array
+	 */
+	function &is_loaded($class = '')
+	{
+		static $_is_loaded = array();
+
+		if ($class !== '')
+		{
+			$_is_loaded[$class] = ucfirst(strtolower($class));
+		}
+
+		return $_is_loaded;
+	}
+}
+
 if ( ! function_exists('show_404'))
 {
-	/*
-	 * ------------------------------------------------------
-	 *  404 Error / Can be modified
-	 * ------------------------------------------------------
+	/**
+	 * 404 Error Not Found
+	 * @param  string $heading
+	 * @param  string $message
+	 * @param  string $page
+	 * @return string
 	 */
 	function show_404($heading, $message, $page = NULL)
 	{
-		$errors =& load_class('Errors', SYSTEM_DIR . 'core');
+		$errors =& load_class('Errors', 'core');
 		return $errors->show_404($heading, $message, $page);
 	}
 }
 
 if ( ! function_exists('show_error'))
 {
-	/*
-	 * ------------------------------------------------------
-	 * Showing errors for debuging
-	 * ------------------------------------------------------
+	/**
+	 * Show error for debugging
+	 * @param  string $heading
+	 * @param  string $message
+	 * @param  string $error_code
+	 * @return string
 	 */
 	function show_error($heading,$message,$error_code)
 	{
-	  	$errors =& load_class('Errors', SYSTEM_DIR . 'core');
-	  	return $errors->show_error($heading,$message,$template = 'custom_errors',$error_code);
+	  	$errors =& load_class('Errors', 'core');
+	  	return $errors->show_error($heading, $message, $template = 'custom_errors', $error_code);
 	}
 }
 
 if ( ! function_exists('_shutdown_handler'))
 {
-	/*
-	 * ------------------------------------------------------
-	 * Showing errors for debuging
-	 * ------------------------------------------------------
+	/**
+	 * For Debugging
+	 * @return string
 	 */
 	function _shutdown_handler()
 	{
@@ -117,10 +147,10 @@ if ( ! function_exists('_shutdown_handler'))
 
 if ( ! function_exists('_exception_handler'))
 {
-	/*
-	 * ------------------------------------------------------
-	 * Showing errors for debuging
-	 * ------------------------------------------------------
+	/**
+	 * For Debgging
+	 * @param  string $e
+	 * @return string
 	 */
 	function _exception_handler($e)
 	{
@@ -131,10 +161,13 @@ if ( ! function_exists('_exception_handler'))
 
 if ( ! function_exists('_error_handler'))
 {
-	/*
-	 * ------------------------------------------------------
-	 * Showing errors for debuging
-	 * ------------------------------------------------------
+	/**
+	 * For Debugging
+	 * @param  string $errno
+	 * @param  string $errstr
+	 * @param  string $errfile
+	 * @param  string $errline
+	 * @return string
 	 */
 	function _error_handler($errno, $errstr, $errfile, $errline)
 	{
@@ -154,9 +187,9 @@ if ( ! function_exists('get_config'))
 	{
 		static $config;
 
-		if ( file_exists(APP_DIR.'config/config.php') ) 
+		if ( file_exists(APP_DIR . 'config/config.php') ) 
 		{
-			require_once APP_DIR.'config/config.php';
+			require_once APP_DIR . 'config/config.php';
 
 			if ( isset($config) OR is_array($config) ) 
 			{
@@ -172,6 +205,27 @@ if ( ! function_exists('get_config'))
 	}
 }
 
+if ( ! function_exists('config_item'))
+{
+	/*
+	 * ------------------------------------------------------
+	 * Config Item
+	 * ------------------------------------------------------
+	 */
+	function config_item($item)
+	{
+		static $_config;
+
+		if (empty($_config))
+		{
+			// references cannot be directly assigned to static variables, so we use an array
+			$_config[0] =& get_config();
+		}
+
+		return isset($_config[0][$item]) ? $_config[0][$item] : NULL;
+	}
+}
+
 if ( ! function_exists('autoload_config'))
 {
 	/*
@@ -184,11 +238,11 @@ if ( ! function_exists('autoload_config'))
 	{
 		static $autoload;
 
-		if ( file_exists(APP_DIR.'config/autoload.php') ) 
+		if ( file_exists(APP_DIR . 'config/autoload.php') ) 
 		{
-			require_once APP_DIR.'config/autoload.php';
+			require_once APP_DIR . 'config/autoload.php';
 
-			if ( isset($autoload)  OR is_array($config) ) 
+			if ( isset($autoload)  OR is_array($autoload) ) 
 			{
 				foreach( $autoload as $key => $val ) 
 				{
@@ -215,11 +269,11 @@ if ( ! function_exists('database_config'))
 	{
 		static $database;
 
-		if ( file_exists(APP_DIR.'config/database.php') ) 
+		if ( file_exists(APP_DIR . 'config/database.php') ) 
 		{
-			require_once APP_DIR.'config/database.php';
+			require_once APP_DIR . 'config/database.php';
 
-			if ( isset($database)  OR is_array($config) )
+			if ( isset($database)  OR is_array($database) )
 			{
 				foreach( $database as $key => $val ) 
 				{
@@ -244,11 +298,11 @@ if ( ! function_exists('route_config'))
 	{
 		static $route;
 
-		if ( file_exists(APP_DIR.'config/routes.php') ) 
+		if ( file_exists(APP_DIR . 'config/routes.php') ) 
 		{
-			require_once APP_DIR.'config/routes.php';
+			require_once APP_DIR . 'config/routes.php';
 
-			if ( isset($route)  OR is_array($config) )
+			if ( isset($route)  OR is_array($route) )
 			{
 				foreach( $route as $key => $val ) 
 				{
@@ -262,106 +316,84 @@ if ( ! function_exists('route_config'))
 	}
 }
 
-function get_mime_type($extension) {
+if ( ! function_exists('get_mime_type'))
+{
+	/**
+	 * Available mime type
+	 * @param  string $extension
+	 * @return string
+	 */
+	function get_mime_type($extension) {
+	    $mimes = array( 
+	        'txt' => 'text/plain',
+	        'htm' => 'text/html',
+	        'html' => 'text/html',
+	        'php' => 'text/html',
+	        'css' => 'text/css',
+	        'js' => 'application/javascript',
+	        'json' => 'application/json',
+	        'xml' => 'application/xml',
+	        'swf' => 'application/x-shockwave-flash',
+	        'flv' => 'video/x-flv',
 
-    $mimes = array( 
-        'txt' => 'text/plain',
-        'htm' => 'text/html',
-        'html' => 'text/html',
-        'php' => 'text/html',
-        'css' => 'text/css',
-        'js' => 'application/javascript',
-        'json' => 'application/json',
-        'xml' => 'application/xml',
-        'swf' => 'application/x-shockwave-flash',
-        'flv' => 'video/x-flv',
+	        'png' => 'image/png',
+	        'jpe' => 'image/jpeg',
+	        'jpeg' => 'image/jpeg',
+	        'jpg' => 'image/jpeg',
+	        'gif' => 'image/gif',
+	        'bmp' => 'image/bmp',
+	        'ico' => 'image/vnd.microsoft.icon',
+	        'tiff' => 'image/tiff',
+	        'tif' => 'image/tiff',
+	        'svg' => 'image/svg+xml',
+	        'svgz' => 'image/svg+xml',
 
-        'png' => 'image/png',
-        'jpe' => 'image/jpeg',
-        'jpeg' => 'image/jpeg',
-        'jpg' => 'image/jpeg',
-        'gif' => 'image/gif',
-        'bmp' => 'image/bmp',
-        'ico' => 'image/vnd.microsoft.icon',
-        'tiff' => 'image/tiff',
-        'tif' => 'image/tiff',
-        'svg' => 'image/svg+xml',
-        'svgz' => 'image/svg+xml',
+	        'zip' => 'application/zip',
+	        'rar' => 'application/x-rar-compressed',
+	        'exe' => 'application/x-msdownload',
+	        'msi' => 'application/x-msdownload',
+	        'cab' => 'application/vnd.ms-cab-compressed',
 
-        'zip' => 'application/zip',
-        'rar' => 'application/x-rar-compressed',
-        'exe' => 'application/x-msdownload',
-        'msi' => 'application/x-msdownload',
-        'cab' => 'application/vnd.ms-cab-compressed',
+	        'mp3' => 'audio/mpeg',
+	        'qt' => 'video/quicktime',
+	        'mov' => 'video/quicktime',
 
-        'mp3' => 'audio/mpeg',
-        'qt' => 'video/quicktime',
-        'mov' => 'video/quicktime',
+	        'pdf' => 'application/pdf',
+	        'psd' => 'image/vnd.adobe.photoshop',
+	        'ai' => 'application/postscript',
+	        'eps' => 'application/postscript',
+	        'ps' => 'application/postscript',
 
-        'pdf' => 'application/pdf',
-        'psd' => 'image/vnd.adobe.photoshop',
-        'ai' => 'application/postscript',
-        'eps' => 'application/postscript',
-        'ps' => 'application/postscript',
+	        'doc' => 'application/msword',
+	        'rtf' => 'application/rtf',
+	        'xls' => 'application/vnd.ms-excel',
+	        'ppt' => 'application/vnd.ms-powerpoint',
+	        'docx' => 'application/msword',
+	        'xlsx' => 'application/vnd.ms-excel',
+	        'pptx' => 'application/vnd.ms-powerpoint',
 
-        'doc' => 'application/msword',
-        'rtf' => 'application/rtf',
-        'xls' => 'application/vnd.ms-excel',
-        'ppt' => 'application/vnd.ms-powerpoint',
-        'docx' => 'application/msword',
-        'xlsx' => 'application/vnd.ms-excel',
-        'pptx' => 'application/vnd.ms-powerpoint',
+	        'odt' => 'application/vnd.oasis.opendocument.text',
+	        'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
+	    );
 
-        'odt' => 'application/vnd.oasis.opendocument.text',
-        'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
-    );
+	    if (isset( $mimes[$extension] )) {
+	     return $mimes[$extension];
+	    } else {
+	     return 'application/octet-stream';
+	    }
+	}
+}
 
-    if (isset( $mimes[$extension] )) {
-     return $mimes[$extension];
-    } else {
-     return 'application/octet-stream';
-    }
- }
-
-if ( ! function_exists('noXSS'))
+if ( ! function_exists('esc'))
 {
 	/*
 	 * ------------------------------------------------------
 	 *  XSS Protection / Based on HTMLawed
 	 * ------------------------------------------------------
 	 */
-	function noXSS($str, $is_image = FALSE)
+	function esc($str)
 	{ 
-		$security =& load_class('Security', SYSTEM_DIR . 'core');
-		return $security->xss_clean($str, $is_image);
-	}
-}
-
-if ( ! function_exists('html_escape'))
-{
-	/*
-	 * ------------------------------------------------------
-	 *  Returns HTML escaped variable
-	 * ------------------------------------------------------
-	 */
-	function html_escape($var, $double_encode = TRUE)
-	{
-		global $config;
-		if (empty($var))
-		{
-			return $var;
-		}
-
-		if (is_array($var))
-		{
-			foreach (array_keys($var) as $key)
-			{
-				$var[$key] = html_escape($var[$key], $double_encode);
-			}
-
-			return $var;
-		}
-
-		return htmlspecialchars($var, ENT_QUOTES, $config['charset'], $double_encode);
+		$security =& load_class('Security', 'core');
+		return $security->xss_clean($str);
 	}
 }
