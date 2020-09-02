@@ -64,7 +64,7 @@ $config['VERSION']                 = '1.2.9';
 | Default Environment
 | -------------------------------------------------------------------
 */
-$config['ENVIRONMENT']             = 'development';
+$config['ENVIRONMENT']             = 'production';
 
 /*
 | -------------------------------------------------------------------
@@ -86,7 +86,7 @@ date_default_timezone_set('Asia/Manila');
 | WARNING: You MUST set this value!
 |
 */
-$config['base_url'] 				= 'http://loacalhost/LAVALust-MVC-Framework';
+$config['base_url'] 				= 'https://lavalust.netlify.app';
 
 /*
 |--------------------------------------------------------------------------
