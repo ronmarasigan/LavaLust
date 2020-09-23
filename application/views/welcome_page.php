@@ -82,7 +82,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
         <p>If you are exploring LavaLust for the very first time, you should start by reading the <a href="user_guide/">User Guide</a>.</p>
     </div>
 
-    <p class="footer"><?php echo  (config_item('ENVIRONMENT') === 'development') ?  'LavaLust Version <strong>' . config_item('VERSION') . '</strong>' : '' ?></p>
+    <p class="footer">Page rendered with <?php echo $this->benchmark->memory_usage(); ?> in <strong><?php echo $this->benchmark->elapsed_time(); ?></strong> seconds. <?php echo  (config_item('ENVIRONMENT') === 'development') ?  'LavaLust Version <strong>' . config_item('VERSION') . '</strong>' : '' ?></p>
 </div>
 
 </body>

@@ -49,8 +49,8 @@ if ( ! function_exists('load_class'))
 		$LAVA = Registry::get_instance();
 		$className = ucfirst(strtolower($class));
 
-		if($LAVA->getObject($class) != NULL) {
-			$object = $LAVA->getObject($class);
+		if($LAVA->getObject($className) != NULL) {
+			$object = $LAVA->getObject($className);
 			return $object;
 		}
 
@@ -59,15 +59,15 @@ if ( ! function_exists('load_class'))
 			$fullPathName = $path . $directory  . DIRECTORY_SEPARATOR . $className . '.php';
 					
 			if (file_exists($fullPathName)) {
-				if( ! class_exists($className)) {
+				if( ! class_exists($className, FALSE)) {
 					require_once $fullPathName;
 				}
 			}
 		}
 		
 		is_loaded($class);
-		$LAVA->storeObject($class, isset($params) ? new $className($params) : new $className());
-		$object = $LAVA->getObject($class);
+		$LAVA->storeObject($className, isset($params) ? new $className($params) : new $className());
+		$object = $LAVA->getObject($className);
 		return $object;
 	}
 }
@@ -124,7 +124,7 @@ if ( ! function_exists('show_error'))
 	function show_error($heading,$message,$error_code)
 	{
 	  	$errors =& load_class('Errors', 'core');
-	  	return $errors->show_error($heading, $message, $template = 'custom_errors', $error_code);
+	  	return $errors->show_error($heading, $message, $template = 'error_general', $error_code);
 	}
 }
 
@@ -384,16 +384,32 @@ if ( ! function_exists('get_mime_type'))
 	}
 }
 
-if ( ! function_exists('esc'))
+if ( ! function_exists('html_escape'))
 {
-	/*
-	 * ------------------------------------------------------
-	 *  XSS Protection / Based on HTMLawed
-	 * ------------------------------------------------------
+	/**
+	 * Returns HTML escaped variable.
+	 *
+	 * @param	mixed	$var		The input string or array of strings to be escaped.
+	 * @param	bool	$double_encode	$double_encode set to FALSE prevents escaping twice.
+	 * @return	mixed			The escaped string or array of strings as a result.
 	 */
-	function esc($str)
-	{ 
-		$security =& load_class('Security', 'core');
-		return $security->xss_clean($str);
+	function html_escape($var, $double_encode = TRUE)
+	{
+		if (empty($var))
+		{
+			return $var;
+		}
+
+		if (is_array($var))
+		{
+			foreach (array_keys($var) as $key)
+			{
+				$var[$key] = html_escape($var[$key], $double_encode);
+			}
+
+			return $var;
+		}
+
+		return htmlspecialchars($var, ENT_QUOTES, config_item('charset'), $double_encode);
 	}
 }

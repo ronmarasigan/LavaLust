@@ -40,10 +40,8 @@ class FileSessionHandler extends Session implements \SessionHandlerInterface {
 
     public function __construct()
     {
-        $this->config =& get_config();
-
-        if (!empty($this->config['sess_save_path'])) {
-            $this->savePath = rtrim($this->config['sess_save_path'], '/\\');
+        if (!empty(config_item('sess_save_path'))) {
+            $this->savePath = rtrim(config_item('sess_save_path'), '/\\');
             ini_set('session.sess_save_path', $this->savePath);
         } else {
             $this->savePath = rtrim(ini_get('session.save_path'), '/\\');

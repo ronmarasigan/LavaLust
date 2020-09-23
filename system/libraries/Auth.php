@@ -40,7 +40,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  *  Authentication
  * ------------------------------------------------------
  */
-class Authentication {
+class Auth {
 
 	private $db;
 

@@ -39,9 +39,9 @@ define('LANG', [
     'Welcome' => 'Welcome',
     'Hello' => 'Hello',
     'Subscribe' => 'Subscribe',
-		'Active Users' => 'Active Users',
-		'Curriculum' => 'Curriculum',
-		'SMS Servers' => 'SMS Servers'
+	'Active Users' => 'Active Users',
+	'Curriculum' => 'Curriculum',
+	'SMS Servers' => 'SMS Servers'
 ]);
 
 ?>

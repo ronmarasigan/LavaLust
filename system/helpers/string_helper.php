@@ -35,32 +35,115 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
-if ( ! function_exists('trim_slashes'))
+if ( ! function_exists('str_insert'))
 {
     /**
-     * Trim Slashes
-     *
-     * Removes any leading/trailing slashes from a string:
-     *
-     * /this/that/theother/
-     *
-     * becomes:
-     *
-     * this/that/theother
-     *
-     * @todo    Remove in version 3.1+.
-     * @deprecated  3.0.0   This is just an alias for PHP's native trim()
-     *
-     * @param   string
-     * @return  string
+     * Insert String
+     * 
+     * @param  array An associative array with key => value pairs.
+     * @param  string The text with the strings to be replaced.
+     * @return string
      */
-    function trim_slashes($str)
+    function str_insert($keyValue, $string)
     {
-        return trim($str, '/');
+        if (is_assoc($keyValue)) {
+            foreach ($keyValue as $search => $replace) {
+                $string = str_replace($search, $replace, $string);
+            }
+        }
+
+        return $string;
     }
 }
 
-// ------------------------------------------------------------------------
+if ( ! function_exists('str_between'))
+{
+    /**
+     * String Between
+     * 
+     * @param  string $left   The left element of the string to search.
+     * @param  string $right  The right element of the string to search.
+     * @param  string $string The string to search in.
+     * @return array         A result array with all matches of the search.
+     */
+    function str_between($left, $right, $string)
+    {
+        preg_match_all('/' . preg_quote($left, '/') . '(.*?)' . preg_quote($right, '/') . '/s', $string, $matches);
+        return array_map('trim', $matches[1]);
+    }
+}
+
+if ( ! function_exists('str_after'))
+{
+    /**
+     * 
+     * 
+     * @param  string $search The string to search for.
+     * @param  string $string The string to search in.
+     * @return string The found string after the search string. Whitespaces at beginning will be removed.
+     */
+    function str_after($search, $string)
+    {
+        return $search === '' ? $string : ltrim(array_reverse(explode($search, $string, 2))[0]);
+    }
+}
+
+if ( ! function_exists('str_before'))
+{
+    /**
+     * 
+     * 
+     * @param  string $search The string to search for.
+     * @param  string $string The string to search in.
+     * @return string The found string before the search string. Whitespaces at end will be removed.
+     */
+    function str_before($search, $string)
+    {
+        return $search === '' ? $string : rtrim(explode($search, $string)[0]);
+    }
+}
+
+if ( ! function_exists('str_limitwords'))
+{
+    /**
+     * String Limit Words
+     * 
+     * @param  string  $string The string to limit the words.
+     * @param  integer $limit  The number of words to limit. Defaults to 10.
+     * @param  string  $end    The string to end the cut string. Defaults to '...'
+     * @return string
+     */
+    function str_limitwords($string, $limit = 10, $end = '...')
+    {
+        $arrayWords = explode(' ', $string);
+
+        if (sizeof($arrayWords) <= $limit) {
+            return $string;
+        }
+
+        return implode(' ', array_slice($arrayWords, 0, $limit)) . $end;
+    }
+}
+
+if ( ! function_exists('str_limitchars'))
+{
+    /**
+     * String limit Characters
+     * 
+     * @param  string  $string The string to limit the words.
+     * @param  integer $limit  The number of words to limit. Defaults to 10.
+     * @param  string  $end    The string to end the cut string. Defaults to '...'
+     * @return string
+     */
+    function str_limitchars($string, $limit = 100, $end = '...')
+    {
+        if (mb_strwidth($string, 'UTF-8') <= $limit) {
+            return $string;
+        }
+
+        return rtrim(mb_strimwidth($string, 0, $limit, '', 'UTF-8')) . $end;
+    }
+}
 
 if ( ! function_exists('strip_slashes'))
 {

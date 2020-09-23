@@ -44,7 +44,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 <p>Line Number: <?php echo $line; ?></p>
 	<p>Backtrace:</p>
 	<?php foreach (debug_backtrace() as $error): ?>
-		<?php if (isset($error['file']) && strpos($error['file'], BASE_URL) !== 0): ?>
+		<?php if (isset($error['file']) && strpos($error['file'], BASE_URL)!== 0): ?>
 			<p style="margin-left:10px">
 			File: <?php echo $error['file'] ?><br />
 			Line: <?php echo $error['line'] ?><br />

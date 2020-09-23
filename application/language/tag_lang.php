@@ -5,8 +5,8 @@ define('LANG', [
     'Welcome' => 'Welcome',
     'Hello' => 'Hello',
     'Subscribe' => 'Subscribe',
-		'Active Users' => 'Aktibong Miyembro',
-		'SMS Servers' => 'SMS Servers',
+	'Active Users' => 'Aktibong Miyembro',
+	'SMS Servers' => 'SMS Servers',
 ]);
 
 ?>

@@ -110,7 +110,7 @@ class Formr
     public $uploads = true;
 
     # sanitize input with HTMLPurifier
-    public $html_purifier = SYSTEM_DIR . 'libraries/Xss/HTMLPurifier.php';
+    public $html_purifier = SYSTEM_DIR . 'libraries/Escaper/HTMLPurifier.php';
 
     #xss on?
     public $xss_clean = FALSE;
@@ -3508,7 +3508,7 @@ class Formr
 
 
 
-    public function create($string, $form = false)
+    public function create($string, $form = false, $action = null)
     {
         #  SIMPLE FORM CREATION
         # create and wrap inputs using labels as our keys
@@ -3516,8 +3516,10 @@ class Formr
         # set our $return var for later
         $return = null;
 
-        if($form) {
+        if($form && $action == null) {
             $return .= $this->form_open();
+        } else {
+            $return .= $this->form_open('', '', $action);
         }
         
         # break apart the comma delimited string of form labels
@@ -3577,11 +3579,11 @@ class Formr
         return $return;
     }
 
-    public function create_form($string)
+    public function create_form($string, $action)
     {
         # alias of create(), except opens and closes form tag, plus adds submit button
         
-        return $this->create($string, true);
+        return $this->create($string, true, $action);
     }
 
 

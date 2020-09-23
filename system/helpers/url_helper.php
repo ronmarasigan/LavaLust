@@ -99,7 +99,6 @@ if ( ! function_exists('site_url'))
 	 * @return string
 	 */
 	function site_url($url='') {
-		$config = get_config();
 		if(isset($_COOKIE['language'])) {
 			$url =  $_COOKIE['language'] . '/' . $url;
 		} else {

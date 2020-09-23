@@ -35,6 +35,21 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
+if ( ! function_exists('xss_clean'))
+{
+	/**
+	 * XSS Filtering
+	 *
+	 * @param	string
+	 * @param	bool	whether or not the content is an image file
+	 * @return	string
+	 */
+	function xss_clean($str)
+	{
+		return get_instance()->security->xss_clean($str);
+	}
+}
+
 if ( ! function_exists('sanitize_filename'))
 {
 	/**

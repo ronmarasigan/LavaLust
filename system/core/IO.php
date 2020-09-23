@@ -43,12 +43,13 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 Class Io {
 
 	private $security;
-    
+
 	public function __construct()
-  	{
-    	global $Security;
-    	$this->security = $Security;
-  	}
+	{
+		global $security;
+		$this->security = $security;
+	}
+	
   	/**
   	 * POST Variable
   	 * @param  string

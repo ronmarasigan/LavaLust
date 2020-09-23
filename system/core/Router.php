@@ -74,7 +74,6 @@ class Router
 	 */
 	public function parseUrl()
 	{
-		$config = get_config();
 		$route = route_config();
 		$request_url = (isset($_SERVER['REQUEST_URI'])) ? $_SERVER['REQUEST_URI'] : '';
 		$script_url  = (isset($_SERVER['PHP_SELF'])) ? $_SERVER['PHP_SELF'] : '';
@@ -92,7 +91,7 @@ class Router
 			{
 				foreach($this->url as $uri)
 				{
-					if (!preg_match('/^['.$config['permitted_uri_chars'].']+$/i', $uri))
+					if (!preg_match('/^['.config_item('permitted_uri_chars').']+$/i', $uri))
 						trigger_error("The characters you entered in the URL are not permitted!", E_USER_WARNING);
 				}
 			}
@@ -106,11 +105,10 @@ class Router
 	 */
 	public function initiate()
 	{
-		$config = get_config(); 
 		$autoload = autoload_config();
 
-		$this->controller = $config['default_controller'];
-		$this->method = $config['default_method'];
+		$this->controller = config_item('default_controller');
+		$this->method = config_item('default_method');
 
 		$segments = $this->parseUrl();
 
@@ -154,7 +152,7 @@ class Router
 			$method_index += 1;
 		}
 		else
-			require(SYSTEM_DIR . 'language/' . strtolower($config['language']) . '_lang.php');
+			require(SYSTEM_DIR . 'language/' . strtolower(config_item('language')) . '_lang.php');
 
 		if(isset($segments[$controller_index]) && !empty($segments[$controller_index]))
 			$this->controller = ucfirst($segments[$controller_index]);

@@ -35,7 +35,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
-require_once 'Form/form.php';
+require_once 'Form/Form.php';
 class Form extends Formr {
 	
 	public function __construct($params) {

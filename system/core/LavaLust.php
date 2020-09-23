@@ -42,6 +42,14 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  */
 require_once SYSTEM_DIR . 'core/Registry.php';
 require_once SYSTEM_DIR . 'core/Common.php';
+/*
+ * ------------------------------------------------------
+ *  Instantiate the Benchmark class
+ * ------------------------------------------------------
+ */
+$bm =& load_class('benchmark', 'core');
+$bm->mark('total_execution_time_start');
+$bm->mark('loading_time:_base_classes_start');
 
 /*
  * ------------------------------------------------------
@@ -87,41 +95,41 @@ switch (config_item('ENVIRONMENT'))
  *  Error Classes to show errors
  * ------------------------------------------------------
  */
-
 function _handlers()
 {
 	set_error_handler('_error_handler');
 	set_exception_handler('_exception_handler');
 	register_shutdown_function('_shutdown_handler');
 }
-/*
- * ------------------------------------------------------
- *  Instantiate the routing class and set the routing
- * ------------------------------------------------------
- */
-$Router =& load_class('Router', 'core');
-
-/*
- * ------------------------------------------------------
- *  Instantiate the Load the security class for xss and csrf support
- * ------------------------------------------------------
- */
-$Security =& load_class('Security', 'core');
 
 /*
  * ------------------------------------------------------
  *  Instantiate the routing class and set the routing
  * ------------------------------------------------------
  */
-$IO =& load_class('IO', 'core');
+$router =& load_class('router', 'core');
 
 /*
  * ------------------------------------------------------
- *  Load Controller and Base Model
+ *  Instantiate the security class for xss and csrf support
+ * ------------------------------------------------------
+ */
+$security =& load_class('security', 'core');
+
+/*
+ * ------------------------------------------------------
+ *  Instantiate the Input/Ouput class
+ * ------------------------------------------------------
+ */
+$io =& load_class('io', 'core');
+
+/*
+ * ------------------------------------------------------
+ *  Load BaseController
  * ------------------------------------------------------
  */
 require_once SYSTEM_DIR . 'core/Controller.php';
-require_once SYSTEM_DIR . 'core/Model.php';
+
 /*
  * ------------------------------------------------------
  *  Instantiate LavaLust Controller
@@ -131,11 +139,13 @@ function &get_instance()
 {
   return Controller::get_instance();
 }
+$bm->mark('loading_time:_base_classes_end');
 
 /*
  * ------------------------------------------------------
  *  Initiate Router
  * ------------------------------------------------------
  */
-$Router->initiate();
+$router->initiate();
+$bm->mark('total_execution_time_end');
 ?>

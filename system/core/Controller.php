@@ -68,19 +68,13 @@ class Loader {
 	 *  Load View
 	 * ------------------------------------------------------
 	 */
-	public function view($viewFile, $params = NULL, $val = NULL)
+	public function view($viewFile, $data = array())
 	{
-		if(!empty($params))
-		{
-			foreach($params as $key => $val)
-			{
-				$this->pageVars[$key] = $val;
-			}
-			extract($this->pageVars);
-		}
+		if(!empty($data))
+			extract($data);
 		ob_start();
 		if(file_exists(APP_DIR .'views/' . $viewFile . '.php'))
-			require(APP_DIR .'views/' . $viewFile . '.php');
+			require_once(APP_DIR .'views/' . $viewFile . '.php');
 		else
 			trigger_error($viewFile . ' view file is missing or does not exist!', E_USER_WARNING);
 		echo ob_get_clean();
@@ -164,14 +158,18 @@ class Loader {
 class Controller extends Loader
 {
 	private static $instance;
-	public $load;
+	public $load, $var;
 	
 	public function __construct()
 	{
 		$this->load = $this;
+
 		self::$instance = $this->load;
-		$this->io =& load_class('IO', 'core');
-		$this->security =& load_class('Security', 'core');
+
+		foreach (is_loaded() as $var => $class)
+		{
+			$this->$var =& load_class($class);
+		}
 
 		$autoload =& autoload_config();
 

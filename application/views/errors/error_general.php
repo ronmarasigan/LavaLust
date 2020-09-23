@@ -94,7 +94,7 @@ p {
 <body>
 	<div id="container">
 		<h1><?php echo $heading; ?></h1>
-		<?php echo $message; ?>
+		<p><?php echo $message; ?></p>
 	</div>
 </body>
 </html>

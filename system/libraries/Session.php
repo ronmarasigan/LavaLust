@@ -54,6 +54,9 @@ class Session {
 	    */
 		$this->config = get_config();
 
+		$this->match_ip = $this->config['sess_match_ip'];
+        $this->match_fingerprint = $this->config['sess_match_fingerprint'];
+
 		if ( ! empty($this->config['cookie_prefix']) ) {
 	    	$this->config['cookie_name'] = $this->config['sess_cookie_name'] ? $this->config['cookie_prefix'].$this->config['sess_cookie_name'] : NULL;
 	    } else {
@@ -99,6 +102,26 @@ class Session {
 		
 	    session_start();
 
+	    //On creation store the useragent fingerprint
+		if(empty($_SESSION['fingerprint'])) {
+			$_SESSION['fingerprint'] = $this->generate_fingerprint();
+
+		//If we should verify user agent fingerprints (and this one doesn't match!)
+		} elseif($this->match_fingerprint && $_SESSION['fingerprint'] != $this->generate_fingerprint()) {
+			return FALSE;
+		}
+
+		//If an IP address is present and we should check to see if it matches
+		if(isset($_SESSION['ip_address']) && $this->match_ip) {
+			//If the IP does NOT match
+			if($_SESSION['ip_address'] != $_SERVER['REMOTE_ADDR']) {
+				return FALSE;
+			}
+		}
+
+		//Set the users IP Address
+		$_SESSION['ip_address'] = $_SERVER['REMOTE_ADDR'];
+
 	    if ( isset($_COOKIE[$this->config['cookie_name']]) ) {
 	    	preg_match('/('.session_id().')/', $_COOKIE[$this->config['cookie_name']], $matches);
 	    	if ( empty($matches) ) {
@@ -128,6 +151,21 @@ class Session {
 	    $this->_lava_init_vars();
 	}
 
+	/**
+	 * Generates key as protection against Session Hijacking & Fixation. This
+	 * works better than IP based checking for most sites due to constant user
+	 * IP changes (although this method is not as secure as IP checks).
+	 * @return string
+	 */
+	public function generate_fingerprint()  {
+		//We don't use the ip-adress, because it is subject to change in most cases
+		foreach(array('ACCEPT_CHARSET', 'ACCEPT_ENCODING', 'ACCEPT_LANGUAGE', 'USER_AGENT') as $name) {
+			$key[] = empty($_SERVER['HTTP_'. $name]) ? NULL : $_SERVER['HTTP_'. $name];
+		}
+		//Create an MD5 has and return it
+		return md5(implode("\0", $key));
+	}
+
 
 	protected function _lava_init_vars()
 	{
@@ -154,23 +192,6 @@ class Session {
 		}
 
 		$this->userdata =& $_SESSION;
-	}
-
-	/**
-	 * Destroy Browser Cookie
-	 * @return bool TRUE if destroyed
-	 */
-	protected function _destroy_cookie()
-	{
-		return setcookie(
-			$this->config['cookie_name'],
-			NULL,
-			1,
-			$this->config['cookie_path'],
-			$this->config['cookie_domain'],
-			$this->config['cookie_secure'],
-			TRUE
-		);
 	}
 
 	/**
