@@ -51,9 +51,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 |	['charset']		The default character set
 */
 
-$database['hostname']	= 'localhost';
-$database['username']	= 'root';
+$database['hostname']	= '';
+$database['username']	= '';
 $database['password']	= '';
-$database['database']	= 'dummy';
-$database['charset']	= 'utf8';
+$database['database']	= '';
+$database['charset']	= '';
 ?>
