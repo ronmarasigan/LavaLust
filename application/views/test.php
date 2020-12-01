@@ -22,19 +22,9 @@
 					<?=form_input(array('type'=>'password', 'name'=>'password', 'class'=>'form-control', 'placeholder'=>'Password'));?>
 				</div>
 				<div class="form-group">
-					<?=form_input(array('type'=>'password', 'name'=>'password2', 'class'=>'form-control', 'placeholder'=>'Re-type Password'));?>
-				</div>
-				<div class="form-group">
-					<?=form_input(array('type'=>'email', 'name'=>'email', 'class'=>'form-control', 'placeholder'=>'Email'));?>
-				</div>
-				<div class="form-group">
 					<?=form_submit(array('name'=>'submit', 'class'=>'btn btn-primary'), 'Login');?>
 				</div>
 				<?=form_close();?>
-				<?php
-					var_dump($data);
-				?>
-
 			</div>
 		</div>
 	</div>

@@ -47,3 +47,5 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('Direct script access not allowed');
 
 $route['404_override']       = '';
 $route['default_controller'] = 'Welcome/index';
+$route['user/register'] = 'welcome/loaded';
+$route['sendmail'] = 'welcome/sendmail';

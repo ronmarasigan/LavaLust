@@ -35,14 +35,14 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
-class FileSessionHandler extends Session implements \SessionHandlerInterface {
+class FileSessionHandler extends Session implements SessionHandlerInterface {
     private $savePath, $data, $file_path;
 
     public function __construct()
     {
         if (!empty(config_item('sess_save_path'))) {
             $this->savePath = rtrim(config_item('sess_save_path'), '/\\');
-            ini_set('session.sess_save_path', $this->savePath);
+            ini_set('session.save_path', $this->savePath);
         } else {
             $this->savePath = rtrim(ini_get('session.save_path'), '/\\');
         }

@@ -35,23 +35,6 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
-if ( ! function_exists('read_file'))
-{
-    /**
-     * Read File
-     *
-     * Opens the file specified in the path and returns it as a string.
-     * @param   string  $file   Path to file
-     * @return  string  File contents
-     */
-    function read_file($file)
-    {
-        return @file_get_contents($file);
-    }
-}
-
-// ------------------------------------------------------------------------
-
 if ( ! function_exists('write_file'))
 {
     /**
@@ -89,8 +72,6 @@ if ( ! function_exists('write_file'))
     }
 }
 
-// ------------------------------------------------------------------------
-
 if ( ! function_exists('delete_files'))
 {
     /**
@@ -121,7 +102,7 @@ if ( ! function_exists('delete_files'))
         {
             if ($filename !== '.' && $filename !== '..')
             {
-                $filepath = $path.DIR.$filename;
+                $filepath = $path.DIRECTORY_SEPARATOR.$filename;
 
                 if (is_dir($filepath) && $filename[0] !== '.' && ! is_link($filepath))
                 {
@@ -141,8 +122,6 @@ if ( ! function_exists('delete_files'))
             : TRUE;
     }
 }
-
-// ------------------------------------------------------------------------
 
 if ( ! function_exists('get_filenames'))
 {
@@ -167,14 +146,14 @@ if ( ! function_exists('get_filenames'))
             if ($_recursion === FALSE)
             {
                 $_filedata = array();
-                $source_dir = rtrim(realpath($source_dir), DIR).DIR;
+                $source_dir = rtrim(realpath($source_dir), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
             }
 
             while (FALSE !== ($file = readdir($fp)))
             {
                 if (is_dir($source_dir.$file) && $file[0] !== '.')
                 {
-                    get_filenames($source_dir.$file.DIR, $include_path, TRUE);
+                    get_filenames($source_dir.$file.DIRECTORY_SEPARATOR, $include_path, TRUE);
                 }
                 elseif ($file[0] !== '.')
                 {
@@ -189,8 +168,6 @@ if ( ! function_exists('get_filenames'))
         return FALSE;
     }
 }
-
-// --------------------------------------------------------------------
 
 if ( ! function_exists('get_dir_file_info'))
 {
@@ -218,7 +195,7 @@ if ( ! function_exists('get_dir_file_info'))
             if ($_recursion === FALSE)
             {
                 $_filedata = array();
-                $source_dir = rtrim(realpath($source_dir), DIR).DIR;
+                $source_dir = rtrim(realpath($source_dir), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
             }
 
             // Used to be foreach (scandir($source_dir, 1) as $file), but scandir() is simply not as fast
@@ -226,7 +203,7 @@ if ( ! function_exists('get_dir_file_info'))
             {
                 if (is_dir($source_dir.$file) && $file[0] !== '.' && $top_level_only === FALSE)
                 {
-                    get_dir_file_info($source_dir.$file.DIR, $top_level_only, TRUE);
+                    get_dir_file_info($source_dir.$file.DIRECTORY_SEPARATOR, $top_level_only, TRUE);
                 }
                 elseif ($file[0] !== '.')
                 {
@@ -242,8 +219,6 @@ if ( ! function_exists('get_dir_file_info'))
         return FALSE;
     }
 }
-
-// --------------------------------------------------------------------
 
 if ( ! function_exists('get_file_info'))
 {
@@ -306,8 +281,6 @@ if ( ! function_exists('get_file_info'))
     }
 }
 
-// --------------------------------------------------------------------
-
 if ( ! function_exists('get_mime_by_extension'))
 {
     /**
@@ -348,8 +321,6 @@ if ( ! function_exists('get_mime_by_extension'))
         return FALSE;
     }
 }
-
-// --------------------------------------------------------------------
 
 if ( ! function_exists('symbolic_permissions'))
 {
@@ -415,8 +386,6 @@ if ( ! function_exists('symbolic_permissions'))
         return $symbolic;
     }
 }
-
-// --------------------------------------------------------------------
 
 if ( ! function_exists('octal_permissions'))
 {

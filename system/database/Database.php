@@ -1,4 +1,5 @@
 <?php
+defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 /**
  * ------------------------------------------------------------------
  * LavaLust - an opensource lightweight PHP MVC Framework
@@ -63,8 +64,7 @@ class Database {
 
     public function __construct()
     {
-        self::$instance[] =& $this;
-        $database_config =& database_config();
+        $database_config = database_config();
         $this->charset = $database_config['charset'];
         $this->dbost = $database_config['hostname'];
         $this->dbname = $database_config['database'];
@@ -82,17 +82,16 @@ class Database {
             $this->db = new PDO($this->dsn, $this->dbuser, $this->dbpass, $options);
             $database_config = NULL;
         } catch (Exception $e) {
-            throw new Exception($e->getMessage(), (int)$e->getCode());
+            show_error('Database Error Occured', $e->getMessage(), 'error_db', 500);
         }
     }
 
-    public static function get_instance($id=null)
+    public static function get_instance()
     {
-        if($id) {
-            return self::$instance[$id];
-        } else {
-            return end(self::$instance);
+        if (!self::$instance) {
+            self::$instance = new Database();
         }
+        return self::$instance;
     }
 
     public function raw($query, $args = [])
@@ -508,15 +507,32 @@ class Database {
         return $this;
     }
 
-    public function get()
+    public function get($mode = PDO::FETCH_ASSOC)
     {
         $this->buildQuery();
         $this->getSQL = $this->sql;
-        $stmt = $this->db->prepare($this->sql);
-        $stmt->execute($this->bindValues);
-        $this->rowCount = $stmt->rowCount();
+        try {
+            $stmt = $this->db->prepare($this->sql);
+            $stmt->execute($this->bindValues);
+            $this->rowCount = $stmt->rowCount();
+            return $stmt->fetch($mode);
+        } catch(PDOException $e) {
+            show_error('Database Error Occured', $e->getMessage().'<br>SQL Query: '.html_escape($this->getSQL), 'error_db', 500);
+        }
+    }
 
-        return $stmt->fetchAll();
+    public function getAll()
+    {
+        $this->buildQuery();
+        $this->getSQL = $this->sql;
+        try {
+            $stmt = $this->db->prepare($this->sql);
+            $stmt->execute($this->bindValues);
+            $this->rowCount = $stmt->rowCount();
+            return $stmt->fetchAll();
+        } catch(PDOException $e) {
+            show_error('Database Error Occured', $e->getMessage().'<br>SQL Query: '.html_escape($this->getSQL), 'error_db', 500);
+        }
     }
 
     private function buildQuery()

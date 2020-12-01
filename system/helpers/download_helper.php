@@ -49,13 +49,14 @@ if ( ! function_exists('force_download'))
 	 */
     function force_download($file, $name, $mime_type='')
     {
+        $LAVA =& get_instance();
+        $LAVA->load->helper('file');
         if(!is_readable($file)) die('File not found or inaccessible!');
         $size = filesize($file);
         $name = rawurldecode($name);
 
         if($mime_type==''){
-            $file_extension = strtolower(substr(strrchr($file,"."),1));
-            $mime_type = get_mime_type($file_extension);
+            $mime_type = get_mime_by_extension($file);
         };
         @ob_end_clean();
         if(ini_get('zlib.output_compression'))

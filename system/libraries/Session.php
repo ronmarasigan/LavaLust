@@ -98,6 +98,17 @@ class Session {
 			require_once 'Session/FileSessionHandler.php';
 			$handler = new FileSessionHandler();
 			session_set_save_handler($handler, TRUE);
+		} elseif ( ! empty($this->config['sess_driver']) AND $this->config['sess_driver'] == 'database' ) {
+			require_once 'Session/DBSessionHandler.php';
+			session_set_save_handler(  
+			array($this, "_open"),  
+			array($this, "_close"),  
+			array($this, "_read"),  
+			array($this, "_write"),  
+			array($this, "_destroy"),  
+			array($this, "_gc")  
+			); 
+			register_shutdown_function('session_write_close');
 		}
 		
 	    session_start();
@@ -282,16 +293,12 @@ class Session {
 	 */
 	public function set_userdata($keys = array())
 	{
-		$keys['SID'] = $this->session_id();
-
 		if(is_array($keys))
 		{
 			foreach($keys as $key => $val)
 			{
 				$_SESSION[$key] = $val;
 			}
-		} else {
-			throw new Exception('Supplied variable is empty or is not an array');
 		}
 	}
 	
@@ -308,8 +315,6 @@ class Session {
 				if($this->has_userdata($key))
 					unset($_SESSION[$key]);
 			}
-		} else {
-			throw new Exception('Supplied variable is empty or is not an array');
 		}
 	}
 	

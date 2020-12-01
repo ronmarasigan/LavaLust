@@ -49,15 +49,12 @@ if ( ! function_exists('redirect'))
 		switch ($method)
 		{
 			case 'refresh':
-				header('Refresh:' .$sec. ';url='. site_url($uri));
+				header('Refresh:' .$sec. ';url='. site_url($uri).'');
 				break;
 			default:
 				header('Location: '. site_url($uri), TRUE);
 				break;
 		}
-		exit;
-
-		header('Location: '. site_url($uri));
 	}
 }
 

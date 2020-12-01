@@ -49,25 +49,31 @@ class Email {
 	public $subject;
 	public $attach_files = array();
 	public $emailContent;
+	public $emailType;
 
+	public function __construct() {
+
+	}
 	/**
 	 * Check if email is in correct format
+	 * 
 	 * @param  string  $email Email to check
 	 * @return boolean        [description]
 	 */
-	public function isEmailValid($email)
+	public function valid_email($email)
 	{
 		return (bool) filter_var($email, FILTER_VALIDATE_EMAIL);
 	}
 
 	/**
 	 * Check Sender Email is Valid
+	 * 
 	 * @param string $sender Email of the sender
 	 * @return string Validated email
 	 */
-	public function setSender($sender)
+	public function sender($sender)
 	{
-		if( ! empty($sender) && $this->isEmailValid($sender) )
+		if( ! empty($sender) && $this->valid_email($sender) )
 		{
 			$this->sender = $sender;
 			return $this->sender;
@@ -78,12 +84,13 @@ class Email {
 
 	/**
 	 * Set recepient Email Addresses
+	 * 
 	 * @param string $recipient Email of the recipient
 	 * @return array Email Addresses
 	 */
-	public function setRecipient($recipient)
+	public function recipient($recipient)
 	{
-		if( ! empty($recipient) && $this->isEmailValid($recipient) )
+		if( ! empty($recipient) && $this->valid_email($recipient) )
 		{
 			if( ! in_array($recipient, $this->recipients) )
 			{
@@ -96,12 +103,13 @@ class Email {
 
 	/**
 	 * Set Reply to Email Address
+	 * 
 	 * @param string $recipient Email of the recipient
 	 * @return string Email Address
 	 */
-	public function setReply_to($reply_to)
+	public function reply_to($reply_to)
 	{
-		if($this->isEmailValid($reply_to))
+		if($this->valid_email($reply_to))
 		{
 			$this->reply_to = $reply_to;
 			return $this->reply_to;
@@ -112,10 +120,11 @@ class Email {
 
 	/**
 	 * Set Email Subject
+	 * 
 	 * @param string $subject Email Subject
 	 * @return string Email Subject
 	 */
-	public function setSubject($subject)
+	public function subject($subject)
 	{
 		if( ! empty($subject) )
 		{
@@ -128,20 +137,23 @@ class Email {
 
 	/**
 	 * Email Content
+	 * 
 	 * @param Email $emailContent Email Content
 	 */
-	public function setEmailContent($emailContent)
+	public function email_content($emailContent, $type = 'plain')
 	{
 		$emailContent = wordwrap($emailContent, 70, "\n");
         $this->emailContent = $emailContent;
+        $this->emailType = $type;
 	}
 
 	/**
 	 * Email Attachment
+	 * 
 	 * @param [type] $attach_file [description]
 	 * @return array Email Attachments
 	 */
-	public function setAttachment($attach_file)
+	public function attachment($attach_file)
 	{
 		if( ! empty($attach_file) )
 		{
@@ -157,16 +169,20 @@ class Email {
 
 	/**
 	 * Recreate Attachment
+	 * 
 	 * @param  Stream File $attachment Attachment File
-	 * @return [type]             [description]
+	 * @return File
 	 */
-	public function recreateAttachment($attachment)
+	public function recreate_attachment($attachment)
     {
         if(file_exists($attachment) === true)
         {
-			$fileType = get_mime_type(pathinfo($attachment, PATHINFO_EXTENSION));
-			$file_size = filesize($attachment);
-			$handle = fopen($attachment, "r");
+        	$LAVA =& get_instance();
+        	$LAVA->load->helper('file');
+        	$fileinfo = get_file_info($attachment);
+			$fileType = get_mime_by_extension($attachment);
+			$file_size = $fileinfo['size'];
+			$handle = fopen($attachment, FOPEN_READ);
 			$content = fread($handle, $file_size);
 			$content = chunk_split(base64_encode($content));
 			fclose($handle);
@@ -184,6 +200,7 @@ class Email {
 
     /**
      * Send Email
+     * 
      * @return function Email Sending
      */
 	public function send()
@@ -191,6 +208,11 @@ class Email {
 		if(( ! is_array($this->recipients) ) || (count($this->recipients) < 1)) {
             return false;
         }
+
+        if($this->emailType == 'plain')
+        	$contype = 'Content-Type: text/plain; charset=ISO-8859-1';
+        else
+        	$contype = 'Content-Type: text/html; charset='.config_item('charset');
 
         $bm = md5(uniqid(time()).'msg');
         $bc = md5(uniqid(time()).'cont');
@@ -214,14 +236,14 @@ class Email {
 
         if(trim($this->emailContent) !== '') {
             $contents .= $out.'--'.$bc.$out;
-            $contents .= 'Content-Type: text/plain; charset=ISO-8859-1'.$out;
+            $contents .= $contype.$out;
             $contents .= $out.$this->emailContent.$out;
         }
 
         $contents .= $out.'--'.$bc.'--'.$out;
 
         foreach($this->attach_files as $attach_file) {
-            $attachmentContent = $this->recreateAttachment($attach_file);
+            $attachmentContent = $this->recreate_attachment($attach_file);
 
             if($attachmentContent !== false) {
                 $contents .= $out.'--'.$bm.$out;

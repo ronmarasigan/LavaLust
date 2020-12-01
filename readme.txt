@@ -28,3 +28,4 @@ Update
 23. new helpers were added
 24. input class was io class now
 25. auth class was added (session must be active and database was configured) (check auth inside libraries folder)
+26. database class update. use get() to use fetch mode $this->db->table('user')->get(PDO::FETCH_OBJ)->username; and getAll if you want to use the old style

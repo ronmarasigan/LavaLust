@@ -37,7 +37,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 
 /*
  * ------------------------------------------------------
- *  Class Mail / For sending email
+ *  Cache Class
  * ------------------------------------------------------
  */
 
@@ -132,7 +132,7 @@ class Cache
 		// Clean given arguments to a 0-index array
 		$arguments = array_values($arguments);
 
-		$cache_file = $property.DIR.do_hash($method.serialize($arguments), 'sha1');
+		$cache_file = $property.DIRECTORY_SEPARATOR.hash('sha1', $method.serialize($arguments));
 
 		// See if we have this cached or delete if $expires is negative
 		if($expires >= 0)
@@ -323,11 +323,11 @@ class Cache
 		}
 
 		// check if filename contains dirs
-		$subdirs = explode(DIR, $this->_filename);
+		$subdirs = explode(DIRECTORY_SEPARATOR, $this->_filename);
 		if (count($subdirs) > 1)
 		{
 			array_pop($subdirs);
-			$test_path = $this->_path.implode(DIR, $subdirs);
+			$test_path = $this->_path.implode(DIRECTORY_SEPARATOR, $subdirs);
 
 			// check if specified subdir exists
 			if ( ! @file_exists($test_path))
@@ -448,7 +448,7 @@ class Cache
 		}
 
 		$this->_lava->load->helper('file');
-		if (file_exists($this->_path.$dirname)) delete_files($this->_path.$dirname, TRUE);
+		if (file_exists($this->_path.$dirname)) delete_files($this->_path.$dirname, TRUE, TRUE);
 
 		// Reset values
 		$this->_reset();

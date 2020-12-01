@@ -78,7 +78,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 |
 |	$autoload['libraries'] = array('user_agent' => 'ua');
 */
-$autoload['libraries'] = array('session');
+$autoload['libraries'] = array('session', 'database');
 
 /*
 | -------------------------------------------------------------------
@@ -102,7 +102,7 @@ $autoload['language'] = array('en', 'tag');
 |
 |	$autoload['helper'] = ['url', 'session'];
 */
-$autoload['helpers'] = array('url');
+$autoload['helpers'] = array('url', 'form', 'security');
 
 /*
 | -------------------------------------------------------------------

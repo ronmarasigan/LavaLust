@@ -46,8 +46,11 @@ class Loader {
 	 *  Load Model
 	 * ------------------------------------------------------
 	 */
-	public function model($classes, $db_conn = FALSE)
+	public function model($classes)
 	{
+		if( ! class_exists('Model'))
+			require_once(SYSTEM_DIR.'core/Model.php');
+
 		$LAVA = Controller::get_instance();
 		if(is_array($classes))
 		{
@@ -56,11 +59,6 @@ class Loader {
 		}
 		else
 			$LAVA->$classes =& load_class($classes . '_model', 'models');
-
-		if ($db_conn !== FALSE && ! class_exists('Database', FALSE))
-		{
-			$this->database();
-		}
 	}
 	
 	/*
@@ -119,10 +117,20 @@ class Loader {
 		if(is_array($classes))
 		{
 			foreach($classes as $class)
+			{
+				if($class == 'database') {
+					$database =& load_class('database', 'database');
+					$LAVA->db = $database::get_instance();
+				}
 				$LAVA->$class =& load_class($class, 'libraries', $params);
-		}
-		else
+			}
+		} else {
+			if($classes == 'database') {
+				$database =& load_class('database', 'database');
+				$LAVA->db = $database::get_instance();
+			}
 			$LAVA->$classes =& load_class($classes, 'libraries', $params);
+		}
 	}
 
 	/*
@@ -133,10 +141,8 @@ class Loader {
 	public function database()
 	{
 		$LAVA =& Controller::get_instance();
-		$database =& load_class('Database','database');
+		$database =& load_class('database','database');
 		$database = $database::get_instance();
-		$LAVA->db = '';
-		$LAVA->db = $database;
 	    return $database;
 	}
 

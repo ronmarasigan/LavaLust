@@ -42,6 +42,133 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 */
 class Security
 {
+	/**
+	 * Random Hash for Cross Site Request Forgery Protection Cookie
+	 *
+	 * @var string
+	 * @access protected
+	 */
+	protected $_csrf_hash			= '';
+	/**
+	 * Expiration time for Cross Site Request Forgery Protection Cookie
+	 * Defaults to two hours (in seconds)
+	 *
+	 * @var int
+	 * @access protected
+	 */
+	protected $_csrf_expire			= 7200;
+	/**
+	 * Token name for Cross Site Request Forgery Protection Cookie
+	 *
+	 * @var string
+	 * @access protected
+	 */
+	protected $_csrf_token_name		= 'ci_csrf_token';
+	/**
+	 * Cookie name for Cross Site Request Forgery Protection Cookie
+	 *
+	 * @var string
+	 * @access protected
+	 */
+	protected $_csrf_cookie_name	= 'ci_csrf_token';
+
+	/**
+	 * Constructor
+	 */
+	public function __construct()
+	{
+		// CSRF config
+		foreach(array('csrf_expire', 'csrf_token_name', 'csrf_cookie_name') as $key)
+		{
+			if (FALSE !== ($val = config_item($key)))
+			{
+				$this->{'_'.$key} = $val;
+			}
+		}
+
+		// Append application specific cookie prefix
+		if (config_item('cookie_prefix'))
+		{
+			$this->_csrf_cookie_name = config_item('cookie_prefix').$this->_csrf_cookie_name;
+		}
+
+		// Set the CSRF hash
+		$this->_csrf_set_hash();
+	}
+
+	/**
+	 * Verify Cross Site Request Forgery Protection
+	 *
+	 * @return	object
+	 */
+	public function csrf_verify()
+	{
+		// If no POST data exists we will set the CSRF cookie
+		if (count($_POST) == 0)
+		{
+			return $this->csrf_set_cookie();
+		}
+
+		// Do the tokens exist in both the _POST and _COOKIE arrays?
+		if ( ! isset($_POST[$this->_csrf_token_name]) OR
+			 ! isset($_COOKIE[$this->_csrf_cookie_name]))
+		{
+			$this->csrf_show_error();
+		}
+
+		// Do the tokens match?
+		if ($_POST[$this->_csrf_token_name] != $_COOKIE[$this->_csrf_cookie_name])
+		{
+			$this->csrf_show_error();
+		}
+
+		// We kill this since we're done and we don't want to
+		// polute the _POST array
+		unset($_POST[$this->_csrf_token_name]);
+
+		// Nothing should last forever
+		unset($_COOKIE[$this->_csrf_cookie_name]);
+		$this->_csrf_set_hash();
+		$this->csrf_set_cookie();
+
+		return $this;
+	}
+
+	/**
+	 * Set Cross Site Request Forgery Protection Cookie
+	 *
+	 * @return	object
+	 */
+	public function csrf_set_cookie()
+	{
+		$expire = time() + $this->_csrf_expire;
+		$secure_cookie = (config_item('cookie_secure') === TRUE) ? 1 : 0;
+
+		if ($secure_cookie)
+		{
+			$req = isset($_SERVER['HTTPS']) ? $_SERVER['HTTPS'] : FALSE;
+
+			if ( ! $req OR $req == 'off')
+			{
+				return FALSE;
+			}
+		}
+
+		setcookie($this->_csrf_cookie_name, $this->_csrf_hash, $expire, config_item('cookie_path'), config_item('cookie_domain'), $secure_cookie);
+
+		return $this;
+	}
+
+	/**
+	 * Show CSRF Error
+	 *
+	 * @return	void
+	 */
+	public function csrf_show_error()
+	{
+		show_error('Not Allowed Error', 'The action you have requested is not allowed.', 404);
+	}
+
 	/*
 	* ------------------------------------------------------
 	*  Escaping characters for a simple XSS Filter
@@ -52,31 +179,107 @@ class Security
 		$escaper =& load_class('Escaper', 'libraries');
 		return $escaper->filter($string);
 	}
-	
-	/*
-	* ------------------------------------------------------
-	*  Generate CSRFToken to be loaded in a hidden form element in the view
-	* ------------------------------------------------------
-	*/
-	public function csrf_token()
-	{
-		$session =& load_class('Session', 'libraries');
-		$session->set(['csrf_token' => bin2hex(random_bytes(32))]);
-		return $session->get('csrf_token');
-	}
-	
+
 	/**
-	* ------------------------------------------------------
-	*  Checking if the actual token and the submitted is equal
-	* ------------------------------------------------------
-	*/
-	public function csrf_verify($token)
+	 * Get CSRF Hash
+	 *
+	 * Getter Method
+	 *
+	 * @return 	string 	self::_csrf_hash
+	 */
+	public function get_csrf_hash()
 	{
-		$session =& load_class('Session', 'libraries');
-		if(hash_equals($session->get('token'), $token))
-			return true;
-		else
-			return false;
+		return $this->_csrf_hash;
+	}
+
+	/**
+	 * Get CSRF Token Name
+	 *
+	 * Getter Method
+	 *
+	 * @return 	string 	self::csrf_token_name
+	 */
+	public function get_csrf_token_name()
+	{
+		return $this->_csrf_token_name;
+	}
+
+	/**
+	 * Set Cross Site Request Forgery Protection Cookie
+	 *
+	 * @return	string
+	 */
+	protected function _csrf_set_hash()
+	{
+		if ($this->_csrf_hash == '')
+		{
+			// If the cookie exists we will use it's value.
+			// We don't necessarily want to regenerate it with
+			// each page load since a page could contain embedded
+			// sub-pages causing this feature to fail
+			if (isset($_COOKIE[$this->_csrf_cookie_name]) &&
+				$_COOKIE[$this->_csrf_cookie_name] != '')
+			{
+				return $this->_csrf_hash = $_COOKIE[$this->_csrf_cookie_name];
+			}
+
+			return $this->_csrf_hash = md5(uniqid(rand(), TRUE));
+		}
+
+		return $this->_csrf_hash;
+	}
+
+	/**
+	 * Get random bytes
+	 *
+	 * @param	int	$length	Output length
+	 * @return	string
+	 */
+	public function get_random_bytes($length)
+	{
+		if (empty($length) OR ! ctype_digit((string) $length))
+		{
+			return FALSE;
+		}
+
+		if (function_exists('random_bytes'))
+		{
+			try
+			{
+				// The cast is required to avoid TypeError
+				return random_bytes((int) $length);
+			}
+			catch (Exception $e)
+			{
+				return FALSE;
+			}
+		}
+
+		// Unfortunately, none of the following PRNGs is guaranteed to exist ...
+		if (defined('MCRYPT_DEV_URANDOM') && ($output = mcrypt_create_iv($length, MCRYPT_DEV_URANDOM)) !== FALSE)
+		{
+			return $output;
+		}
+
+
+		if (is_readable('/dev/urandom') && ($fp = fopen('/dev/urandom', FOPEN_READ)) !== FALSE)
+		{
+			// Try not to waste entropy ...
+			is_php('5.4') && stream_set_chunk_size($fp, $length);
+			$output = fread($fp, $length);
+			fclose($fp);
+			if ($output !== FALSE)
+			{
+				return $output;
+			}
+		}
+
+		if (function_exists('openssl_random_pseudo_bytes'))
+		{
+			return openssl_random_pseudo_bytes($length);
+		}
+
+		return FALSE;
 	}
 }
 

@@ -42,29 +42,37 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 */
 Class Io {
 
+	private $_enable_csrf			= FALSE;
+
 	private $security;
 
 	public function __construct()
 	{
-		global $security;
-		$this->security = $security;
+		$this->security =& load_class('Security', 'core');
+		$this->_enable_csrf	= (config_item('csrf_protection') === TRUE);
+
+		// CSRF Protection check
+		if ($this->_enable_csrf === TRUE)
+		{
+			$this->security->csrf_verify();
+		}
 	}
 	
   	/**
   	 * POST Variable
   	 * @param  string
-  	 * @param  boolean $xss_clean Use this to sanitize you output. (for XSS prevention)
   	 * @return string
   	 */
-	public function post($post = NULL, $xss_clean = FALSE)
+	public function post($index = NULL)
 	{
-		if ( isset($_POST[$post]) ) {
-			if ( $xss_clean === TRUE ) {
-				return $this->security->xss_clean($_POST[$post]);		
-			} else {
-				return $_POST[$post];	
+		if($index === NULL && !empty($_POST)) {
+			$post = array();
+			foreach($_POST as $key => $value) {
+				$post[$key] = $value;
 			}
+			return $post;
 		}
+		return $_POST[$index];
 	}
 
 	/**
@@ -73,15 +81,16 @@ Class Io {
   	 * @param  boolean $xss_clean Use this to sanitize you output. (for XSS prevention)
   	 * @return string
   	 */
-	public function get($get = NULL, $xss_clean = FALSE)
+	public function get($index = NULL)
 	{
-		if ( isset($_GET[$get]) ) {
-			if ( $xss_clean === TRUE ) {
-				return $this->security->xss_clean($_GET[$get]);
-			} else {
-				return $_GET[$get];
+		if($index === NULL && !empty($_GET)) {
+			$get = array();
+			foreach($_GET as $key => $value) {
+				$get[$key] = $value;
 			}
+			return $get;
 		}
+		return $_GET[$index];
 	}
 
 	/**
@@ -90,22 +99,34 @@ Class Io {
   	 * @param  boolean $xss_clean Use this to sanitize you output. (for XSS prevention)
   	 * @return string
   	 */
-	public function cookie($cookie = NULL, $xss_clean = FALSE)
+	public function cookie($index = NULL)
 	{
-		if ( isset($_COOKIE[$cookie]) ) {
-			if ( $xss_clean === TRUE ) {
-				return $this->security->xss_clean($_COOKIE[$cookie]);		
-			} else {
-				return $_COOKIE[$cookie];	
+		if($index === NULL && !empty($_COOKIE)) {
+			$cookie = array();
+			foreach($_COOKIE as $key => $value) {
+				$cookie[$key] = $value;
 			}
+			return $cookie;
 		}
+		return $_COOKIE[$index];
 	}
 
-	/*
-	* ------------------------------------------------------
-	*  Setting Up Cookie Cookies
-	* ------------------------------------------------------
-	*/
+	/**
+	 * Set cookie
+	 *
+	 * Accepts an arbitrary number of parameters (up to 7) or an associative
+	 * array in the first parameter containing all the values.
+	 *
+	 * @param	string|mixed[]	$name		Cookie name or an array containing parameters
+	 * @param	string		$value		Cookie value
+	 * @param	int		$expire		Cookie expiration time in seconds
+	 * @param	string		$domain		Cookie domain (e.g.: '.yourdomain.com')
+	 * @param	string		$path		Cookie path (default: '/')
+	 * @param	string		$prefix		Cookie name prefix
+	 * @param	bool		$secure		Whether to only transfer cookies via SSL
+	 * @param	bool		$httponly	Whether to only makes the cookie accessible via HTTP (no javascript)
+	 * @return	void
+	 */
 	public function set_cookie($name, $value = '', $expire = '', $domain = '', $path = '/', $prefix = '', $secure = NULL, $httponly = NULL)
 	{
 		if (is_array($name))

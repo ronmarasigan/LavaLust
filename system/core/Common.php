@@ -121,7 +121,7 @@ if ( ! function_exists('show_error'))
 	 * @param  string $error_code
 	 * @return string
 	 */
-	function show_error($heading,$message,$error_code)
+	function show_error($heading, $message, $template, $error_code)
 	{
 	  	$errors =& load_class('Errors', 'core');
 	  	return $errors->show_error($heading, $message, $template = 'error_general', $error_code);
@@ -316,71 +316,31 @@ if ( ! function_exists('route_config'))
 	}
 }
 
-if ( ! function_exists('get_mime_type'))
+
+if ( ! function_exists('get_mimes'))
 {
 	/**
-	 * Available mime type
-	 * @param  string $extension
-	 * @return string
+	 * Returns the MIME types array from config/mimes.php
+	 *
+	 * @return	array
 	 */
-	function get_mime_type($extension) {
-	    $mimes = array( 
-	        'txt' => 'text/plain',
-	        'htm' => 'text/html',
-	        'html' => 'text/html',
-	        'php' => 'text/html',
-	        'css' => 'text/css',
-	        'js' => 'application/javascript',
-	        'json' => 'application/json',
-	        'xml' => 'application/xml',
-	        'swf' => 'application/x-shockwave-flash',
-	        'flv' => 'video/x-flv',
+	function &get_mimes()
+	{
+		static $_mimes;
 
-	        'png' => 'image/png',
-	        'jpe' => 'image/jpeg',
-	        'jpeg' => 'image/jpeg',
-	        'jpg' => 'image/jpeg',
-	        'gif' => 'image/gif',
-	        'bmp' => 'image/bmp',
-	        'ico' => 'image/vnd.microsoft.icon',
-	        'tiff' => 'image/tiff',
-	        'tif' => 'image/tiff',
-	        'svg' => 'image/svg+xml',
-	        'svgz' => 'image/svg+xml',
+		if (empty($_mimes))
+		{
+			$_mimes = file_exists(APP_DIR.'config/mimes.php')
+				? include(APP_DIR.'config/mimes.php')
+				: array();
 
-	        'zip' => 'application/zip',
-	        'rar' => 'application/x-rar-compressed',
-	        'exe' => 'application/x-msdownload',
-	        'msi' => 'application/x-msdownload',
-	        'cab' => 'application/vnd.ms-cab-compressed',
+			if (file_exists(APP_DIR.'config/mimes.php'))
+			{
+				$_mimes = array_merge($_mimes, include(APP_DIR.'config/mimes.php'));
+			}
+		}
 
-	        'mp3' => 'audio/mpeg',
-	        'qt' => 'video/quicktime',
-	        'mov' => 'video/quicktime',
-
-	        'pdf' => 'application/pdf',
-	        'psd' => 'image/vnd.adobe.photoshop',
-	        'ai' => 'application/postscript',
-	        'eps' => 'application/postscript',
-	        'ps' => 'application/postscript',
-
-	        'doc' => 'application/msword',
-	        'rtf' => 'application/rtf',
-	        'xls' => 'application/vnd.ms-excel',
-	        'ppt' => 'application/vnd.ms-powerpoint',
-	        'docx' => 'application/msword',
-	        'xlsx' => 'application/vnd.ms-excel',
-	        'pptx' => 'application/vnd.ms-powerpoint',
-
-	        'odt' => 'application/vnd.oasis.opendocument.text',
-	        'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
-	    );
-
-	    if (isset( $mimes[$extension] )) {
-	     return $mimes[$extension];
-	    } else {
-	     return 'application/octet-stream';
-	    }
+		return $_mimes;
 	}
 }
 
