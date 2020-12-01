@@ -29,9 +29,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  *
  * @package LavaLust
  * @author Ronald M. Marasigan <ronald.marasigan@yahoo.com>
- * @copyright Copyright 2020 (https://techron.info)
- * @version Version 1.2
- * @link https://lavalust.com
+ * @copyright Copyright 2020 (https://ronmarasigan.github.io)
+ * @version Version 1.3.4
+ * @link https://lavalust.pinoywap.org
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
@@ -55,5 +55,5 @@ $database['hostname']	= '';
 $database['username']	= '';
 $database['password']	= '';
 $database['database']	= '';
-$database['charset']	= '';
+$database['charset']	= 'utf8';
 ?>
