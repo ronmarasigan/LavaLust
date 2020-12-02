@@ -76,7 +76,8 @@ class Router
 	{
 		$route = route_config();
 		$request_url = (isset($_SERVER['REQUEST_URI'])) ? $_SERVER['REQUEST_URI'] : '';
-		$script_url  = (isset($_SERVER['PHP_SELF'])) ? $_SERVER['PHP_SELF'] : '';
+		//hack!
+		$script_url  = (isset($_SERVER['PHP_SELF'])) ? substr_replace($_SERVER['PHP_SELF'], '', strpos($_SERVER['PHP_SELF'], 'index.php') + 9) : '';
 
 		if(strpos($request_url, '?') == TRUE)
 		{
@@ -111,64 +112,19 @@ class Router
 		$this->method = config_item('default_method');
 
 		$segments = $this->parseUrl();
-
-		/***** Set default indexes *****/
-		$controller_index = 0;
-		$method_index = 1;
-		$script_index = 0;
-
-		/**** This is optional. If you will deploy this on your server
-		such like https://mywebsite.com
-		You can remove this condition *****/
-
-		if($_SERVER['SERVER_NAME']=='localhost' || $_SERVER['SERVER_NAME']=='127.0.0.1')
-		{
-			$controller_index = 1;
-			$method_index = 2;
-			if(count($segments) > 1)
-				$script_index = 1;
-		}
 		
-		/*
-		 * ------------------------------------------------------
-		 *  Function for Available Language
-		 * ------------------------------------------------------
-		 */
-		if(in_array($segments[$script_index], $autoload['language'])) {
-			if(file_exists(SYSTEM_DIR . 'language/' . strtolower($segments[$controller_index]) . '_lang.php'))
-				require(SYSTEM_DIR . 'language/' . strtolower($segments[$controller_index]) . '_lang.php');
-			else
-				require(APP_DIR . 'language/' . strtolower($segments[$controller_index]) . '_lang.php');
-
-			setcookie('language', strtolower($segments[$controller_index]), time() + (60*60*24*30));
-			unset($segments[$controller_index]);
-
-			/*
-			 * ------------------------------------------------------
-			 *  Function for setting segment if language is available
-			 * ------------------------------------------------------
-			 */
-			$controller_index += 1;
-			$method_index += 1;
-		}
-		else
-			require(SYSTEM_DIR . 'language/' . strtolower(config_item('language')) . '_lang.php');
-
-		if(isset($segments[$controller_index]) && !empty($segments[$controller_index]))
-			$this->controller = ucfirst($segments[$controller_index]);
-		if(isset($segments[$method_index]) && !empty($segments[$method_index]))
-			$this->method = str_replace('-', '_', $segments[$method_index]);
+		if(isset($segments[0]) && !empty($segments[0]))
+			$this->controller = ucfirst($segments[0]);
+		if(isset($segments[1]) && !empty($segments[1]))
+			$this->method = str_replace('-', '_', $segments[1]);
 
 		if(file_exists(APP_DIR . 'controllers/' . $this->controller . '.php'))
 		{
 			require(APP_DIR . 'controllers/' . $this->controller . '.php');
-			if($controller_index != 0)
-				unset($segments[$controller_index], $segments[0]);
-			else
-				unset($segments[0]);
+			unset($segments[0]);
 
 			if(method_exists($this->controller, $this->method))
-				unset($segments[$method_index]);
+				unset($segments[1]);
 			else
 				/*
 				 * ------------------------------------------------------

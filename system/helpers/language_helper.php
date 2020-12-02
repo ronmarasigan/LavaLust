@@ -35,13 +35,26 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
-define('LANG', [
-    'Welcome' => 'Welcome',
-    'Hello' => 'Hello',
-    'Subscribe' => 'Subscribe',
-	'Active Users' => 'Active Users',
-	'Curriculum' => 'Curriculum',
-	'SMS Servers' => 'SMS Servers'
-]);
+if ( ! function_exists('lang'))
+{
+	/**
+	 * Use to translate text on you app in different languages
+	 * 
+	 * @param  [type]  $key    [key value from your language file]
+	 * @param  array   $params [optional parameters]
+	 * @param  boolean $xss    [if you want to include anti XSS before displaying the text]
+	 * @return [type]
+	 */
+	function lang($key, $params = array(), $xss = FALSE)
+	{
+		$translated = get_instance()->lang->translate($key, $params);
+
+		if($xss == TRUE) {
+			return get_instance()->security->xss_clean($translated);
+		}
+		else
+			return $translated;
+	}
+}
 
 ?>
