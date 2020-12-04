@@ -36,13 +36,15 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');/**
 
 class Lang {
 
+	//current language
     public $current = '';
 
-    public $default = 'en-US';
+    public $default;
 
     public $languages = array();
 
     public function __construct() {
+        $this->default = config_item('language');
         $this->current = $this->clientlanguage();
     }
 
@@ -89,7 +91,7 @@ class Lang {
 
     public function clientlanguage()
     {
-        return !empty($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 5) : null;
+        return !empty($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']) : null;
     }
 
 }

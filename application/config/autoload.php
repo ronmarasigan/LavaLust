@@ -82,20 +82,6 @@ $autoload['libraries'] = array();
 
 /*
 | -------------------------------------------------------------------
-|  Auto-load Language files
-| -------------------------------------------------------------------
-| Prototype:
-|
-|	$autoload['language'] = ['lang1', 'lang2'];
-|
-| NOTE: Do not include the "_lang" part of your file.  For example
-| "en_lang.php" would be referenced as array('en');
-|
-*/
-$autoload['language'] = array('en', 'tag');
-
-/*
-| -------------------------------------------------------------------
 |  Auto-load Helper Files
 | -------------------------------------------------------------------
 | Prototype:

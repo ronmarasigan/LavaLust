@@ -86,7 +86,7 @@ date_default_timezone_set('Asia/Manila');
 | WARNING: You MUST set this value!
 |
 */
-$config['base_url'] 				= 'http://lavalust-dev.local';
+$config['base_url'] 				= 'http://lavalust-dev.local/';
 
 /*
 |--------------------------------------------------------------------------
@@ -150,7 +150,7 @@ $config['error_view_path']         	= APP_DIR . 'views' . DIRECTORY_SEPARATOR . 
 | than english.
 |
 */
-$config['language'] 				= 'en';
+$config['language'] 				= 'en-US';
 
 /*
 |--------------------------------------------------------------------------

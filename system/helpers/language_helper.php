@@ -57,4 +57,13 @@ if ( ! function_exists('lang'))
 	}
 }
 
+if ( ! function_exists('language'))
+{
+
+	function language($lang)
+	{
+		return get_instance()->lang->language($lang);
+	}
+}
+
 ?>
