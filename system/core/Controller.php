@@ -142,8 +142,7 @@ class Loader {
 	{
 		$LAVA =& Controller::get_instance();
 		$database =& load_class('database','database');
-		$database = $database::get_instance();
-	    return $database;
+		$LAVA->db = $database::get_instance();
 	}
 
 	/**

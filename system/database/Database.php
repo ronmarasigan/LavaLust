@@ -65,12 +65,13 @@ class Database {
     public function __construct()
     {
         $database_config = database_config();
+        $this->driver = $database_config['driver'];
         $this->charset = $database_config['charset'];
         $this->dbost = $database_config['hostname'];
         $this->dbname = $database_config['database'];
         $this->dbuser = $database_config['username'];
         $this->dbpass = $database_config['password'];
-        $this->dsn = 'mysql:host=' . $this->dbost . ';dbname=' . $this->dbname . ';charset=' . $this->charset;
+        $this->dsn = ''.$this->driver.':host=' . $this->dbost . ';dbname=' . $this->dbname . ';charset=' . $this->charset;
 
         $options = array(
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
@@ -399,6 +400,71 @@ class Database {
             : $this->where . ' ' . 'AND ' . $where;
 
         return $this;
+    }
+
+    public function like($field, $data, $type = '', $andOr = 'AND')
+    {
+        $this->bindValues[] = $data;
+        $where = $field . ' ' . $type . 'LIKE ?';
+
+        if ($this->grouped) {
+            $where = '(' . $where;
+            $this->grouped = false;
+        }
+
+        $this->where = (is_null($this->where))
+            ? ' WHERE ' . $where
+            : $this->where . ' ' . $andOr . ' ' . $where;
+
+        return $this;
+    }
+
+    public function orLike($field, $data)
+    {
+        return $this->like($field, $data, '', 'OR');
+    }
+
+    public function notLike($field, $data)
+    {
+        return $this->like($field, $data, 'NOT ', 'AND');
+    }
+
+    public function orNotLike($field, $data)
+    {
+        return $this->like($field, $data, 'NOT ', 'OR');
+    }
+
+    public function between($field, $value1, $value2, $type = '', $andOr = 'AND')
+    {
+        $this->bindValues[] = $value1;
+        $this->bindValues[] = $value2;
+        $where = '(' . $field . ' ' . $type . 'BETWEEN ?  AND ?)';
+
+        if ($this->grouped) {
+            $where = '(' . $where;
+            $this->grouped = false;
+        }
+
+        $this->where = (is_null($this->where))
+            ? ' WHERE ' . $where
+            : $this->where . ' ' . $andOr . ' ' . $where;
+
+        return $this;
+    }
+
+    public function notBetween($field, $value1, $value2)
+    {
+        return $this->between($field, $value1, $value2, 'NOT ', 'AND');
+    }
+
+    public function orBetween($field, $value1, $value2)
+    {
+        return $this->between($field, $value1, $value2, '', 'OR');
+    }
+
+    public function orNotBetween($field, $value1, $value2)
+    {
+        return $this->between($field, $value1, $value2, 'NOT ', 'OR');
     }
 
     public function limit($limit, $offset=NULL)

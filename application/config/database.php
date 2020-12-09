@@ -51,6 +51,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 |	['charset']		The default character set
 */
 
+$database['driver']	= 'mysql';
 $database['hostname']	= '';
 $database['username']	= '';
 $database['password']	= '';
