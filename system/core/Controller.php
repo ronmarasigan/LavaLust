@@ -69,7 +69,7 @@ class Loader {
 	public function view($viewFile, $data = array())
 	{
 		if(!empty($data))
-			extract($data);
+			extract($data, EXTR_SKIP);
 		ob_start();
 		if(file_exists(APP_DIR .'views/' . $viewFile . '.php'))
 			require_once(APP_DIR .'views/' . $viewFile . '.php');
