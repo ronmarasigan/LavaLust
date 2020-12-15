@@ -1,5 +1,0 @@
-New Updates
-
-1. You can now call $this->load->database inside models, controllers and view so that you can use $this->db directly (see controller.php's database function)
-2.database.php added like and between queries
-3. view function. extract(EXTR_SKIP)

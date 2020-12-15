@@ -52,9 +52,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 */
 
 $database['driver']	= 'mysql';
-$database['hostname']	= 'localhost';
-$database['username']	= 'root';
+$database['hostname']	= '';
+$database['username']	= '';
 $database['password']	= '';
-$database['database']	= 'dummy';
+$database['database']	= '';
 $database['charset']	= 'utf8';
 ?>
