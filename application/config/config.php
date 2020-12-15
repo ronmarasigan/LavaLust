@@ -162,7 +162,7 @@ $config['language'] 				= 'en-US';
 |--------------------------------------------------------------------------
 */
 $config['sess_driver']             = 'file';
-$config['sess_cookie_name']        = 'lava_session';
+$config['sess_cookie_name']        = APP_DIR . 'session/';
 $config['sess_expiration']         = 7200;
 $config['sess_save_path']          = '';
 $config['sess_match_ip']           = TRUE;
