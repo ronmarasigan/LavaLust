@@ -87,6 +87,11 @@ class Database {
         }
     }
 
+    /**
+     * Get Database Instance
+     * 
+     * @return instance
+     */
     public static function get_instance()
     {
         if (!self::$instance) {
@@ -95,6 +100,13 @@ class Database {
         return self::$instance;
     }
 
+    /**
+     * Raw Query
+     * 
+     * @param  string $query [description]
+     * @param  array  $args  arguments
+     * @return result
+     */
     public function raw($query, $args = [])
     {
         $this->resetQuery();
@@ -114,6 +126,12 @@ class Database {
             return $stmt->rowCount();
         }
     }
+
+    /**
+     * Execute insert, update and delete
+     * 
+     * @return query
+     */
     public function exec()
     {
             $this->sql .= $this->where;
@@ -128,6 +146,11 @@ class Database {
                 return $stmt->rowCount();
     }
 
+    /**
+     * Reset queries
+     * 
+     * @return $this
+     */
     private function resetQuery()
     {
         $this->table = NULL;
@@ -144,6 +167,11 @@ class Database {
         $this->lastIDInserted = 0;
     }
 
+    /**
+     * Delete Records
+     * 
+     * @return Result
+     */
     public function delete()
     {
         $this->sql = "DELETE FROM {$this->table}";
@@ -166,6 +194,13 @@ class Database {
         return $this;
     }
 
+
+    /**
+     * Insert record
+     * 
+     * @param  array  $fields [description]
+     * @return [type]         [description]
+     */
     public function insert($fields = [])
     {
         $keys = implode(', ', array_keys($fields));
@@ -185,11 +220,22 @@ class Database {
         return $this;
     }
 
-    public function lastId()
+    /**
+     * Last inserted ID
+     * 
+     * @return [type] [description]
+     */
+    public function last_id()
     {
         return $this->lastIDInserted;
     }
 
+    /**
+     * Get table names
+     * 
+     * @param  [type] $table_name [description]
+     * @return [type]             [description]
+     */
     public function table($table_name)
     {
         $this->resetQuery();
@@ -197,6 +243,12 @@ class Database {
         return $this;
     }
 
+    /**
+     * Select
+     * 
+     * @param  [type] $columns [description]
+     * @return [type]          [description]
+     */
     public function select($columns)
     {
         $columns = explode(',', $columns);
@@ -210,99 +262,158 @@ class Database {
         return $this;
     }
 
-    public function max($column, $name = null)
+    /**
+     * [_max_min_sum_count_avg description]
+     * 
+     * @param  [type] $column [description]
+     * @param  [type] $alias  [description]
+     * @param  string $type   [description]
+     * @return [type]         [description]
+     */
+    public function _max_min_sum_count_avg($column, $alias = null, $type = 'MAX')
     {
-        $func = 'MAX(' . $column . ')' . (! is_null($name) ? ' AS ' . $name : '');
-        $this->columns = ($this->columns == NULL ? $func : $this->columns . ', ' . $func);
-
-        return $this;
-    }
-
-    public function min($field, $name = null)
-    {
-        $func = 'MIN(' . $field . ')' . (! is_null($name) ? ' AS ' . $name : '');
-        $this->columns = ($this->columns == NULL ? $func : $this->columns . ', ' . $func);
-
-        return $this;
-    }
-
-    public function sum($field, $name = null)
-    {
-        $func = 'SUM(' . $field . ')' . (! is_null($name) ? ' AS ' . $name : '');
-        $this->columns = ($this->columns == NULL ? $func : $this->columns . ', ' . $func);
-
-        return $this;
-    }
-
-    public function count($field, $name = null)
-    {
-        $func = 'COUNT(' . $field . ')' . (! is_null($name) ? ' AS ' . $name : '');
-        $this->columns = ($this->columns == NULL ? $func : $this->columns . ', ' . $func);
-
-        return $this;
-    }
-
-    public function avg($field, $name = null)
-    {
-        $func = 'AVG(' . $field . ')' . (! is_null($name) ? ' AS ' . $name : '');
-        $this->columns = ($this->columns == NULL ? $func : $this->columns . ', ' . $func);
-
-        return $this;
-    }
-
-    public function join($table_name, $field1 = NULL, $op = NULL, $field2 = NULL, $type = '')
-    {
-        $on = $field1;
-
-        if (! is_NULL($op)) {
-            $on = (! in_array($op, $this->operators) ? $field1 . ' = ' . $op : $field1 . ' ' . $op . ' ' . $field2);
+        if( ! in_array($type, array('MAX', 'MIN', 'SUM', 'COUNT', 'AVG'))) {
+            show_error('Database Error Occured', 'Invalid function type: ' . html_escape($type), 'error_db', 500);
         }
 
-        $this->join = (is_NULL($this->join))
-            ? ' ' . $type . 'JOIN' . ' ' . $table_name . ' ON ' . $on
-            : $this->join . ' ' . $type . 'JOIN' . ' ' . $table_name . ' ON ' . $on;
+        $function = $type . '(' . $column . ')' . (! is_null($alias) ? ' AS ' . $alias : '');
+        $this->columns = ( is_null($this->columns) ? $function : $this->columns . ', ' . $function);
+ 
+        return $this;
+    }
+
+    /**
+     * [select_max description]
+     * 
+     * @param  [type] $column [description]
+     * @param  [type] $alias  [description]
+     * @return [type]         [description]
+     */
+    public function select_max($column, $alias = null)
+    {
+        return $this->_max_min_sum_count_avg($column, $alias, $type = 'MAX');
+    }
+
+    /**
+     * [select_min description]
+     * 
+     * @param  [type] $column [description]
+     * @param  [type] $alias  [description]
+     * @return [type]         [description]
+     */
+    public function select_min($column, $alias = null)
+    {
+        return $this->_max_min_sum_count_avg($column, $alias, $type = 'MIN');
+    }
+
+    /**
+     * [select_sum description]
+     * 
+     * @param  [type] $column [description]
+     * @param  [type] $alias  [description]
+     * @return [type]         [description]
+     */
+    public function select_sum($column, $alias = null)
+    {
+        return $this->_max_min_sum_count_avg($column, $alias, $type = 'SUM');
+    }
+
+    /**
+     * [select_count description]
+     * 
+     * @param  [type] $column [description]
+     * @param  [type] $alias  [description]
+     * @return [type]         [description]
+     */
+    public function select_count($column, $alias = null)
+    {
+        return $this->_max_min_sum_count_avg($column, $alias, $type = 'COUNT');
+    }
+
+    /**
+     * [select_avg description]
+     * 
+     * @param  [type] $column [description]
+     * @param  [type] $alias  [description]
+     * @return [type]         [description]
+     */
+    public function select_avg($column, $alias = null)
+    {
+        return $this->_max_min_sum_count_avg($column, $alias, $type = 'AVG');
+    }
+
+    /**
+     * [join description]
+     * 
+     * @param  [type] $table_name [description]
+     * @param  [type] $cond       [description]
+     * @param  string $type       [description]
+     * @return [type]             [description]
+     */
+    public function join($table_name, $cond, $type = '')
+    {
+        //Planning to add but im worrying about the loading speed.
+        /*
+        $flag = false;
+        foreach ($this->$operators as $operator) {
+            if (strpos($cond, $operator) !== FALSE) {
+                $flag = true;
+            } else {
+                $flag = false;
+            }
+        }
+        */
+       
+        $this->join = (is_null($this->join))
+            ? ' ' . $type . 'JOIN' . ' ' . $table_name . ' ON ' . $cond
+            : $this->join . ' ' . $type . 'JOIN' . ' ' . $table_name . ' ON ' . $cond;
 
         return $this;
     }
 
-    public function innerJoin($table_name, $field1, $op = '', $field2 = '')
+    /**
+     * [inner_join description]
+     * 
+     * @param  [type] $table_name [description]
+     * @param  [type] $cond       [description]
+     * @return [type]             [description]
+     */
+    public function inner_join($table_name, $cond)
     {
-        $this->join($table_name, $field1, $op, $field2, 'INNER ');
+        return $this->join($table_name, $cond, 'INNER ');
+    }
+
+    public function left_join($table_name, $cond)
+    {
+        $this->join($table_name, $cond, 'LEFT ');
 
         return $this;
     }
 
-    public function leftJoin($table_name, $field1, $op = '', $field2 = '')
+    public function right_join($table_name, $cond)
     {
-        $this->join($table_name, $field1, $op, $field2, 'LEFT ');
+        $this->join($table_name, $cond, 'RIGHT ');
 
         return $this;
     }
 
-    public function rightJoin($table_name, $field1, $op = '', $field2 = '')
+    public function full_outer_join($table_name, $cond)
     {
-        $this->join($table_name, $field1, $op, $field2, 'RIGHT ');
+        $this->join($table_name, $cond, 'FULL OUTER ');
 
         return $this;
     }
 
-    public function fullOuterJoin($table_name, $field1, $op = '', $field2 = '')
+    public function left_outer_join($table_name, $cond)
     {
-        $this->join($table_name, $field1, $op, $field2, 'FULL OUTER ');
+        $this->join($table_name, $cond, 'LEFT OUTER ');
 
         return $this;
     }
 
-    public function leftOuterJoin($table_name, $field1, $op = '', $field2 = '')
+    public function right_outer_join($table_name, $cond)
     {
-        $this->join($table_name, $field1, $op, $field2, 'LEFT OUTER ');
-
-        return $this;
-    }
-
-    public function rightOuterJoin($table_name, $field1, $op = '', $field2 = '')
-    {
-        $this->join($table_name, $field1, $op, $field2, 'RIGHT OUTER ');
+        $this->join($table_name, $cond, 'RIGHT OUTER ');
 
         return $this;
     }
@@ -361,28 +472,28 @@ class Database {
         return $this;
     }
 
-    public function orWhere($where, $op = null, $val = null)
+    public function or_where($where, $op = null, $val = null)
     {
         $this->where($where, $op, $val, '', 'OR');
 
         return $this;
     }
 
-    public function notWhere($where, $op = null, $val = null)
+    public function not_where($where, $op = null, $val = null)
     {
         $this->where($where, $op, $val, 'NOT ', 'AND');
 
         return $this;
     }
 
-    public function orNotWhere($where, $op = null, $val = null)
+    public function or_not_where($where, $op = null, $val = null)
     {
         $this->where($where, $op, $val, 'NOT ', 'OR');
 
         return $this;
     }
 
-    public function whereNull($where)
+    public function where_null($where)
     {
         $where = $where . ' IS NULL';
         $this->where = (is_null($this->where))
@@ -392,7 +503,7 @@ class Database {
         return $this;
     }
 
-    public function whereNotNull($where)
+    public function where_not_null($where)
     {
         $where = $where . ' IS NOT NULL';
         $this->where = (is_null($this->where))
@@ -419,17 +530,17 @@ class Database {
         return $this;
     }
 
-    public function orLike($field, $data)
+    public function or_like($field, $data)
     {
         return $this->like($field, $data, '', 'OR');
     }
 
-    public function notLike($field, $data)
+    public function not_like($field, $data)
     {
         return $this->like($field, $data, 'NOT ', 'AND');
     }
 
-    public function orNotLike($field, $data)
+    public function or_not_like($field, $data)
     {
         return $this->like($field, $data, 'NOT ', 'OR');
     }
@@ -452,17 +563,17 @@ class Database {
         return $this;
     }
 
-    public function notBetween($field, $value1, $value2)
+    public function not_between($field, $value1, $value2)
     {
         return $this->between($field, $value1, $value2, 'NOT ', 'AND');
     }
 
-    public function orBetween($field, $value1, $value2)
+    public function or_between($field, $value1, $value2)
     {
         return $this->between($field, $value1, $value2, '', 'OR');
     }
 
-    public function orNotBetween($field, $value1, $value2)
+    public function or_not_between($field, $value1, $value2)
     {
         return $this->between($field, $value1, $value2, 'NOT ', 'OR');
     }
@@ -478,7 +589,7 @@ class Database {
         return $this;
     }
 
-    public function orderBy($field_name, $order = 'ASC')
+    public function order_by($field_name, $order = 'ASC')
     {
         $field_name = trim($field_name);
 
@@ -496,7 +607,7 @@ class Database {
         return $this;
     }
 
-     public function groupBy($groupBy)
+     public function group_by($groupBy)
     {
         $this->groupBy = ' GROUP BY ';
         $this->groupBy .= (is_array($groupBy))
@@ -552,21 +663,21 @@ class Database {
         return $this;
     }
 
-    public function notIn($field, array $keys)
+    public function not_in($field, array $keys)
     {
         $this->in($field, $keys, 'NOT ', 'AND');
 
         return $this;
     }
 
-    public function orIn($field, array $keys)
+    public function or_in($field, array $keys)
     {
         $this->in($field, $keys, '', 'OR');
 
         return $this;
     }
 
-    public function orNotIn($field, array $keys)
+    public function or_not_in($field, array $keys)
     {
         $this->in($field, $keys, 'NOT ', 'OR');
 
@@ -587,7 +698,7 @@ class Database {
         }
     }
 
-    public function getAll()
+    public function get_all()
     {
         $this->buildQuery();
         $this->getSQL = $this->sql;
@@ -635,12 +746,12 @@ class Database {
         }
     }
 
-    public function getSQL()
+    public function get_sql()
     {
         return $this->getSQL;
     }
 
-    public function rowCount()
+    public function row_count()
     {
         return $this->rowCount;
     }
@@ -669,7 +780,7 @@ class Database {
         return $this->transactionCount >= 0;
     }
 
-    public function rollBack()
+    public function roll_back()
     {
         if (--$this->transactionCount) {
             $this->db->exec('ROLLBACK TO trans' . ($this->transactionCount + 1));

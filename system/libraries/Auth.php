@@ -58,8 +58,7 @@ class Auth {
 		$options = array(
 		'cost' => 4,
 		);
-		$password_hash = password_hash($password, PASSWORD_BCRYPT, $options);
-		return $password_hash;
+		return password_hash($password, PASSWORD_BCRYPT, $options);
 	}
 
 	/**
@@ -78,10 +77,9 @@ class Auth {
 			'email' => $email,
 			'usertype' => $usertype,
 			);
-		$res = $this->db->table('user')
+		return $this->db->table('user')
 						->insert($bind)
 						->exec();
-		return $res;
 	}
 
 	/**
@@ -100,9 +98,7 @@ class Auth {
 			if(password_verify($password, $row['password']))
 			{
 				return $row['username'];
-			}
-			else
-			{
+			} else {
 				return false;
 			}
 		}

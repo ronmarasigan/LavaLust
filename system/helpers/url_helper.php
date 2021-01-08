@@ -68,7 +68,7 @@ if ( ! function_exists('load_js'))
 	function load_js($paths)
 	{
 		foreach ($paths as $path) {
-			echo '<script src="' . BASE_URL . PUBLIC_FOLDER . '/' . $path . '.js"></script>' . "\r\n";
+			echo '<script src="' . BASE_URL . PUBLIC_DIR . '/' . $path . '.js"></script>' . "\r\n";
 		}
 	}
 }
@@ -83,7 +83,7 @@ if ( ! function_exists('load_css'))
 	function load_css($paths)
 	{
 		foreach ($paths as $path) {
-			echo '<link rel="stylesheet" href="' . BASE_URL . PUBLIC_FOLDER .'/' . $path . '.css" type="text/css" />' . "\r\n";
+			echo '<link rel="stylesheet" href="' . BASE_URL . PUBLIC_DIR .'/' . $path . '.css" type="text/css" />' . "\r\n";
 		}
 	}
 }
