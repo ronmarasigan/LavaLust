@@ -11,10 +11,10 @@
 [Github Page] https://ronmarasigan.github.io
 [Youtube Channel] https://youtube.com/ronmarasigan
 
-## Special Thanks to the following
-	CodeIgniter (so many reasons to mention)
+## Special Thanks/Credits to the following
+	CodeIgniter (some helpers, libraries and many other things)
 	HTMLPurifier (for XSS filtering)
-	Github Comunity for all the resouces I read to make this work.
+	Github Comunity / Youtube for all the resouces I read to make this work.
 
 ### Licence
 	MIT License

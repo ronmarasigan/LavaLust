@@ -30,7 +30,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * @package LavaLust
  * @author Ronald M. Marasigan <ronald.marasigan@yahoo.com>
  * @copyright Copyright 2020 (https://ronmarasigan.github.io)
- * @version Version 1.3.4
+ * @version Version 1
  * @link https://lavalust.pinoywap.org
  * @license https://opensource.org/licenses/MIT MIT License
  */
@@ -103,7 +103,7 @@ class Database {
     /**
      * Raw Query
      * 
-     * @param  string $query [description]
+     * @param  string $query
      * @param  array  $args  arguments
      * @return result
      */
@@ -170,7 +170,7 @@ class Database {
     /**
      * Delete Records
      * 
-     * @return Result
+     * @return $this
      */
     public function delete()
     {
@@ -198,8 +198,8 @@ class Database {
     /**
      * Insert record
      * 
-     * @param  array  $fields [description]
-     * @return [type]         [description]
+     * @param  array  $fields
+     * @return $this
      */
     public function insert($fields = [])
     {
@@ -223,7 +223,7 @@ class Database {
     /**
      * Last inserted ID
      * 
-     * @return [type] [description]
+     * @return $this
      */
     public function last_id()
     {
@@ -233,8 +233,8 @@ class Database {
     /**
      * Get table names
      * 
-     * @param  [type] $table_name [description]
-     * @return [type]             [description]
+     * @param  string $table_name
+     * @return $this
      */
     public function table($table_name)
     {
@@ -246,8 +246,8 @@ class Database {
     /**
      * Select
      * 
-     * @param  [type] $columns [description]
-     * @return [type]          [description]
+     * @param  string $columns
+     * @return $this
      */
     public function select($columns)
     {
@@ -263,12 +263,12 @@ class Database {
     }
 
     /**
-     * [_max_min_sum_count_avg description]
+     * max_min_sum_count_avg
      * 
-     * @param  [type] $column [description]
-     * @param  [type] $alias  [description]
-     * @param  string $type   [description]
-     * @return [type]         [description]
+     * @param  string $column
+     * @param  string $alias
+     * @param  string $type
+     * @return $this
      */
     public function _max_min_sum_count_avg($column, $alias = null, $type = 'MAX')
     {
@@ -283,11 +283,11 @@ class Database {
     }
 
     /**
-     * [select_max description]
+     * select_max
      * 
-     * @param  [type] $column [description]
-     * @param  [type] $alias  [description]
-     * @return [type]         [description]
+     * @param  string $column
+     * @param  string $alias
+     * @return $this 
      */
     public function select_max($column, $alias = null)
     {
@@ -295,11 +295,11 @@ class Database {
     }
 
     /**
-     * [select_min description]
+     * select_min
      * 
-     * @param  [type] $column [description]
-     * @param  [type] $alias  [description]
-     * @return [type]         [description]
+     * @param  string $column
+     * @param  string $alias
+     * @return $this 
      */
     public function select_min($column, $alias = null)
     {
@@ -307,11 +307,11 @@ class Database {
     }
 
     /**
-     * [select_sum description]
+     * select_sum
      * 
-     * @param  [type] $column [description]
-     * @param  [type] $alias  [description]
-     * @return [type]         [description]
+     * @param  string $column
+     * @param  string $alias
+     * @return $this
      */
     public function select_sum($column, $alias = null)
     {
@@ -319,11 +319,11 @@ class Database {
     }
 
     /**
-     * [select_count description]
+     * select_count
      * 
-     * @param  [type] $column [description]
-     * @param  [type] $alias  [description]
-     * @return [type]         [description]
+     * @param  string $column
+     * @param  string $alias
+     * @return $this 
      */
     public function select_count($column, $alias = null)
     {
@@ -331,11 +331,11 @@ class Database {
     }
 
     /**
-     * [select_avg description]
+     * select_avg
      * 
-     * @param  [type] $column [description]
-     * @param  [type] $alias  [description]
-     * @return [type]         [description]
+     * @param  string $column
+     * @param  string $alias
+     * @return $this 
      */
     public function select_avg($column, $alias = null)
     {
@@ -343,12 +343,12 @@ class Database {
     }
 
     /**
-     * [join description]
+     * join
      * 
-     * @param  [type] $table_name [description]
-     * @param  [type] $cond       [description]
-     * @param  string $type       [description]
-     * @return [type]             [description]
+     * @param  string $table_name
+     * @param  string $cond
+     * @param  string $type
+     * @return $this
      */
     public function join($table_name, $cond, $type = '')
     {
@@ -372,17 +372,24 @@ class Database {
     }
 
     /**
-     * [inner_join description]
+     * inner_join
      * 
-     * @param  [type] $table_name [description]
-     * @param  [type] $cond       [description]
-     * @return [type]             [description]
+     * @param  string $table_name
+     * @param  string $cond
+     * @return $this
      */
     public function inner_join($table_name, $cond)
     {
         return $this->join($table_name, $cond, 'INNER ');
     }
 
+    /**
+     * left_join
+     * 
+     * @param  string $table_name
+     * @param  string $cond
+     * @return $this
+     */
     public function left_join($table_name, $cond)
     {
         $this->join($table_name, $cond, 'LEFT ');
@@ -390,6 +397,13 @@ class Database {
         return $this;
     }
 
+    /**
+     * right_join
+     * 
+     * @param  string $table_name
+     * @param  string $cond
+     * @return $this
+     */
     public function right_join($table_name, $cond)
     {
         $this->join($table_name, $cond, 'RIGHT ');
@@ -397,6 +411,13 @@ class Database {
         return $this;
     }
 
+    /**
+     * full_outer_join
+     * 
+     * @param  string $table_name
+     * @param  string $cond
+     * @return $this
+     */
     public function full_outer_join($table_name, $cond)
     {
         $this->join($table_name, $cond, 'FULL OUTER ');
@@ -404,6 +425,13 @@ class Database {
         return $this;
     }
 
+    /**
+     * left_outer_join
+     * 
+     * @param  string $table_name
+     * @param  string $cond
+     * @return $this
+     */
     public function left_outer_join($table_name, $cond)
     {
         $this->join($table_name, $cond, 'LEFT OUTER ');
@@ -411,6 +439,13 @@ class Database {
         return $this;
     }
 
+    /**
+     * right_outer_join
+     * 
+     * @param  string $table_name
+     * @param  string $cond
+     * @return $this
+     */
     public function right_outer_join($table_name, $cond)
     {
         $this->join($table_name, $cond, 'RIGHT OUTER ');
@@ -418,6 +453,12 @@ class Database {
         return $this;
     }
 
+    /**
+     * grouped
+     * 
+     * @param  Closure $obj
+     * @return $this
+     */
     public function grouped(Closure $obj)
     {
         $this->grouped = true;
@@ -427,6 +468,16 @@ class Database {
         return $this;
     }
 
+    /**
+     * where
+     * 
+     * @param  string $where
+     * @param  string $op
+     * @param  mixed $val
+     * @param  string $type
+     * @param  string $andOr
+     * @return $this
+     */
     public function where($where, $op = null, $val = null, $type = '', $andOr = 'AND')
     {
         if (is_array($where) && ! empty($where)) {
@@ -472,6 +523,14 @@ class Database {
         return $this;
     }
 
+    /**
+     * or_where
+     * 
+     * @param  string $where
+     * @param  string $op
+     * @param  mixed $val
+     * @return $this
+     */
     public function or_where($where, $op = null, $val = null)
     {
         $this->where($where, $op, $val, '', 'OR');
@@ -479,6 +538,14 @@ class Database {
         return $this;
     }
 
+    /**
+     * not_where
+     * 
+     * @param  string $where
+     * @param  string $op
+     * @param  mixed $val
+     * @return $this
+     */
     public function not_where($where, $op = null, $val = null)
     {
         $this->where($where, $op, $val, 'NOT ', 'AND');
@@ -486,6 +553,14 @@ class Database {
         return $this;
     }
 
+    /**
+     * or_not_where
+     * 
+     * @param  string $where
+     * @param  string $op
+     * @param  mixed $val
+     * @return $this
+     */
     public function or_not_where($where, $op = null, $val = null)
     {
         $this->where($where, $op, $val, 'NOT ', 'OR');
@@ -493,6 +568,12 @@ class Database {
         return $this;
     }
 
+    /**
+     * where_null
+     * 
+     * @param  string $where
+     * @return $this
+     */
     public function where_null($where)
     {
         $where = $where . ' IS NULL';
@@ -503,6 +584,12 @@ class Database {
         return $this;
     }
 
+    /**
+     * where_not_null
+     * 
+     * @param  string $where
+     * @return $this
+     */
     public function where_not_null($where)
     {
         $where = $where . ' IS NOT NULL';
@@ -513,6 +600,15 @@ class Database {
         return $this;
     }
 
+    /**
+     * like
+     * 
+     * @param  string $field
+     * @param  mixed $data
+     * @param  string $type
+     * @param  string $andOr
+     * @return $this
+     */
     public function like($field, $data, $type = '', $andOr = 'AND')
     {
         $this->bindValues[] = $data;
@@ -530,21 +626,50 @@ class Database {
         return $this;
     }
 
+    /**
+     * or_like
+     * @param  string $field
+     * @param  mixed $data
+     * @return $this
+     */
     public function or_like($field, $data)
     {
         return $this->like($field, $data, '', 'OR');
     }
 
+    /**
+     * not_like
+     * @param  string $field
+     * @param  mixed $data
+     * @return $this
+     */
     public function not_like($field, $data)
     {
         return $this->like($field, $data, 'NOT ', 'AND');
     }
 
+    /**
+     * or_not_like
+     * 
+     * @param  string $field
+     * @param  mixed $data
+     * @return $this
+     */
     public function or_not_like($field, $data)
     {
         return $this->like($field, $data, 'NOT ', 'OR');
     }
 
+    /**
+     * between
+     * 
+     * @param  string $field
+     * @param  mixed $value1
+     * @param  mixed $value2
+     * @param  string $type
+     * @param  string $andOr
+     * @return $this
+     */
     public function between($field, $value1, $value2, $type = '', $andOr = 'AND')
     {
         $this->bindValues[] = $value1;
@@ -563,21 +688,125 @@ class Database {
         return $this;
     }
 
+    /**
+     * not_between
+     * 
+     * @param  string $field
+     * @param  mixed $value1
+     * @param  mixed $value2
+     * @return $this
+     */
     public function not_between($field, $value1, $value2)
     {
         return $this->between($field, $value1, $value2, 'NOT ', 'AND');
     }
 
+    /**
+     * or_between
+     * 
+     * @param  string $field
+     * @param  mixed $value1
+     * @param  mixed $value2
+     * @return $this
+     */
     public function or_between($field, $value1, $value2)
     {
         return $this->between($field, $value1, $value2, '', 'OR');
     }
 
+    /**
+     * or_not_between
+     * 
+     * @param  string $field
+     * @param  mixed $value1
+     * @param  mixed $value2
+     * @return $this
+     */
     public function or_not_between($field, $value1, $value2)
     {
         return $this->between($field, $value1, $value2, 'NOT ', 'OR');
     }
 
+    /**
+     * in
+     * 
+     * @param  string $field
+     * @param  array  $keys
+     * @param  string $type
+     * @param  string $andOr
+     * @return $this
+     */
+    public function in($field, array $keys, $type = '', $andOr = 'AND')
+    {
+        if (is_array($keys)) {
+            $_keys = [];
+            foreach ($keys as $k => $v) {
+                $_keys[] = (is_numeric($v) ? $v : '?');
+            }
+            $where = $field . ' ' . $type . 'IN (' . implode(', ', $_keys) . ')';
+
+            if ($this->grouped) {
+                $where = '(' . $where;
+                $this->grouped = false;
+            }
+
+            $this->where = (is_null($this->where))
+                ? ' WHERE ' . $where
+                : $this->where . ' ' . $andOr . ' ' . $where;
+        }
+
+        return $this;
+    }
+
+    /**
+     * not_in
+     * 
+     * @param  string $field
+     * @param  array  $keys
+     * @return $this
+     */
+    public function not_in($field, array $keys)
+    {
+        $this->in($field, $keys, 'NOT ', 'AND');
+
+        return $this;
+    }
+
+    /**
+     * or_in
+     * 
+     * @param  string $field
+     * @param  array  $keys
+     * @return $this
+     */
+    public function or_in($field, array $keys)
+    {
+        $this->in($field, $keys, '', 'OR');
+
+        return $this;
+    }
+
+    /**
+     * or_not_in
+     * 
+     * @param  string $field
+     * @param  array  $keys
+     * @return $this
+     */
+    public function or_not_in($field, array $keys)
+    {
+        $this->in($field, $keys, 'NOT ', 'OR');
+
+        return $this;
+    }
+
+    /**
+     * limit
+     * 
+     * @param  integer $limit
+     * @param  integer $offset
+     * @return $this
+     */
     public function limit($limit, $offset=NULL)
     {
         if ($offset ==NULL ) {
@@ -589,6 +818,13 @@ class Database {
         return $this;
     }
 
+    /**
+     * order_by
+     * 
+     * @param  string $field_name
+     * @param  string $order
+     * @return $this
+     */
     public function order_by($field_name, $order = 'ASC')
     {
         $field_name = trim($field_name);
@@ -607,6 +843,12 @@ class Database {
         return $this;
     }
 
+    /**
+     * group_by
+     * 
+     * @param  string $groupBy
+     * @return $this
+     */
      public function group_by($groupBy)
     {
         $this->groupBy = ' GROUP BY ';
@@ -617,6 +859,14 @@ class Database {
         return $this;
     }
 
+    /**
+     * having
+     * 
+     * @param  string $field
+     * @param  string $op
+     * @param  mixed $val
+     * @return $this
+     */
     public function having($field, $op = null, $val = null)
     {
         $this->having = ' HAVING ';
@@ -641,77 +891,11 @@ class Database {
         return $this;
     }
 
-    public function in($field, array $keys, $type = '', $andOr = 'AND')
-    {
-        if (is_array($keys)) {
-            $_keys = [];
-            foreach ($keys as $k => $v) {
-                $_keys[] = (is_numeric($v) ? $v : '?');
-            }
-            $where = $field . ' ' . $type . 'IN (' . implode(', ', $_keys) . ')';
-
-            if ($this->grouped) {
-                $where = '(' . $where;
-                $this->grouped = false;
-            }
-
-            $this->where = (is_null($this->where))
-                ? ' WHERE ' . $where
-                : $this->where . ' ' . $andOr . ' ' . $where;
-        }
-
-        return $this;
-    }
-
-    public function not_in($field, array $keys)
-    {
-        $this->in($field, $keys, 'NOT ', 'AND');
-
-        return $this;
-    }
-
-    public function or_in($field, array $keys)
-    {
-        $this->in($field, $keys, '', 'OR');
-
-        return $this;
-    }
-
-    public function or_not_in($field, array $keys)
-    {
-        $this->in($field, $keys, 'NOT ', 'OR');
-
-        return $this;
-    }
-
-    public function get($mode = PDO::FETCH_ASSOC)
-    {
-        $this->buildQuery();
-        $this->getSQL = $this->sql;
-        try {
-            $stmt = $this->db->prepare($this->sql);
-            $stmt->execute($this->bindValues);
-            $this->rowCount = $stmt->rowCount();
-            return $stmt->fetch($mode);
-        } catch(PDOException $e) {
-            show_error('Database Error Occured', $e->getMessage().'<br>SQL Query: '.html_escape($this->getSQL), 'error_db', 500);
-        }
-    }
-
-    public function get_all()
-    {
-        $this->buildQuery();
-        $this->getSQL = $this->sql;
-        try {
-            $stmt = $this->db->prepare($this->sql);
-            $stmt->execute($this->bindValues);
-            $this->rowCount = $stmt->rowCount();
-            return $stmt->fetchAll();
-        } catch(PDOException $e) {
-            show_error('Database Error Occured', $e->getMessage().'<br>SQL Query: '.html_escape($this->getSQL), 'error_db', 500);
-        }
-    }
-
+    /**
+     * buildQuery
+     * 
+     * @return $this
+     */
     private function buildQuery()
     {
         if ( $this->columns !== NULL ) {
@@ -746,21 +930,70 @@ class Database {
         }
     }
 
+    /**
+     * get
+     * 
+     * @param  string $mode
+     * @return result
+     */
+    public function get($mode = PDO::FETCH_ASSOC)
+    {
+        $this->buildQuery();
+        $this->getSQL = $this->sql;
+        try {
+            $stmt = $this->db->prepare($this->sql);
+            $stmt->execute($this->bindValues);
+            $this->rowCount = $stmt->rowCount();
+            return $stmt->fetch($mode);
+        } catch(PDOException $e) {
+            show_error('Database Error Occured', $e->getMessage().'<br>SQL Query: '.html_escape($this->getSQL), 'error_db', 500);
+        }
+    }
+
+    /**
+     * get_all
+     * 
+     * @return result
+     */
+    public function get_all()
+    {
+        $this->buildQuery();
+        $this->getSQL = $this->sql;
+        try {
+            $stmt = $this->db->prepare($this->sql);
+            $stmt->execute($this->bindValues);
+            $this->rowCount = $stmt->rowCount();
+            return $stmt->fetchAll();
+        } catch(PDOException $e) {
+            show_error('Database Error Occured', $e->getMessage().'<br>SQL Query: '.html_escape($this->getSQL), 'error_db', 500);
+        }
+    }
+
+    /**
+     * get_sql
+     * 
+     * @return string
+     */
     public function get_sql()
     {
         return $this->getSQL;
     }
 
+    /**
+     * row_count
+     * 
+     * @return integer
+     */
     public function row_count()
     {
         return $this->rowCount;
     }
 
-    public function __destruct()
-    {
-        $this->db = null;
-    }
-
+    /**
+     * transaction
+     * 
+     * @return result
+     */
     public function transaction()
     {
         if (! $this->transactionCount++) {
@@ -771,6 +1004,11 @@ class Database {
         return $this->transactionCount >= 0;
     }
 
+    /**
+     * commit
+     * 
+     * @return result
+     */
     public function commit()
     {
         if (! --$this->transactionCount) {
@@ -780,6 +1018,11 @@ class Database {
         return $this->transactionCount >= 0;
     }
 
+    /**
+     * roll_back
+     * 
+     * @return result
+     */
     public function roll_back()
     {
         if (--$this->transactionCount) {
@@ -788,5 +1031,13 @@ class Database {
         }
 
         return $this->db->rollBack();
+    }
+
+    /**
+     * __destruct
+     */
+    public function __destruct()
+    {
+        $this->db = null;
     }
 }
