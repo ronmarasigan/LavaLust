@@ -93,7 +93,6 @@ class Lang {
     {
         return !empty($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? locale_accept_from_http($_SERVER['HTTP_ACCEPT_LANGUAGE']) : null;
     }
-
 }
 
 ?>
