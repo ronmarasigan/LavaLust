@@ -8,7 +8,9 @@
 	it will work with MVC. You will see in the documentation the similarities I am pertaining to.
 
 ## Installation and Tutorials
+
 [Github Page](https://ronmarasigan.github.io)
+
 [Youtube Channel](https://youtube.com/ronmarasigan) 
 
 ## Special Thanks/Credits to the following
