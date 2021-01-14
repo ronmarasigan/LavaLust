@@ -9,7 +9,7 @@
 
 ## Installation and Tutorials
 [Github Page](https://ronmarasigan.github.io)
-[Youtube Channel](https://youtube.com/ronmarasigan)
+[Youtube Channel](https://youtube.com/ronmarasigan) 
 
 ## Special Thanks/Credits to the following
 	CodeIgniter (some helpers, libraries and many other things)
