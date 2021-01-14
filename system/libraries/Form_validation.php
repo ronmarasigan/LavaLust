@@ -30,7 +30,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * @package LavaLust
  * @author Ronald M. Marasigan <ronald.marasigan@yahoo.com>
  * @copyright Copyright 2020 (https://ronmarasigan.github.io)
- * @version Version 1.3.4
+ * @version Version 1
  * @link https://lavalust.pinoywap.org
  * @license https://opensource.org/licenses/MIT MIT License
  */
@@ -43,7 +43,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 
 class Form_validation {
 
-	//Default Error Messages
+    //Default Error Messages
     private static $err_required = '%s is required';
     private static $err_matches = '%s does not match with the other field';
     private static $err_min_length = 'Please enter less than %d character/s';
@@ -52,6 +52,7 @@ class Form_validation {
     private static $err_aplha = '%s accepts letters only';
     private static $err_alphanum = '%s accepts letters and numbers only';
     private static $err_alphanumspace = '%s accepts letters, numbers and spaces only';
+    private static $err_alphaspace = '%s accepts letters and spaces only';
     private static $err_alphanumdash = '%s accepts letters, numbers and dashes only';
     private static $err_numeric = '%s accepts numbers only';
     private static $err_grater_than = 'Please enter a value less than %f';
@@ -83,7 +84,7 @@ class Form_validation {
 
 
     public function __construct() {
-    	foreach($_POST as $key => $value) {
+        foreach($_POST as $key => $value) {
             $this->post_arrays[$key] = $value;
         }
     }
@@ -93,7 +94,7 @@ class Form_validation {
      * @return [type] [description]
      */
     public function submitted() {
-    	return !empty($_POST) ? TRUE : FALSE;
+        return !empty($_POST) ? TRUE : FALSE;
     }
 
     /**
@@ -103,10 +104,10 @@ class Form_validation {
      * @param string $params
      */
     public function set_error_message($custom, $default, $params = NULL) {
-    	if(empty($custom))
-            	$this->errors[] = sprintf($default, $params);
+        if(empty($custom))
+                $this->errors[] = sprintf($default, $params);
             else
-            	$this->errors[] = $custom;
+                $this->errors[] = $custom;
     }
 
     /**
@@ -154,7 +155,7 @@ class Form_validation {
      * @param  string $pattern pattern
      * @return $this
      */
-    public function custompattern($pattern) {   
+    public function custom_pattern($pattern) {   
         $regex = '/^('.$pattern.')$/u';
         if($this->value != '' && !preg_match($regex, $this->value)) {
             $this->set_error_message($custom_error, self::$err_required, $this->name);
@@ -170,7 +171,7 @@ class Form_validation {
      */
     public function required($custom_error = '') {     
         if(($this->value == '' || $this->value == null)) {
-        	$this->set_error_message($custom_error, self::$err_required, $this->name);
+            $this->set_error_message($custom_error, self::$err_required, $this->name);
         }            
         return $this;  
     }
@@ -184,7 +185,7 @@ class Form_validation {
      */
     public function matches($field, $custom_error = '') {
         if($this->value !== $this->post_arrays[$field]){
-        	$this->set_error_message($custom_error, self::$err_matches, $this->name);
+            $this->set_error_message($custom_error, self::$err_matches, $this->name);
         }
         return $this;
     }
@@ -200,7 +201,7 @@ class Form_validation {
             return FALSE;
 
         if(mb_strlen($this->value) < $length){
-        	$this->set_error_message($custom_error, self::$err_min_length, $length);
+            $this->set_error_message($custom_error, self::$err_min_length, $length);
         }
         return $this;
     }
@@ -254,7 +255,7 @@ class Form_validation {
      * @param   string
      * @return  bool
      */
-    public function alphanum($custom_error = '')
+    public function alpha_num($custom_error = '')
     {
         if(!ctype_alnum((string) $this->value))
             $this->set_error_message($custom_error, self::$err_alphanum, $this->name);
@@ -267,10 +268,23 @@ class Form_validation {
      * @param   string
      * @return  bool
      */
-    public function alphanumspace($custom_error = '')
+    public function alpha_num_space($custom_error = '')
     {
         if(!preg_match('/^[A-Z0-9 ]+$/i', $this->value))
             $this->set_error_message($custom_error, self::$err_alphanumspace, $this->name);
+        return $this; 
+    }
+
+    /**
+     * Alpha and Spaces
+     * 
+     * @param  string
+     * @return bool
+     */
+    public function alpha_space($custom_error = '')
+    {
+        if(!preg_match('/^[A-Z ]+$/i', $this->value))
+            $this->set_error_message($custom_error, self::$err_alphaspace, $this->name);
         return $this; 
     }
 
@@ -280,7 +294,7 @@ class Form_validation {
      * @param   string
      * @return  bool
      */
-    public function alphanumdash($custom_error = '')
+    public function alpha_num_dash($custom_error = '')
     {
         if(!preg_match('/^[a-z0-9_-]+$/i', $this->value))
             $this->set_error_message($custom_error, self::$err_alphanumdash, $this->name);
@@ -308,7 +322,7 @@ class Form_validation {
      * @param   int
      * @return  bool
      */
-    public function greaterthan($min, $custom_error = '')
+    public function greater_than($min, $custom_error = '')
     {
         if(!is_numeric($this->value))
             return FALSE;
@@ -324,7 +338,7 @@ class Form_validation {
      * @param   int
      * @return  bool
      */
-    public function lessthan($max, $custom_error = '')
+    public function less_than($max, $custom_error = '')
     {
         if(!is_numeric($this->value))
             return FALSE;
@@ -340,10 +354,10 @@ class Form_validation {
      * @param   string
      * @return  bool
      */
-    public function inlist($list, $custom_error = '')
+    public function in_list($list, $custom_error = '')
     {
         if(!in_array($this->value, explode(',', $list), TRUE))
-        	$this->set_error_message($custom_error, self::$err_numeric, $this->value);
+            $this->set_error_message($custom_error, self::$err_numeric, $this->value);
         return $this; 
     }
 
