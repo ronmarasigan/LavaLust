@@ -365,7 +365,7 @@ class Session {
 	}
 
 	/**
-	 * Get flash data to Session
+	 * Set flash data to Session
 	 * @param  array $key Session Keys
 	 * @return function
 	 */
