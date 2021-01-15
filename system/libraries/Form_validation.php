@@ -42,10 +42,19 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  */
 
 class Form_validation {
+    /**
+     * Reference to the LavaLust instance
+     *
+     * @var object
+     */
+    protected $LAVA;
 
     //Default Error Messages
     private static $err_required = '%s is required';
     private static $err_matches = '%s does not match with the other field';
+    private static $err_differs = '%s matches with the other field';
+    private static $err_is_unique = '%s is not unique';
+    private static $err_exact_length = '%s not in exact length';
     private static $err_min_length = 'Please enter less than %d character/s';
     private static $err_max_length = 'Please enter more than %d character/s';
     private static $err_email = '%s contains invalid email address';
@@ -55,8 +64,12 @@ class Form_validation {
     private static $err_alphaspace = '%s accepts letters and spaces only';
     private static $err_alphanumdash = '%s accepts letters, numbers and dashes only';
     private static $err_numeric = '%s accepts numbers only';
-    private static $err_grater_than = 'Please enter a value less than %f';
+    private static $err_integer = '%s accepts integers only';
+    private static $err_decimal = '%s accepts decimals only';
+    private static $err_greater_than = 'Please enter a value less than %f';
     private static $err_less_than = 'Please enter a value greater than %f';
+    private static $err_greater_than_equal_to = 'Please enter a value less than or equal to %f';
+    private static $err_less_than_equal_to = 'Please enter a value greater than or equal to %f';
     private static $err_in_list = '%s is not in the list';
     private static $err_pattern = 'Please is not in %s format';
 
@@ -84,6 +97,7 @@ class Form_validation {
 
 
     public function __construct() {
+        $this->LAVA =& get_instance();
         foreach($_POST as $key => $value) {
             $this->post_arrays[$key] = $value;
         }
@@ -191,6 +205,59 @@ class Form_validation {
     }
 
     /**
+     * Check if current field differs from other field
+     * 
+     * @param  string $field
+     * @param  string $err   Custom Error
+     * @return $this
+     */
+    public function differs($field, $custom_error = '') {
+        if($this->value === $this->post_arrays[$field]){
+            $this->set_error_message($custom_error, self::$err_differs, $this->name);
+        }
+        return $this;
+    }
+
+    /**
+     * Is Unique
+     *
+     * Check if the input value doesn't already exist
+     * in the specified database field.
+     *
+     * @param   string  $str
+     * @param   string  $field
+     * @return  bool
+     */
+    public function is_unique($table, $str, $field,  $custom_error = '')
+    {
+        if(isset($this->LAVA->db))
+        {
+            $this->LAVA->db->table($table)->where($field, $str)->limit(1)->get();
+            if($this->LAVA->db->row_count()!==0)
+                 $this->set_error_message($custom_error, self::$err_is_unique, $this->name);
+        }
+        return $this;
+    }
+
+    /**
+     * Exact Length
+     *
+     * @param   string
+     * @param   string
+     * @return  bool
+     */
+    public function exact_length($length, $custom_error = '')
+    {
+        if ( ! is_numeric($length))  
+            return FALSE;
+
+        if(mb_strlen($this->value) === (int) $length){
+            $this->set_error_message($custom_error, self::$err_exact_length, $length);
+        }
+        return $this;
+    }
+
+    /**
      * Check for minumum length
      * 
      * @param  int $length
@@ -255,7 +322,7 @@ class Form_validation {
      * @param   string
      * @return  bool
      */
-    public function alpha_num($custom_error = '')
+    public function alpha_numeric($custom_error = '')
     {
         if(!ctype_alnum((string) $this->value))
             $this->set_error_message($custom_error, self::$err_alphanum, $this->name);
@@ -268,7 +335,7 @@ class Form_validation {
      * @param   string
      * @return  bool
      */
-    public function alpha_num_space($custom_error = '')
+    public function alpha_numeric_space($custom_error = '')
     {
         if(!preg_match('/^[A-Z0-9 ]+$/i', $this->value))
             $this->set_error_message($custom_error, self::$err_alphanumspace, $this->name);
@@ -294,7 +361,7 @@ class Form_validation {
      * @param   string
      * @return  bool
      */
-    public function alpha_num_dash($custom_error = '')
+    public function alpha_numeric_dash($custom_error = '')
     {
         if(!preg_match('/^[a-z0-9_-]+$/i', $this->value))
             $this->set_error_message($custom_error, self::$err_alphanumdash, $this->name);
@@ -316,6 +383,34 @@ class Form_validation {
     }
 
     /**
+     * Integer
+     *
+     * @param   string
+     * @return  bool
+     */
+    public function integer($custom_error = '')
+    {
+        if(!preg_match('/^[\-+]?[0-9]+$/', $this->value))
+            $this->set_error_message($custom_error, self::$err_integer, $this->name);
+        return $this; 
+
+    }
+
+    /**
+     * decimal
+     *
+     * @param   string
+     * @return  bool
+     */
+    public function decimal($custom_error = '')
+    {
+        if(!preg_match('/^[\-+]?[0-9]+\.[0-9]+$/', $this->value))
+            $this->set_error_message($custom_error, self::$err_decimal, $this->name);
+        return $this; 
+
+    }
+
+    /**
      * Greater than
      *
      * @param   string
@@ -327,7 +422,23 @@ class Form_validation {
         if(!is_numeric($this->value))
             return FALSE;
         if($this->value < $min)
-            $$this->set_error_message($custom_error, self::$err_numeric, $min);
+            $$this->set_error_message($custom_error, self::$err_greater_than, $min);
+        return $this; 
+    }
+
+    /**
+     * Greater than or Equal
+     *
+     * @param   string
+     * @param   int
+     * @return  bool
+     */
+    public function greater_than_equal_to($min, $custom_error = '')
+    {
+        if(!is_numeric($this->value))
+            return FALSE;
+        if($this->value <= $min)
+            $$this->set_error_message($custom_error, self::$err_greater_than_equal_to, $min);
         return $this; 
     }
 
@@ -342,8 +453,24 @@ class Form_validation {
     {
         if(!is_numeric($this->value))
             return FALSE;
-        if($this->value > $min)
-            $this->set_error_message($custom_error, self::$err_numeric, $max);
+        if($this->value > $max)
+            $this->set_error_message($custom_error, self::$err_less_than, $max);
+        return $this; 
+    }
+
+    /**
+     * Less than equal to
+     *
+     * @param   string
+     * @param   int
+     * @return  bool
+     */
+    public function less_than_equal_to($max, $custom_error = '')
+    {
+        if(!is_numeric($this->value))
+            return FALSE;
+        if($this->value >= $max)
+            $this->set_error_message($custom_error, self::$err_less_than_equal_to, $max);
         return $this; 
     }
 
