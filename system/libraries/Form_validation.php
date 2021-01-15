@@ -335,7 +335,7 @@ class Form_validation {
      * @param   string
      * @return  bool
      */
-    public function alpha_numumeric_space($custom_error = '')
+    public function alpha_numeric_space($custom_error = '')
     {
         if(!preg_match('/^[A-Z0-9 ]+$/i', $this->value))
             $this->set_error_message($custom_error, self::$err_alphanumspace, $this->name);
@@ -361,7 +361,7 @@ class Form_validation {
      * @param   string
      * @return  bool
      */
-    public function alpha_numumeric_dash($custom_error = '')
+    public function alpha_numeric_dash($custom_error = '')
     {
         if(!preg_match('/^[a-z0-9_-]+$/i', $this->value))
             $this->set_error_message($custom_error, self::$err_alphanumdash, $this->name);
