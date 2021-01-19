@@ -55,7 +55,7 @@ class Cache
 	private $_dependencies;
 
 	/**
-	 * Constructor - Initializes and references CI
+	 * Constructor - Initializes and references LAVA
 	 */
 	function __construct()
 	{

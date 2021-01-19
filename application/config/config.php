@@ -86,7 +86,7 @@ date_default_timezone_set('Asia/Manila');
 | WARNING: You MUST set this value!
 |
 */
-$config['base_url'] 				= '';
+$config['base_url'] 				= 'http://lavalust-dev.local/';
 
 /*
 |--------------------------------------------------------------------------
