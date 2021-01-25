@@ -323,7 +323,7 @@ class Session {
    	 * @param  array $key Session Keys
    	 * @return string      Session Data
    	 */
-	public function get_userdata($key)
+	public function userdata($key)
 	{
 	  return isset($_SESSION[$key]) ? $_SESSION[$key] : null;
 	}
