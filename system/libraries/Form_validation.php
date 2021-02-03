@@ -105,7 +105,7 @@ class Form_validation {
 
     /**
      * Check if from is submitted and not empty
-     * @return [type] [description]
+     * @return Bool
      */
     public function submitted() {
         return !empty($_POST) ? TRUE : FALSE;
@@ -490,7 +490,7 @@ class Form_validation {
 
     /**
      * Is validated
-     * @return boolean
+     * @return bool
      */
     public function run() {
         if(empty($this->errors)) return true;
@@ -506,7 +506,7 @@ class Form_validation {
 
     /**
      * Display errors
-     * @return [type] [description]
+     * @return string
      */
     public function errors() {
         if($_POST) {
