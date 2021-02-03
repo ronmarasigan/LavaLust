@@ -42,10 +42,12 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  */
 class Auth {
 
-	private $db;
+	private $LAVA;
 
 	public function __construct() {
-		$this->db = get_instance()->load->database();
+		$LAVA = get_instance();
+		$LAVA->load->database();
+		$LAVA->load->library('session');
 	}
 
 	/**
@@ -67,7 +69,7 @@ class Auth {
 	 * @param  string $password  Password
 	 * @param  string $email     Email
 	 * @param  string $usertype   Usertype
-	 * @return array            [description]
+	 * @return $this
 	 */
 	public function register($username, $password, $email, $usertype)
 	{
@@ -86,7 +88,7 @@ class Auth {
 	 * Login
 	 * @param  string $username Username
 	 * @param  string $password Password
-	 * @return string           Validated Username
+	 * @return string Validated Username
 	 */
 	public function login($username, $password)
 	{
@@ -110,7 +112,7 @@ class Auth {
 	 */
 	public function loggedin()
 	{
-		if(get_instance()->session->get_userdata('loggedin') === 1)
+		if($LAVA->session->get_userdata('loggedin') === 1)
 			return true;
 	}
 
@@ -120,7 +122,7 @@ class Auth {
 	 */
 	public function user_id()
 	{
-		$user_id = get_instance()->session->get_userdata('user_id');
+		$user_id = $LAVA->session->get_userdata('user_id');
 		return !empty($user_id) ? $user_id : false;
 	}
 }
