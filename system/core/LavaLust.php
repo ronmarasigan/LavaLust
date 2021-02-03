@@ -70,7 +70,7 @@ define('BASE_URL', config_item('base_url'));
  *  Deployment Environment
  * ------------------------------------------------------
  */
-switch (config_item('ENVIRONMENT'))
+switch (strtolower(config_item('ENVIRONMENT')))
 {
 	case 'development':
 		_handlers();
