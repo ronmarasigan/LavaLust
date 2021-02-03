@@ -229,58 +229,6 @@ class Security
 		return $this->_csrf_hash;
 	}
 
-	/**
-	 * Get random bytes
-	 *
-	 * @param	int	$length	Output length
-	 * @return	string
-	 */
-	public function get_random_bytes($length)
-	{
-		if (empty($length) OR ! ctype_digit((string) $length))
-		{
-			return FALSE;
-		}
-
-		if (function_exists('random_bytes'))
-		{
-			try
-			{
-				// The cast is required to avoid TypeError
-				return random_bytes((int) $length);
-			}
-			catch (Exception $e)
-			{
-				return FALSE;
-			}
-		}
-
-		// Unfortunately, none of the following PRNGs is guaranteed to exist ...
-		if (defined('MCRYPT_DEV_URANDOM') && ($output = mcrypt_create_iv($length, MCRYPT_DEV_URANDOM)) !== FALSE)
-		{
-			return $output;
-		}
-
-
-		if (is_readable('/dev/urandom') && ($fp = fopen('/dev/urandom', FOPEN_READ)) !== FALSE)
-		{
-			// Try not to waste entropy ...
-			is_php('5.4') && stream_set_chunk_size($fp, $length);
-			$output = fread($fp, $length);
-			fclose($fp);
-			if ($output !== FALSE)
-			{
-				return $output;
-			}
-		}
-
-		if (function_exists('openssl_random_pseudo_bytes'))
-		{
-			return openssl_random_pseudo_bytes($length);
-		}
-
-		return FALSE;
-	}
 }
 
 ?>
