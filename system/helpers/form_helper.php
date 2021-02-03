@@ -88,7 +88,7 @@ if ( ! function_exists('form_open'))
         {
             // Prepend/append random-length "white noise" around the CSRF
             // token input, as a form of protection against BREACH attacks
-            if (FALSE !== ($noise = $LAVA->security->random_bytes(1)))
+            if (FALSE !== ($noise = random_bytes(1)))
             {
                 list(, $noise) = unpack('c', $noise);
             }
@@ -718,7 +718,6 @@ if ( ! function_exists('_attributes_to_string'))
     }
 
     function validation_errors() {
-    	$LAVA =& get_instance();
     	return $LAVA->form_validation->errors();
     }
 }
