@@ -718,6 +718,7 @@ if ( ! function_exists('_attributes_to_string'))
     }
 
     function validation_errors() {
+        $LAVA =& get_instance();
     	return $LAVA->form_validation->errors();
     }
 }
