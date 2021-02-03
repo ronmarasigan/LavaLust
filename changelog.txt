@@ -1,0 +1,22 @@
+LavaLust Version 1.0.1
+
+# Changelog
+
+
+## Auth library [1.0.1] 2021-02-03
+    - methods can be use without manually loading database and session
+
+## form_helper [1.0.1] 2021-02-03
+    - error_validation() function can now be use without manually loading form_validation. check the method statements
+
+## Session library [1.0.0] 2021-01-29
+    - get_userdata() method is now userdata()
+
+## Form_validation library [1.0.0] 2021-01-22
+    - fixed some bugs
+
+## Language class [1.0.0] 2021-01-22
+    - Class Locale is no longer needed to get the country locale code. updating php.ini in the server is no longer required
+Fixedd some minor bugs.
+
+
