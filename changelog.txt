@@ -17,6 +17,7 @@ LavaLust Version 1.0.1
 
 ## Language class [1.0.0] 2021-01-22
     - Class Locale is no longer needed to get the country locale code. updating php.ini in the server is no longer required
-Fixedd some minor bugs.
+    
+Fixed some minor bugs.
 
 

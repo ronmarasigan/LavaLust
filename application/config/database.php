@@ -44,15 +44,18 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 | EXPLANATION OF VARIABLES
 | -------------------------------------------------------------------
 |
+|	['driver'] 		The driver of your database server.	
 |	['hostname'] 	The hostname of your database server.
+|	['port'] 		The port used by your database server.
 |	['username'] 	The username used to connect to the database
 |	['password'] 	The password used to connect to the database
 |	['database'] 	The name of the database you want to connect to
 |	['charset']		The default character set
 */
 
-$database['driver']	= 'mysql';
+$database['driver']		= '';
 $database['hostname']	= '';
+$database['port']		= '';
 $database['username']	= '';
 $database['password']	= '';
 $database['database']	= '';
