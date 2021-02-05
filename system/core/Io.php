@@ -78,7 +78,6 @@ Class Io {
 	/**
   	 * GET Variable
   	 * @param  string
-  	 * @param  boolean $xss_clean Use this to sanitize you output. (for XSS prevention)
   	 * @return string
   	 */
 	public function get($index = NULL)
@@ -96,7 +95,6 @@ Class Io {
 	/**
   	 * COOKIE Variable
   	 * @param  string
-  	 * @param  boolean $xss_clean Use this to sanitize you output. (for XSS prevention)
   	 * @return string
   	 */
 	public function cookie($index = NULL)

@@ -61,13 +61,12 @@ if ( ! function_exists('get_cookie'))
 	/**
 	 * Fetch an item from the COOKIE array
 	 * @param  string  $index
-	 * @param  boolean $xss_clean
 	 * @return mixed
 	 */
-	function get_cookie($index, $xss_clean = FALSE)
+	function get_cookie($index)
 	{
 		$prefix = isset($_COOKIE[$index]) ? '' : config_item('cookie_prefix');
-		return get_instance()->input->cookie($prefix.$index, $xss_clean);
+		return get_instance()->io->cookie($prefix.$index);
 	}
 }
 
