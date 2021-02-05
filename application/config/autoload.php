@@ -72,11 +72,6 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 | Prototype:
 |
 |	$autoload['libraries'] = array('database', 'email', 'session');
-|
-| You can also supply an alternative library name to be assigned
-| in the controller:
-|
-|	$autoload['libraries'] = array('user_agent' => 'ua');
 */
 $autoload['libraries'] = array();
 
@@ -86,7 +81,7 @@ $autoload['libraries'] = array();
 | -------------------------------------------------------------------
 | Prototype:
 |
-|	$autoload['helper'] = ['url', 'session'];
+|	$autoload['helper'] = array('url', 'session');
 */
 $autoload['helpers'] = array('url');
 
@@ -96,7 +91,7 @@ $autoload['helpers'] = array('url');
 | -------------------------------------------------------------------
 | Prototype:
 |
-|	$autoload['model'] = ['first_model', 'second_model'];
+|	$autoload['model'] = array('model1', 'model2')
 */
 $autoload['models'] = array();
 ?>

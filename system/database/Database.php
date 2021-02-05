@@ -68,10 +68,11 @@ class Database {
         $this->driver = $database_config['driver'];
         $this->charset = $database_config['charset'];
         $this->dbost = $database_config['hostname'];
+        $this->port = $database_config['port'];
         $this->dbname = $database_config['database'];
         $this->dbuser = $database_config['username'];
         $this->dbpass = $database_config['password'];
-        $this->dsn = ''.$this->driver.':host=' . $this->dbost . ';dbname=' . $this->dbname . ';charset=' . $this->charset;
+        $this->dsn = ''.$this->driver.':host=' . $this->dbost . ';dbname=' . $this->dbname . ';charset=' . $this->charset . ';port=' . $this->port;
 
         $options = array(
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
