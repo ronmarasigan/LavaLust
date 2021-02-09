@@ -44,7 +44,7 @@ if ( ! function_exists('redirect'))
 	 * @param  integer $sec    [description]
 	 * @return mixed
 	 */
-	function redirect($uri, $method = NULL, $sec = 0)
+	function redirect($uri = '', $method = NULL, $sec = 0)
 	{
 		switch ($method)
 		{
