@@ -45,9 +45,9 @@ class Auth {
 	private $LAVA;
 
 	public function __construct() {
-		$LAVA = get_instance();
-		$LAVA->load->database();
-		$LAVA->load->library('session');
+		$this->LAVA =& get_instance();
+		$this->LAVA->load->database();
+		$this->LAVA->load->library('session');
 	}
 
 	/**
@@ -79,7 +79,7 @@ class Auth {
 			'email' => $email,
 			'usertype' => $usertype,
 			);
-		return $this->db->table('user')
+		return $this->LAVA->db->table('user')
 						->insert($bind)
 						->exec();
 	}
@@ -92,7 +92,7 @@ class Auth {
 	 */
 	public function login($username, $password)
 	{
-    	$row = $this->db->table('user') 					
+    	$row = $this->LAVA->db->table('user') 					
     					->where('username', $username)
     					->get();
 		if($row)
@@ -107,12 +107,20 @@ class Auth {
 	}
 
 	/**
+	 * Set up session for login
+	 * @param $this
+	 */
+	public function set_logged_in($username) {
+		return $this->LAVA->session->set_userdata(array('username' => $username, 'loggedin' => 1));
+	}
+
+	/**
 	 * Check if user is Logged in
 	 * @return bool TRUE is logged in
 	 */
-	public function loggedin()
+	public function is_logged_in()
 	{
-		if($LAVA->session->get_userdata('loggedin') === 1)
+		if($this->LAVA->session->userdata('loggedin') === 1)
 			return true;
 	}
 
@@ -120,10 +128,15 @@ class Auth {
 	 * Get User ID
 	 * @return string User ID from Session
 	 */
-	public function user_id()
+	public function get_username()
 	{
-		$user_id = $LAVA->session->get_userdata('user_id');
-		return !empty($user_id) ? $user_id : false;
+		$username = $this->LAVA->session->userdata('username');
+		return !empty($username) ? $username : false;
+	}
+
+	public function set_logged_out() {
+		$this->LAVA->session->unset_userdata(array('loggedin', 'username'));
+		$this->LAVA->session->sess_destroy();
 	}
 }
 
