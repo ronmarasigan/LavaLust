@@ -36,18 +36,52 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');/**
 
 class Lang {
 
-	//current language
+	/**
+     * Current Language
+     * 
+     * @var string
+     */
     public $current = '';
 
+    /**
+     * Default Language
+     * 
+     * @var string
+     */
     public $default;
 
+    /**
+     * List of Language
+     * 
+     * @var array
+     */
     public $languages = array();
 
+    /**
+     * Class Constructor
+     */
     public function __construct() {
+        /**
+         * Set Default Language
+         * 
+         * @var string
+         */
         $this->default = config_item('language');
+        /**
+         * Set Current Language
+         * 
+         * @var string
+         */
         $this->current = $this->clientlanguage();
     }
 
+    /**
+     * Translate String to other Language
+     * 
+     * @param  string $key
+     * @param  array  $params
+     * @return strng
+     */
     public function translate($key, $params = array()) {
 
         $this->lang_loaded();
@@ -70,6 +104,11 @@ class Lang {
         return null;
     }
 
+    /**
+     * Load Language File
+     * 
+     * @return array
+     */
     public function lang_loaded()
     {
         if (empty($this->languages[$this->current]))
@@ -83,12 +122,23 @@ class Lang {
         }
     }
 
+    /**
+     * Change Current Language
+     * 
+     * @param  string $lang
+     * @return $this
+     */
     public function language($lang)
     {
         $this->current = (!empty($lang) && is_string($lang)) ? $lang : $this->clientlanguage();
         $this->lang_loaded();
     }
 
+    /**
+     * Get Client Language
+     * 
+     * @return string
+     */
     public function clientlanguage()
     {
         return !empty($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 5) : null;

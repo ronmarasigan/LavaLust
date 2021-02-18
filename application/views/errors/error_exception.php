@@ -29,27 +29,80 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  *
  * @package LavaLust
  * @author Ronald M. Marasigan <ronald.marasigan@yahoo.com>
- * @copyright Copyright 2020 (https://techron.info)
- * @version Version 1.2
- * @link https://lavalust.com
+ * @copyright Copyright 2020 (https://ronmarasigan.github.io)
+ * @version Version 1
+ * @link https://lavalust.pinoywap.org
  * @license https://opensource.org/licenses/MIT MIT License
  */
-
 ?>
-<div style="border:1px solid #990000;padding-left:20px;margin:0 0 10px 0;">
-<h4>An uncaught Exception was encountered</h4>
-<p>Type: <?php echo get_class($exception); ?></p>
-<p>Message: <?php echo $message; ?></p>
-<p>Filename: <?php echo $exception->getFile(); ?></p>
-<p>Line Number: <?php echo $exception->getLine(); ?></p>
-	<p>Backtrace:</p>
-	<?php foreach ($exception->getTrace() as $error): ?>
-		<?php if (isset($error['file']) && strpos($error['file'], BASE_URL)!== 0): ?>
-			<p style="margin-left:10px">
-			File: <?php echo $error['file']; ?><br />
-			Line: <?php echo $error['line']; ?><br />
-			Function: <?php echo $error['function']; ?>
-			</p>
-		<?php endif ?>
-	<?php endforeach ?>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Uncaught Exception Encountered</title>
+	<style type="text/css">
+		html {
+		    height: 100%;
+		}
+
+		body{
+		    color: #888;
+		    margin: 10px;
+		    box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
+		}
+
+		.border{
+			border: 1px solid #990000;
+			padding: 10px;
+		}
+
+		.header {
+			font-size: 20px;
+			background-color: #AB5C4B;
+			color: #ffffff;
+			padding: 5px;
+			
+		}
+
+		.sub_header {
+			background-color: #E1D8D6;
+			padding: 5px;
+		}
+
+		.stack_trace {
+			color: #000000;
+			background-color: #fff1f1;
+			padding: 5px;
+		}
+
+		.err_body {
+			background-color: #ffffff;
+			color: #000000;
+			padding: 5px;
+		}
+	</style>
+</head>
+<body>
+	<div class="header"><h4>Uncaught Exception Encountered</h4></div>
+		<div class="sub_header">
+			<b style="color: red">Exception Class: <?php echo get_class($exception); ?></b>
+		</div>
+		<div class="err_body">
+			<p>Error Message: <?php echo $message; ?></p>
+			<p>File: <?php echo $exception->getFile(); ?></p>
+			<p>Line Number: <?php echo $exception->getLine(); ?></p>
+		</div>
+		<div class="stack_trace">
+			<p style="font-weight: bold">Stack trace:</p>
+			<?php foreach ($exception->getTrace() as $error): ?>
+				<?php if (isset($error['file'])): ?>
+					<p style="margin-left:10px">
+					File: <?php echo $error['file']; ?><br />
+					Line: <?php echo $error['line']; ?><br />
+					Function: <?php echo $error['function']; ?>
+					</p>
+				<?php endif ?>
+			<?php endforeach ?>
+		</div>
+</body>
+</html>

@@ -105,7 +105,7 @@ if ( ! function_exists('show_404'))
 	 * @param  string $page
 	 * @return string
 	 */
-	function show_404($heading, $message, $page = NULL)
+	function show_404($heading = NULL, $message = NULL, $page = NULL)
 	{
 		$errors =& load_class('Errors', 'core');
 		return $errors->show_404($heading, $message, $page);
@@ -201,7 +201,7 @@ if ( ! function_exists('get_config'))
 				return $config;
 			}
 		} else
-			throw new Exception("The configuration file does not exist");
+			show_404('404 Not Found', 'The configuration file does not exist');
 	}
 }
 
@@ -252,7 +252,7 @@ if ( ! function_exists('autoload_config'))
 				return $autoload;
 			}
 		} else
-			throw new Exception("The configuration file does not exist");
+			show_404('404 Not Found', 'The configuration file does not exist');
 	}
 }
 
@@ -283,7 +283,7 @@ if ( ! function_exists('database_config'))
 				return $database;
 			}
 		} else
-			throw new Exception("The configuration file does not exist");
+			show_404('404 Not Found', 'The configuration file does not exist');
 	}
 }
 
@@ -312,7 +312,7 @@ if ( ! function_exists('route_config'))
 				return $route;
 			}
 		} else
-			throw new Exception("The configuration file does not exist");
+			show_404('404 Not Found', 'The configuration file does not exist');
 	}
 }
 
