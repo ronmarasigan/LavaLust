@@ -42,16 +42,63 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 */
 class Router
 {
+	/**
+	 * url from URI
+	 * 
+	 * @var array
+	 */
 	protected $url = array();
+
+	/**
+	 * url string
+	 * 
+	 * @var string
+	 */
 	protected $url_string = '';
+
+	/**
+	 * Controller
+	 * 
+	 * @var string
+	 */
 	protected $controller;
+
+	/**
+	 * $Method
+	 * 
+	 * @var string
+	 */
 	protected $method;
+
+	/**
+	 * Parameters
+	 * 
+	 * @var array
+	 */
 	protected $params = array();
 
-	/*
-	 * ------------------------------------------------------
-	 *  Function for re-routing
-	 * ------------------------------------------------------
+	/**
+	 * Routes
+	 * 
+	 * @var array
+	 */
+	private $route = array();
+
+	/**
+	 * Class Constructor
+	 */
+	public function __construct() {
+
+		//Routes
+		$this->route = route_config();
+	}
+
+	/**
+	 * Re-Routing
+	 * 
+	 * @param  string $url
+	 * @param  array $route
+	 * @return string
 	 */
 	public function remapUrl($url, $route)
     {
@@ -67,14 +114,13 @@ class Router
         return $this->url_string;
     }
 
-    /*
-	 * ------------------------------------------------------
-	 *  Function for URL Parsing using $_SERVER['REQUEST_URI']
-	 * ------------------------------------------------------
-	 */
+    /**
+     * URL Parsing using $_SERVER['REQUEST_URI']
+     * 
+     * @return string
+     */
 	public function parseUrl()
 	{
-		$route = route_config();
 		$request_url = (isset($_SERVER['REQUEST_URI'])) ? $_SERVER['REQUEST_URI'] : '';
 		//hack!
 		$script_url  = (isset($_SERVER['PHP_SELF'])) ? substr_replace($_SERVER['PHP_SELF'], '', strpos($_SERVER['PHP_SELF'], 'index.php') + 9) : '';
@@ -87,7 +133,7 @@ class Router
 
 		if($request_url != $script_url)
 			$this->url_string = trim(preg_replace('/'. str_replace('/', '\/', str_replace('index.php', '', $script_url)) .'/', '', $request_url, 1), '/');
-			$this->url = explode('/', $this->remapUrl(filter_var($this->url_string, FILTER_SANITIZE_URL), $route));
+			$this->url = explode('/', $this->remapUrl(filter_var($this->url_string, FILTER_SANITIZE_URL), $this->route));
 			if($this->url[0] != NULL)
 			{
 				foreach($this->url as $uri)
@@ -99,50 +145,86 @@ class Router
 			return $this->url;				
 	}
 
-	/*
-	 * ------------------------------------------------------
-	 *  Initiate Routing
-	 * ------------------------------------------------------
+	/**
+	 * Initiate Routing
+	 * 
+	 * @return $this
 	 */
 	public function initiate()
 	{
-		$autoload = autoload_config();
-
+		/**
+		 * Default Controller
+		 * 
+		 * @var string
+		 */
 		$this->controller = config_item('default_controller');
+
+		/**
+		 * Default Method
+		 * 
+		 * @var string
+		 */
 		$this->method = config_item('default_method');
 
+		/**
+		 * Segments
+		 * 
+		 * @var array
+		 */
 		$segments = $this->parseUrl();
 		
+		/**
+		 * Get the Controller Segment
+		 */
 		if(isset($segments[0]) && !empty($segments[0]))
-			$this->controller = ucfirst($segments[0]);
-		if(isset($segments[1]) && !empty($segments[1]))
-			$this->method = str_replace('-', '_', $segments[1]);
+		{
+			if($this->route['translate_uri_dashes'] == TRUE)
+				$this->controller = str_replace('-', '_', ucfirst($segments[0]));	
+			else
+				$this->controller = ucfirst($segments[0]);
+		}
 
+		/**
+		 * Get The Method Segment
+		 */
+		if(isset($segments[1]) && !empty($segments[1]))
+		{
+			if($this->route['translate_uri_dashes'] == TRUE)
+				$this->method = str_replace('-', '_', $segments[1]);
+			else
+				$this->method = $segments[1];
+		}
+
+		/**
+		 * Checking if controller exist
+		 */
 		if(file_exists(APP_DIR . 'controllers/' . $this->controller . '.php'))
 		{
 			require(APP_DIR . 'controllers/' . $this->controller . '.php');
 			unset($segments[0]);
 
+			/**
+			 * Checking if method exist
+			 */
 			if(method_exists($this->controller, $this->method))
 				unset($segments[1]);
 			else
-				/*
-				 * ------------------------------------------------------
-				 *  You can set this to default method if you like
-				 * ------------------------------------------------------
-				 */
-				show_404('404 Page Not Found', 'The requested page does not found.');
+				empty($this->route['404_override']) ? show_404() : show_404('', '', $this->route['404_override']);
 
+			/**
+			 * Check if there are parameters in the URI
+			 * 
+			 * @var string
+			 */
 			$this->params = $segments ? array_values($segments) : [];
-				call_user_func_array([new $this->controller, $this->method], $this->params);
+
+			/**
+			 * Load the controller, method and parameters
+			 */
+			call_user_func_array([new $this->controller, $this->method], $this->params);
 
 		} else {
-			/*
-			 * ------------------------------------------------------
-			 *  You can set this to default conroller if you like
-			 * ------------------------------------------------------
-			 */
-			show_404('404 Page Not Found', 'The requested page does not found.');
+			empty($this->route['404_override']) ? show_404() : show_404('', '', $this->route['404_override']);
 		}	
 	}
 }

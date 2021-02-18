@@ -169,11 +169,12 @@ class Security
 		show_error('Not Allowed Error', 'The action you have requested is not allowed.', 404);
 	}
 
-	/*
-	* ------------------------------------------------------
-	*  Escaping characters for a simple XSS Filter
-	* ------------------------------------------------------
-	*/
+	/**
+	 * XSS Filtering
+	 * 
+	 * @param  string $string
+	 * @return string
+	 */
 	public function xss_clean($string)
 	{
 		$escaper =& load_class('Escaper', 'libraries');

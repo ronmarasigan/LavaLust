@@ -42,16 +42,45 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 */
 Class Io {
 
+	/**
+	 * If CSRF Protection is enables, csrf_verify() will
+	 * run
+	 * 
+	 * @var boolean
+	 */
 	private $_enable_csrf			= FALSE;
 
+	/**
+	 * Securty instance
+	 * 
+	 * @var class
+	 */
 	private $security;
 
+	/**
+	 * Class constructor
+	 */
 	public function __construct()
 	{
+		/**
+		 * Load Security Instance
+		 * 
+		 * @var class
+		 */
 		$this->security =& load_class('Security', 'core');
+
+		/**
+		 * Check CSRF Protection if enabled
+		 * 
+		 * @var boolean
+		 */
 		$this->_enable_csrf	= (config_item('csrf_protection') === TRUE);
 
-		// CSRF Protection check
+		/**
+		 * Check CSRF Protection
+		 * 
+		 * @var
+		 */
 		if ($this->_enable_csrf === TRUE)
 		{
 			$this->security->csrf_verify();
@@ -60,6 +89,7 @@ Class Io {
 	
   	/**
   	 * POST Variable
+  	 * 
   	 * @param  string
   	 * @return string
   	 */
@@ -77,6 +107,7 @@ Class Io {
 
 	/**
   	 * GET Variable
+  	 * 
   	 * @param  string
   	 * @return string
   	 */
@@ -173,6 +204,11 @@ Class Io {
 	setcookie($prefix.$name, $value, $expire, $path, $domain, $secure, $httponly);
 	}
 
+	/**
+	 * Is Ajax
+	 * 
+	 * @return boolean Check if Request is AJAX
+	 */
 	public function is_ajax() {
         return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest';
 	}
