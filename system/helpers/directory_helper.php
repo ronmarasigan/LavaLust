@@ -84,4 +84,25 @@ if ( ! function_exists('directory_map'))
 
 		return FALSE;
 	}
+
+	if ( ! function_exists('usable'))
+	{
+		/**
+		 * Check if directory is usable
+		 * 
+		 * @param  string $dir
+		 * @param  string $chmod
+		 * @return boolean
+		 */
+		function usable($dir, $chmod = '0744')
+		{
+			// If it doesn't exist, and can't be made
+			if(! is_dir($dir) AND ! mkdir($dir, $chmod, TRUE)) return FALSE;
+
+			// If it isn't writable, and can't be made writable
+			if(! is_writable($dir) AND !chmod($dir, $chmod)) return FALSE;
+
+			return TRUE;
+		}
+	}
 }
