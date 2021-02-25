@@ -42,6 +42,32 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  */
 require_once SYSTEM_DIR . 'core/Registry.php';
 require_once SYSTEM_DIR . 'core/Common.php';
+
+/**
+ * ------------------------------------------------------
+ *  Composer (Autoload)
+ * ------------------------------------------------------
+ * 
+ * @var $this
+ */
+if ($composer_autoload = config_item('composer_autoload'))
+{
+	if ($composer_autoload === TRUE)
+	{
+		file_exists(APP_DIR.'vendor/autoload.php')
+			? require_once(APP_DIR.'vendor/autoload.php')
+			: show_404('404 Not Found', 'Composer config file not found.');
+	}
+	elseif (file_exists($composer_autoload))
+	{
+		require_once($composer_autoload);
+	}
+	else
+	{
+		show_404('404 Not Found', 'Composer config file not found.');
+	}
+}
+
 /*
  * ------------------------------------------------------
  *  Instantiate the Benchmark class
