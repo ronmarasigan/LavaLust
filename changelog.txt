@@ -2,7 +2,9 @@ LavaLust Version 1.0.1
 
 # Changelog
 
-
+## Upload Class was added [1.0.2] 2021-02-23]
+    -Added Upload Library
+    
 ## Auth library [1.0.1] 2021-02-10]
     -Fixed bugs and add two more methods
     

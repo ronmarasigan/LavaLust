@@ -57,7 +57,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 | LavaLust Version
 | -------------------------------------------------------------------
 */
-$config['VERSION']                 = '1';
+$config['VERSION']                 = '1.0.2';
 
 /*
 | -------------------------------------------------------------------
@@ -87,6 +87,28 @@ date_default_timezone_set('Asia/Manila');
 |
 */
 $config['base_url'] 				= '';
+
+/*
+|--------------------------------------------------------------------------
+| Composer auto-loading
+|--------------------------------------------------------------------------
+|
+| Enabling this setting will tell LvaLust to look for a Composer
+| package auto-loader script in application/vendor/autoload.php.
+|
+|	$config['composer_autoload'] = TRUE;
+|
+| Or if you have your vendor/ directory located somewhere else, you
+| can opt to set a specific path as well:
+|
+|	$config['composer_autoload'] = '/path/to/vendor/autoload.php';
+|
+| For more information about Composer, please visit http://getcomposer.org/
+|
+| Note: This will NOT disable or override the CodeIgniter-specific
+|	autoloading (application/config/autoload.php)
+*/
+$config['composer_autoload'] = FALSE;
 
 /*
 |--------------------------------------------------------------------------

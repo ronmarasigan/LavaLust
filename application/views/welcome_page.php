@@ -63,7 +63,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 <body>
     <div class="header">LavaLust Framework</div>
     <div class="main">
-        <b>LavaLust</b> is a <i>Lightweight Web Framework</i> - (using MVC pattern) - for people who are developing web sites using PHP. It helps you write code easily using Object-Oriented Approach. It also provides set of libraries for commonly needed tasks, as well as helper functions to minimize the amount of time coding.
+        <b>LavaLust</b> is a <i>Lightweight Web Framework</i> that uses MVC(Model View Controller) design pattern for people who are developing web applications using PHP. It helps you write code easily using Object-Oriented Approach. It also provides set of libraries for commonly needed tasks, as well as helper functions to minimize the amount of time coding.
         <br><br>
         <code>
             <b>System Requirements:</b>
@@ -74,10 +74,10 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
                 <li>mod_rewrite is enabled</li>
             </ul>
         </code>
-        <p>This View is located inside: </p>
+        <p>This view is located inside: </p>
         <code>application/views/welcome_message.php</code>
 
-        <p>The corresponding controller for this view file is:</p>
+        <p>The corresponding controller for this view file: </p>
         <code>application/controllers/Welcome.php</code>
 
         <p>You can star and fork the <a href="https://github.com/ronmarasigan/LavaLust">Github Repository</a> and read its <a href="https://ronmarasigan.github.io">Documentation</a>.</p>
