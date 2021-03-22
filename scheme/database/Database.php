@@ -30,7 +30,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * @package LavaLust
  * @author Ronald M. Marasigan <ronald.marasigan@yahoo.com>
  * @copyright Copyright 2020 (https://ronmarasigan.github.io)
- * @version Version 1
+ * @since Version 1
  * @link https://lavalust.pinoywap.org
  * @license https://opensource.org/licenses/MIT MIT License
  */
@@ -164,6 +164,7 @@ class Database {
         $this->having = NULL;
         $this->getSQL = NULL;
         $this->where = NULL;
+        $this->join = NULL;
         $this->rowCount = 0;
         $this->lastIDInserted = 0;
     }

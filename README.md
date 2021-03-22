@@ -1,3 +1,22 @@
+## LavaLust Version 2
+	This is an early release of LavaLust Version 2. You may check the changelog.txt file to see the changes.
+###	Overview of Changes in Version 2
+#### Note: you can still use the framework version 2 the way you use the version 1 before
+	-> $this->load is now $this->call
+	-> super object get_instance is now lava_instance()
+	->folder structures but you can still change it to your preferred names and path
+		* application is now app
+		* system is now scheme
+		* assets is now public
+		* core is now kernel
+		* benchmark class is now performance. see the changelog.txt for more details
+		* Constants and mimes file inside config folder was also deleted. We are making the framework as simple and as
+		light as possible
+	->cache is now inside runtime folder
+### Update Version 1 to Version 2
+	1. Backup your files..
+	2. Replace all files and directories in your system/ directory with the files and directories from scheme/ folder of version 2.
+	3. If you are using the constants and mimes that were deleted in version 2, please take note of those things and update your app manually. 
 ## What is LavaLust?
 	LavaLust is an lightweight Web Framework - (using MVC pattern) - for people who are developing web sites using PHP. It helps
 	you write code easily using Object-Oriented Approach. It also provides set of libraries for commonly needed tasks, as well as
