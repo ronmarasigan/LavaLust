@@ -1,10 +1,36 @@
-LavaLust Version 1.0.1
+LavaLust Version 1.0.2
 
 # Changelog
 
 ## Upload Class was added [1.0.2] 2021-02-23]
     -Added Upload Library
-    
+    -Benchmark is now Performance
+        * to add maker point:
+            $this->performance->tag('your_pointer'), to start and end the test;
+        * you can start several pointers provided that you will stop each pointer before getting the elapsed_time()
+
+## Rename some files, folder, class methods and functions [1.0.2] 2021-02-19]
+    -You need to update several files inside your "application" folder
+    new folder structure
+        * app - before is application (still changeable)
+        * public - before is public (still changeable)
+            * update config.php add $config['composer_autoload'] = FALSE; (see config file of the new version)
+            * $config['cache_dir'] = 'runtime/cache/'; (see config file of the new version)
+                $config['cache_default_expires'] = 0; (see config file of the new version)
+            * add port to database.php config (see database.php file of the new version)
+            * routes.php add $route['translate_uri_dashes']     = FALSE; (see routes.php file of the new version)
+            * Remove mimes.php and constants.php (it is not use by system anymore)
+        * runtime - before is cache but this will now also include other dynamically generated files
+        * scheme - before is system (still changeable)
+            * kernel - before is core
+                * Routine - before is Common
+        * Default error pages inside View is now updated
+    BIG CHANGES
+        * To access the LavaLust Super Object, you need to call:
+             lava_instance() - before is get_instance()
+        * $this->call - before is $this->load
+        * All other changes does not affect the coding style in your application
+        
 ## Auth library [1.0.1] 2021-02-10]
     -Fixed bugs and add two more methods
     

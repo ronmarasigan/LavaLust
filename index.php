@@ -40,24 +40,24 @@ define('PREVENT_DIRECT_ACCESS', TRUE);
  * SYSTEM DIRECTORY NAME
  *---------------------------------------------------------------
  *
- * This variable must contain the name of your "system" directory.
+ * This variable must contain the name of your "scheme" directory.
  * Set the path if it is not in the same directory as this file.
  * 
  * NO TRAILING SLASH!
  */
-	$system_path 			= 'system';
+	$system_path 			= 'scheme';
 
 /*
  *---------------------------------------------------------------
  * APPLICATION DIRECTORY NAME
  *---------------------------------------------------------------
  *
- * If you want this front controller to use a different "application"
+ * If you want this front controller to use a different "app"
  * directory than the default one you can set its name here.
  *
  * NO TRAILING SLASH!
  */
-	$application_folder 	= 'application';
+	$application_folder 	= 'app';
 
 /*
  *---------------------------------------------------------------
@@ -66,7 +66,7 @@ define('PREVENT_DIRECT_ACCESS', TRUE);
  * This let you set up your public folder where css, js and other public,
  * files will be visible
  */
-	$public_folder			= 'assets';
+	$public_folder			= 'public';
 
 /*
  * ------------------------------------------------------
@@ -83,5 +83,5 @@ define('PUBLIC_DIR', $public_folder);
  * Setup done? Then Hurray!
  * ------------------------------------------------------
  */
-require_once(SYSTEM_DIR . 'core/LavaLust.php');
+require_once(SYSTEM_DIR . 'kernel/LavaLust.php');
 ?>
