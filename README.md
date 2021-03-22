@@ -14,7 +14,7 @@
 		light as possible
 	->cache is now inside runtime folder
 ### Update Version 1 to Version 2
-	1. Backup your files.
+	1. Backup your files..
 	2. Replace all files and directories in your system/ directory with the files and directories from scheme/ folder of version 2.
 	3. If you are using the constants and mimes that were deleted in version 2, please take note of those things and update your app manually. 
 ## What is LavaLust?
