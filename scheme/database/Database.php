@@ -164,6 +164,7 @@ class Database {
         $this->having = NULL;
         $this->getSQL = NULL;
         $this->where = NULL;
+        $this->join = NULL;
         $this->rowCount = 0;
         $this->lastIDInserted = 0;
     }
