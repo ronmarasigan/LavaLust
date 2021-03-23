@@ -75,10 +75,10 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
             </ul>
         </code>
         <p>This view is located inside: </p>
-        <code>application/views/welcome_message.php</code>
+        <code>app/views/welcome_message.php</code>
 
         <p>The corresponding controller for this view file: </p>
-        <code>application/controllers/Welcome.php</code>
+        <code>app/controllers/Welcome.php</code>
 
         <p>You can star and fork the <a href="https://github.com/ronmarasigan/LavaLust">Github Repository</a> and read its <a href="https://ronmarasigan.github.io">Documentation</a>.</p>
     </div>

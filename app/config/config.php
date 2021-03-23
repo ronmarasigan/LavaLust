@@ -57,7 +57,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 | LavaLust Version
 | -------------------------------------------------------------------
 */
-$config['VERSION']                 = '1.0.2';
+$config['VERSION']                 = '2';
 
 /*
 | -------------------------------------------------------------------
@@ -93,7 +93,7 @@ $config['base_url'] 				= '';
 | Composer auto-loading
 |--------------------------------------------------------------------------
 |
-| Enabling this setting will tell LvaLust to look for a Composer
+| Enabling this setting will tell LavaLust to look for a Composer
 | package auto-loader script in application/vendor/autoload.php.
 |
 |	$config['composer_autoload'] = TRUE;

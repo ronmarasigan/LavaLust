@@ -1,6 +1,8 @@
-LavaLust Version 1.0.2
+LavaLust Version 2
 
 # Changelog
+
+## LavaLust Version 2 Starts with change log 1.0.2 2021-02-19
 
 ## Upload Class was added [1.0.2] 2021-02-23]
     -Added Upload Library
