@@ -125,12 +125,6 @@ class Router
 		//hack!
 		$script_url  = (isset($_SERVER['PHP_SELF'])) ? substr_replace($_SERVER['PHP_SELF'], '', strpos($_SERVER['PHP_SELF'], 'index.php') + 9) : '';
 
-		if(strpos($request_url, '?') == TRUE)
-		{
-			$exp = explode('?', $request_url);
-			$request_url = $exp[0];
-		}
-
 		if($request_url != $script_url)
 			$this->url_string = trim(preg_replace('/'. str_replace('/', '\/', str_replace('index.php', '', $script_url)) .'/', '', $request_url, 1), '/');
 			$this->url = explode('/', $this->remapUrl(filter_var($this->url_string, FILTER_SANITIZE_URL), $this->route));
