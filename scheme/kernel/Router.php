@@ -125,21 +125,15 @@ class Router
 		//hack!
 		$script_url  = (isset($_SERVER['PHP_SELF'])) ? substr_replace($_SERVER['PHP_SELF'], '', strpos($_SERVER['PHP_SELF'], 'index.php') + 9) : '';
 
-		if(strpos($request_url, '?') == TRUE)
-		{
-			$exp = explode('?', $request_url);
-			$request_url = $exp[0];
-		}
-
 		if($request_url != $script_url)
 			$this->url_string = trim(preg_replace('/'. str_replace('/', '\/', str_replace('index.php', '', $script_url)) .'/', '', $request_url, 1), '/');
 			$this->url = explode('/', $this->remapUrl(filter_var($this->url_string, FILTER_SANITIZE_URL), $this->route));
-			if($this->url[0] != NULL)
+			if($this->url[0] != NULL && config_item('enable_query_strings') == FALSE)
 			{
 				foreach($this->url as $uri)
 				{
 					if (!preg_match('/^['.config_item('permitted_uri_chars').']+$/i', $uri))
-						trigger_error("The characters you entered in the URL are not permitted!", E_USER_WARNING);
+						show_404('404 Page Not Found', 'The URI you submitted has disallowed characters.');
 				}
 			}
 			return $this->url;				
