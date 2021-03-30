@@ -1,6 +1,10 @@
 LavaLust Version 2
 
 # Changelog
+## Added option to use query string [2] 2021-03-30
+    -inside config there is now option to allow query string on the links
+        for some reason it is sometimes needed if there are optional
+        parameters
 
 ## LavaLust Version 2 Starts with change log 1.0.2 2021-02-19
 
