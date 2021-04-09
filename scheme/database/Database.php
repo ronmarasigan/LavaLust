@@ -177,7 +177,8 @@ class Database {
     public function delete()
     {
         $this->sql = "DELETE FROM {$this->table}";
-        return $this;
+        
+        $this->exec();
     }
 
     public function update($fields = [])
@@ -193,7 +194,7 @@ class Database {
 
         $this->sql = "UPDATE {$this->table} SET {$set}";
 
-        return $this;
+        $this->exec();
     }
 
 
@@ -219,7 +220,7 @@ class Database {
  
         $this->sql = "INSERT INTO {$this->table} ({$keys}) VALUES ({$values})";
         
-        return $this;
+        $this->exec();
     }
 
     /**
