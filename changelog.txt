@@ -1,7 +1,10 @@
 LavaLust Version 2
 
 # Changelog
-## Added option to use query string [2] 2021-03-30
+## No need to add Database.php ->exec() method in insert, update and delete [2.0.1]
+    - you can simple remove ->exec() now while creating sql statement using query builder
+    
+## Added option to use query string [2.0.0] 2021-03-30
     -inside config there is now option to allow query string on the links
         for some reason it is sometimes needed if there are optional
         parameters
