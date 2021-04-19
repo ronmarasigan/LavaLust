@@ -178,23 +178,26 @@ class Database {
     {
         $this->sql = "DELETE FROM {$this->table}";
         
-        $this->exec();
+        return $this;
     }
 
     public function update($fields = [])
     {
         $set = '';
         $values = [];
+        $field_array = [];
 
         foreach ($fields as $column => $field) {
             $values[] = $column . ' = ?';
-            $this->bindValues[] = $field;
+            $field_array[] = $field;
         }
+        $this->bindValues = array_merge($field_array, $this->bindValues);
+        
         $set .= implode(', ', $values);
 
         $this->sql = "UPDATE {$this->table} SET {$set}";
 
-        $this->exec();
+        return $this;
     }
 
 
@@ -220,7 +223,7 @@ class Database {
  
         $this->sql = "INSERT INTO {$this->table} ({$keys}) VALUES ({$values})";
         
-        $this->exec();
+        return $this;
     }
 
     /**
