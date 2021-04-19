@@ -1,6 +1,8 @@
 LavaLust Version 2
 
 # Changelog
+## ->exec() was added again for some technical reasons [2.0.2]
+
 ## No need to add Database.php ->exec() method in insert, update and delete [2.0.1]
     - you can simple remove ->exec() now while creating sql statement using query builder
     
