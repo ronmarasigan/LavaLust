@@ -42,13 +42,15 @@ switch ($option) {
 }
 if($flag) {
 	$class = ucfirst(readline('Enter ' . $option . ' name: '));
-	if(! file_exists(APP_DIR . strtolower($option) . 's\\' . $class . '.php')) {
-		$file_handle = fopen(APP_DIR . strtolower($option) . 's\\' . $class . '.php', 'w');
+	$_m = '';
+	if(strtolower($option) == 'model') $_m = '_model';
+	if(! file_exists(APP_DIR . strtolower($option) . 's\\' . $class . ''.$_m.'.php')) {
+		$file_handle = fopen(APP_DIR . strtolower($option) . 's\\' . $class . ''.$_m.'.php', 'w');
 		fwrite($file_handle, '<?php');
 		fwrite($file_handle, "\n");
 		fwrite($file_handle, "defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');");
 		fwrite($file_handle, "\n");
-		fwrite($file_handle, "class ".$class." extends ".$option." {");
+		fwrite($file_handle, "class ".$class."".$_m." extends ".$option." {");
 		fwrite($file_handle, "\n");
 		fwrite($file_handle, "}");
 		fwrite($file_handle, "\n");
