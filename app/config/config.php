@@ -63,6 +63,7 @@ $config['VERSION']                 = '2';
 | -------------------------------------------------------------------
 | Default Environment
 | -------------------------------------------------------------------
+| Values: development and production
 */
 $config['ENVIRONMENT']             = 'development';
 
