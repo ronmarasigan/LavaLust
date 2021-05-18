@@ -121,7 +121,6 @@ class Database {
             $this->rowCount = $stmt->rowCount();
             return $stmt->fetchAll();
         }else{
-            $this->getSQL = $query;
             $stmt = $this->db->prepare($query);
             $stmt->execute($this->bindValues);
             return $stmt->rowCount();
