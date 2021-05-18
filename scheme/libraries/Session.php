@@ -98,20 +98,11 @@ class Session {
 			require_once 'Session/FileSessionHandler.php';
 			$handler = new FileSessionHandler();
 			session_set_save_handler($handler, TRUE);
+			session_start();
 		} elseif ( ! empty($this->config['sess_driver']) AND $this->config['sess_driver'] == 'database' ) {
-			require_once 'Session/DBSessionHandler.php';
-			session_set_save_handler(  
-			array($this, "_open"),  
-			array($this, "_close"),  
-			array($this, "_read"),  
-			array($this, "_write"),  
-			array($this, "_destroy"),  
-			array($this, "_gc")  
-			); 
-			register_shutdown_function('session_write_close');
+			
 		}
-		
-	    session_start();
+
 
 	    //On creation store the useragent fingerprint
 		if(empty($_SESSION['fingerprint'])) {
@@ -270,7 +261,13 @@ class Session {
    	 */
 	public function session_id()
 	{
-		return session_id();
+		$seed = str_split('abcdefghijklmnopqrstuvwxyz0123456789');
+        $rand_id = '';
+        shuffle($seed);
+        foreach (array_rand($seed, 32) as $k) { // sessions ids are 32 chars in length.
+            $rand_id .= $seed[$k];
+        }
+           return $rand_id; 
 	}
 
 	/**

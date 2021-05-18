@@ -58,7 +58,7 @@ class Form_validation {
     private static $err_min_length = 'Please enter less than %d character/s';
     private static $err_max_length = 'Please enter more than %d character/s';
     private static $err_email = '%s contains invalid email address';
-    private static $err_aplha = '%s accepts letters only';
+    private static $err_alpha = '%s accepts letters only';
     private static $err_alphanum = '%s accepts letters and numbers only';
     private static $err_alphanumspace = '%s accepts letters, numbers and spaces only';
     private static $err_alphaspace = '%s accepts letters and spaces only';
@@ -311,8 +311,9 @@ class Form_validation {
     
     public function alpha($custom_error = '')
     {
-        if(!ctype_alpha($this->value))
-            $this->set_error_message($custom_error, self::$err_alpha, $this->name);
+        if(($this->value != '' || $this->value != null))
+            if(!ctype_alpha($this->value))
+                $this->set_error_message($custom_error, self::$err_alpha, $this->name);
         return $this; 
     }
 
@@ -324,8 +325,9 @@ class Form_validation {
      */
     public function alpha_numeric($custom_error = '')
     {
-        if(!ctype_alnum((string) $this->value))
-            $this->set_error_message($custom_error, self::$err_alphanum, $this->name);
+        if(($this->value != '' || $this->value != null))
+            if(!ctype_alnum((string) $this->value))
+                $this->set_error_message($custom_error, self::$err_alphanum, $this->name);
         return $this; 
     }
 
@@ -337,8 +339,9 @@ class Form_validation {
      */
     public function alpha_numeric_space($custom_error = '')
     {
-        if(!preg_match('/^[A-Z0-9 ]+$/i', $this->value))
-            $this->set_error_message($custom_error, self::$err_alphanumspace, $this->name);
+        if(($this->value != '' || $this->value != null))
+            if(!preg_match('/^[A-Z0-9 ]+$/i', $this->value))
+                $this->set_error_message($custom_error, self::$err_alphanumspace, $this->name);
         return $this; 
     }
 
@@ -350,8 +353,9 @@ class Form_validation {
      */
     public function alpha_space($custom_error = '')
     {
-        if(!preg_match('/^[A-Z ]+$/i', $this->value))
-            $this->set_error_message($custom_error, self::$err_alphaspace, $this->name);
+        if(($this->value != '' || $this->value != null))
+            if(!preg_match('/^[A-Z ]+$/i', $this->value))
+                $this->set_error_message($custom_error, self::$err_alphaspace, $this->name);
         return $this; 
     }
 
@@ -363,8 +367,9 @@ class Form_validation {
      */
     public function alpha_numeric_dash($custom_error = '')
     {
-        if(!preg_match('/^[a-z0-9_-]+$/i', $this->value))
-            $this->set_error_message($custom_error, self::$err_alphanumdash, $this->name);
+        if(($this->value != '' || $this->value != null))
+            if(!preg_match('/^[a-z0-9_-]+$/i', $this->value))
+                $this->set_error_message($custom_error, self::$err_alphanumdash, $this->name);
         return $this; 
     }
 
@@ -376,8 +381,9 @@ class Form_validation {
      */
     public function numeric($custom_error = '')
     {
-        if(!preg_match('/^[\-+]?[0-9]*\.?[0-9]+$/', $this->value))
-            $this->set_error_message($custom_error, self::$err_numeric, $this->name);
+        if(($this->value != '' || $this->value != null))
+            if(!preg_match('/^[\-+]?[0-9]*\.?[0-9]+$/', $this->value))
+                $this->set_error_message($custom_error, self::$err_numeric, $this->name);
         return $this; 
 
     }
@@ -390,8 +396,9 @@ class Form_validation {
      */
     public function integer($custom_error = '')
     {
-        if(!preg_match('/^[\-+]?[0-9]+$/', $this->value))
-            $this->set_error_message($custom_error, self::$err_integer, $this->name);
+        if(($this->value != '' || $this->value != null))
+            if(!preg_match('/^[\-+]?[0-9]+$/', $this->value))
+                $this->set_error_message($custom_error, self::$err_integer, $this->name);
         return $this; 
 
     }
@@ -404,8 +411,9 @@ class Form_validation {
      */
     public function decimal($custom_error = '')
     {
-        if(!preg_match('/^[\-+]?[0-9]+\.[0-9]+$/', $this->value))
-            $this->set_error_message($custom_error, self::$err_decimal, $this->name);
+        if(($this->value != '' || $this->value != null))
+            if(!preg_match('/^[\-+]?[0-9]+\.[0-9]+$/', $this->value))
+                $this->set_error_message($custom_error, self::$err_decimal, $this->name);
         return $this; 
 
     }
