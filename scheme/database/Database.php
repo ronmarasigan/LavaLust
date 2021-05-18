@@ -812,13 +812,25 @@ class Database {
      * @param  integer $offset
      * @return $this
      */
-    public function limit($limit, $offset=NULL)
+    public function limit($limit, $end = NULL)
     {
-        if ($offset ==NULL ) {
+        if ($end == NULL ) {
             $this->limit = " LIMIT {$limit}";
         }else{
-            $this->limit = " LIMIT {$limit} OFFSET {$offset}";
+            $this->limit = " LIMIT {$limit}, {$end}";
         }
+
+        return $this;
+    }
+
+    /**
+     * offset
+     * 
+     * @param  int $offset
+     * @return $this
+     */
+    public function offset($offset) {
+        $this->limit .= " OFFSET {$offset}";
 
         return $this;
     }

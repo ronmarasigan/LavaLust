@@ -1,6 +1,8 @@
 LavaLust Version 2
 
 # Changelog
+## Add Pagination Class [2.0.3]
+
 ## ->exec() was added again for some technical reasons [2.0.2]
 
 ## No need to add Database.php ->exec() method in insert, update and delete [2.0.1]
