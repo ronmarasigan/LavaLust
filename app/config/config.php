@@ -57,7 +57,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 | LavaLust Version
 | -------------------------------------------------------------------
 */
-$config['VERSION']                 = '2';
+$config['VERSION']                 = '2.0.3';
 
 /*
 | -------------------------------------------------------------------
@@ -171,7 +171,7 @@ $config['error_view_path']         	= APP_DIR . 'views' . DIRECTORY_SEPARATOR . 
 |
 | This determines which set of language files should be used. Make sure
 | there is an available translation if you intend to use something other
-| than english.
+| than en-US.
 |
 */
 $config['language'] 				= 'en-US';

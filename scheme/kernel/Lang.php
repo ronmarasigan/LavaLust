@@ -115,9 +115,9 @@ class Lang {
         {
             if (file_exists(APP_DIR . 'language/' . $this->current . '.php'))
             {
-                $this->languages[$this->current] = require(APP_DIR .'language/' . $this->current . '.php');
+                $this->languages[$this->current] = require_once(APP_DIR .'language/' . $this->current . '.php');
             } else {
-                $this->languages[$this->current] = require(SYSTEM_DIR .'language/' . $this->default . '.php');
+                $this->languages[$this->current] = require_once(SYSTEM_DIR .'language/' . $this->default . '.php');
             }
         }
     }
