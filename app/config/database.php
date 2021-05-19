@@ -59,5 +59,5 @@ $database['port']		= '';
 $database['username']	= '';
 $database['password']	= '';
 $database['database']	= '';
-$database['charset']	= 'utf8';
+$database['charset']	= '';
 ?>
