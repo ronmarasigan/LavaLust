@@ -122,8 +122,6 @@ class Cache
 
 	private function _call($property, $method, $arguments = array(), $expires = NULL)
 	{
-		$this->_lava->call->helper('security');
-
 		if ( !  is_array($arguments))
 		{
 			$arguments = (array) $arguments;
