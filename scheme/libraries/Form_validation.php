@@ -228,7 +228,7 @@ class Form_validation {
      * @param   string  $field
      * @return  bool
      */
-    public function is_unique($table, $str, $field,  $custom_error = '')
+    public function is_unique($table, $field, $str,  $custom_error = '')
     {
         if(isset($this->LAVA->db))
         {
