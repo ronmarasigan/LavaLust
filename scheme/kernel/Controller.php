@@ -74,7 +74,7 @@ class Loader {
 		if(file_exists(APP_DIR .'views/' . $viewFile . '.php'))
 			require_once(APP_DIR .'views/' . $viewFile . '.php');
 		else
-			show_404('404 Not Found', $viewFile . ' view file was not found.');
+			throw new Exception(''.$viewFile.' view file did not exist.');
 		echo ob_get_clean();
 	}
 
