@@ -133,7 +133,7 @@ class Router
 				foreach($this->url as $uri)
 				{
 					if (!preg_match('/^['.config_item('permitted_uri_chars').']+$/i', $uri))
-						show_404('404 Page Not Found', 'The URI you submitted has disallowed characters.');
+						throw new Exception('The URI you submitted has disallowed characters.');
 				}
 			}
 			return $this->url;				
