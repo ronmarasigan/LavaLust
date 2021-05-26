@@ -152,12 +152,12 @@ class Form_validation {
     public function pattern($name) {
         if($name == 'array'){
             if(!is_array($this->value)) {
-                $this->set_error_message($custom_error, self::$err_required, $this->name);
+                $this->set_error_message($custom_error, self::$err_pattern, $this->name);
             }
         } else {
             $regex = '/^('.$this->patterns[$name].')$/u';
             if($this->value != '' && !preg_match($regex, $this->value)){
-                $this->set_error_message($custom_error, self::$err_required, $this->name);
+                $this->set_error_message($custom_error, self::$err_pattern, $this->name);
             }           
         }
         return $this;
@@ -172,7 +172,7 @@ class Form_validation {
     public function custom_pattern($pattern) {   
         $regex = '/^('.$pattern.')$/u';
         if($this->value != '' && !preg_match($regex, $this->value)) {
-            $this->set_error_message($custom_error, self::$err_required, $this->name);
+            $this->set_error_message($custom_error, self::$err_pattern, $this->name);
         }
         return $this;
     }
