@@ -149,7 +149,7 @@ class Form_validation {
      * @param  string $name Pattern
      * @return $this
      */
-    public function pattern($name) {
+    public function pattern($name, $custom_error) {
         if($name == 'array'){
             if(!is_array($this->value)) {
                 $this->set_error_message($custom_error, self::$err_pattern, $this->name);
@@ -169,7 +169,7 @@ class Form_validation {
      * @param  string $pattern pattern
      * @return $this
      */
-    public function custom_pattern($pattern) {   
+    public function custom_pattern($pattern, $custom_error) {   
         $regex = '/^('.$pattern.')$/u';
         if($this->value != '' && !preg_match($regex, $this->value)) {
             $this->set_error_message($custom_error, self::$err_pattern, $this->name);
