@@ -43,6 +43,13 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 require_once SYSTEM_DIR . 'kernel/Registry.php';
 require_once SYSTEM_DIR . 'kernel/Routine.php';
 
+/*
+ * ------------------------------------------------------
+ * LavaLust BASE URL of your APPLICATION
+ * ------------------------------------------------------
+ */
+define('BASE_URL', config_item('base_url'));
+
 /**
  * ------------------------------------------------------
  *  Composer (Autoload)
@@ -75,13 +82,6 @@ if ($composer_autoload = config_item('composer_autoload'))
  */
 $pf =& load_class('performance', 'kernel');
 $pf->tag('lavalust');
-
-/*
- * ------------------------------------------------------
- * LavaLust BASE URL of your APPLICATION
- * ------------------------------------------------------
- */
-define('BASE_URL', config_item('base_url'));
 
 /*
  * ------------------------------------------------------

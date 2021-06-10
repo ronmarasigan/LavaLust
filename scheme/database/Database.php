@@ -134,16 +134,16 @@ class Database {
      */
     public function exec()
     {
-            $this->sql .= $this->where;
-            $this->getSQL = $this->sql;
-            $stmt = $this->db->prepare($this->sql);
-            $stmt->execute($this->bindValues);
-            if (strpos( strtoupper($this->sql), "INSERT" ) === 0 ) {
-                $this->lastIDInserted = $this->db->lastInsertId();
-                return $this->lastIDInserted;
-            }
-            else
-                return $stmt->rowCount();
+        $this->sql .= $this->where;
+        $this->getSQL = $this->sql;
+        $stmt = $this->db->prepare($this->sql);
+        $stmt->execute($this->bindValues);
+        if (strpos( strtoupper($this->sql), "INSERT" ) === 0 ) {
+            $this->lastIDInserted = $this->db->lastInsertId();
+            return $this->lastIDInserted;
+        }
+        else
+            return $stmt->rowCount();
     }
 
     /**
@@ -1017,7 +1017,7 @@ class Database {
             return $this->db->beginTransaction();
         }
 
-        $this->pdo->exec('SAVEPOINT trans' . $this->transactionCount);
+        $this->db->exec('SAVEPOINT trans' . $this->transactionCount);
         return $this->transactionCount >= 0;
     }
 

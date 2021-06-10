@@ -45,15 +45,9 @@ class Registry
 	private $_classes = array();
 	private static $_instance;
 	
-	private function __construct() { }
-	
-	private function __clone(){ }
-	
-    /*
-    * ------------------------------------------------------
-    *  Get Instance
-    * ------------------------------------------------------
-    */
+    /**
+     * Get Instance of Registry
+     */
     public static function instance()
     {
     	if(!isset(self::$_instance))
@@ -63,11 +57,9 @@ class Registry
         return self::$_instance;
     }
 
-    /*
-    * ------------------------------------------------------
-    *  Get Class
-    * ------------------------------------------------------
-    */
+    /**
+     * @param string $key
+     */
     protected function get($key)
     {
     	
@@ -78,34 +70,29 @@ class Registry
         return NULL;
     }
 
-    /*
-    * ------------------------------------------------------
-    *  Set Class
-    * ------------------------------------------------------
-    */
+    /**
+     * @param string $key
+     * @param object $object
+     */
     protected function set($key, $object)
     {
         $this->_classes[$key] = $object;
     }
-    
-    /*
-    * ------------------------------------------------------
-    *  Get Class Object
-    * ------------------------------------------------------
-    */
-    static function getObject($key)
+
+    /**
+     * @param string $key
+     */
+    static function get_object($key)
     {
 		return self::instance()->get($key);
 	}
 
-    /*
-    * ------------------------------------------------------
-    *  Store Class Object
-    * ------------------------------------------------------
-    */
-	static function storeObject($key, $object)
+    /**
+     * @param string $key
+     * @param object $object
+     */
+	static function store_object($key, $object)
 	{
 		return self::instance()->set($key, $object);
 	}
 }
-
