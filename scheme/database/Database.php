@@ -84,7 +84,7 @@ class Database {
             $this->db = new PDO($this->dsn, $this->dbuser, $this->dbpass, $options);
             $database_config = NULL;
         } catch (Exception $e) {
-            show_error('Database Error Occured', $e->getMessage(), 'error_db', 500);
+            throw new PDOException($e->getMessage());
         }
     }
 
@@ -278,7 +278,7 @@ class Database {
     public function _max_min_sum_count_avg($column, $alias = null, $type = 'MAX')
     {
         if( ! in_array($type, array('MAX', 'MIN', 'SUM', 'COUNT', 'AVG'))) {
-            show_error('Database Error Occured', 'Invalid function type: ' . html_escape($type), 'error_db', 500);
+            throw new RuntimeException('Invalid function type: ' . html_escape($type));
         }
 
         $function = $type . '(' . $column . ')' . (! is_null($alias) ? ' AS ' . $alias : '');
@@ -962,8 +962,8 @@ class Database {
             $stmt->execute($this->bindValues);
             $this->rowCount = $stmt->rowCount();
             return $stmt->fetch($mode);
-        } catch(PDOException $e) {
-            show_error('Database Error Occured', $e->getMessage().'<br>SQL Query: '.html_escape($this->getSQL), 'error_db', 500);
+        } catch(Exception $e) {
+            throw new PDOException($e->getMessage().'<br>SQL STATEMENT: '.html_escape($this->getSQL));
         }
     }
 
@@ -981,8 +981,8 @@ class Database {
             $stmt->execute($this->bindValues);
             $this->rowCount = $stmt->rowCount();
             return $stmt->fetchAll();
-        } catch(PDOException $e) {
-            show_error('Database Error Occured', $e->getMessage().'<br>SQL Query: '.html_escape($this->getSQL), 'error_db', 500);
+        } catch(Exception $e) {
+            throw new PDOException($e->getMessage().'<br>SQL STATEMENT: '.html_escape($this->getSQL));
         }
     }
 
