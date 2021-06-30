@@ -67,7 +67,6 @@ class Database {
     {
         $database_config = database_config();
         $this->dbprefix = $database_config['dbprefix'];
-        $this->table = $this->dbprefix.$this->table;
         $this->driver = $database_config['driver'];
         $this->charset = $database_config['charset'];
         $this->dbost = $database_config['hostname'];
@@ -75,6 +74,7 @@ class Database {
         $this->dbname = $database_config['database'];
         $this->dbuser = $database_config['username'];
         $this->dbpass = $database_config['password'];
+        
         $this->dsn = ''.$this->driver.':host=' . $this->dbost . ';dbname=' . $this->dbname . ';charset=' . $this->charset . ';port=' . $this->port;
 
         $options = array(
@@ -247,7 +247,7 @@ class Database {
     public function table($table_name)
     {
         $this->resetQuery();
-        $this->table = $table_name;
+        $this->table = $this->dbprefix.$table_name;
         return $this;
     }
 
@@ -360,20 +360,8 @@ class Database {
      */
     public function join($table_name, $cond, $type = '')
     {
-        //Planning to add but im worrying about the loading speed.
-        /*
-        $flag = false;
-        foreach ($this->$operators as $operator) {
-            if (strpos($cond, $operator) !== FALSE) {
-                $flag = true;
-            } else {
-                $flag = false;
-            }
-        }
-        */
-       
         $this->join = (is_null($this->join))
-            ? ' ' . $type . 'JOIN' . ' ' . $table_name . ' ON ' . $cond
+            ? ' ' . $type . 'JOIN' . ' ' . $this->dbprefix.$table_name . ' ON ' . $cond
             : $this->join . ' ' . $type . 'JOIN' . ' ' . $table_name . ' ON ' . $cond;
 
         return $this;
@@ -924,7 +912,7 @@ class Database {
             $select = "*";
         }
 
-        $this->sql = "SELECT $select FROM $this->table";
+        $this->sql = "SELECT $select FROM {$this->table}";
         if ($this->join !== NULL) {
             $this->sql .= $this->join;
         }
