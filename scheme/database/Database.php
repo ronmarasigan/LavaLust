@@ -43,6 +43,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 class Database {
     private static $instance = NULL;
     private $db = NULL;
+    private $dbprefix = NULL;
     private $table;
     private $columns;
     private $sql;
@@ -65,6 +66,8 @@ class Database {
     public function __construct()
     {
         $database_config = database_config();
+        $this->prefix = $database_config['prefix'];
+        $this->table = $this->dbprefix.$this->table;
         $this->driver = $database_config['driver'];
         $this->charset = $database_config['charset'];
         $this->dbost = $database_config['hostname'];

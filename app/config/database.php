@@ -51,13 +51,16 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 |	['password'] 	The password used to connect to the database
 |	['database'] 	The name of the database you want to connect to
 |	['charset']		The default character set
+|   ['dbprefix']    You can add an optional prefix, which will be added
+|				    to the table name when using the  Query Builder class
 */
 
-$database['driver']		= '';
-$database['hostname']	= '';
-$database['port']		= '';
-$database['username']	= '';
+$database['driver']		= 'mysql';
+$database['hostname']	= 'localhost';
+$database['port']		= '3306';
+$database['username']	= 'root';
 $database['password']	= '';
-$database['database']	= '';
-$database['charset']	= '';
+$database['database']	= 'pinoywap';
+$database['charset']	= 'utf8';
+$database['dbprefix']	= '';
 ?>
