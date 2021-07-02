@@ -51,7 +51,7 @@ if($flag) {
 		fwrite($file_handle, '?>');
 		fclose($file_handle);
 	} else {
-		echo 'File aready exist.';
+		echo 'File already exist.';
 	}
 }
 
