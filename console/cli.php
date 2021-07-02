@@ -13,8 +13,6 @@ echo '-----------------------';
 echo "\n";
 echo 'Type M => Model';
 echo "\n";
-echo 'Type V => View';
-echo "\n";
 echo 'Type C => Controller';
 echo "\n";
 echo '-----------------------';
@@ -25,10 +23,6 @@ $flag = FALSE;
 switch ($option) {
 	case 'M':
 		$option = 'Model';
-		$flag = TRUE;
-		break;
-	case 'V':
-		$option = 'View';
 		$flag = TRUE;
 		break;
 	case 'C':
@@ -49,11 +43,11 @@ if($flag) {
 		fwrite($file_handle, '<?php');
 		fwrite($file_handle, "\n");
 		fwrite($file_handle, "defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');");
-		fwrite($file_handle, "\n");
+		fwrite($file_handle, "\n\n");
 		fwrite($file_handle, "class ".$class."".$_m." extends ".$option." {");
-		fwrite($file_handle, "\n");
+		fwrite($file_handle, "\n\n");
 		fwrite($file_handle, "}");
-		fwrite($file_handle, "\n");
+		fwrite($file_handle, "\n\n");
 		fwrite($file_handle, '?>');
 		fclose($file_handle);
 	} else {
