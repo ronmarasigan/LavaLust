@@ -43,6 +43,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 class Database {
     private static $instance = NULL;
     private $db = NULL;
+    private $dbprefix = NULL;
     private $table;
     private $columns;
     private $sql;
@@ -65,6 +66,7 @@ class Database {
     public function __construct()
     {
         $database_config = database_config();
+        $this->dbprefix = $database_config['dbprefix'];
         $this->driver = $database_config['driver'];
         $this->charset = $database_config['charset'];
         $this->dbost = $database_config['hostname'];
@@ -72,6 +74,7 @@ class Database {
         $this->dbname = $database_config['database'];
         $this->dbuser = $database_config['username'];
         $this->dbpass = $database_config['password'];
+        
         $this->dsn = ''.$this->driver.':host=' . $this->dbost . ';dbname=' . $this->dbname . ';charset=' . $this->charset . ';port=' . $this->port;
 
         $options = array(
@@ -84,7 +87,7 @@ class Database {
             $this->db = new PDO($this->dsn, $this->dbuser, $this->dbpass, $options);
             $database_config = NULL;
         } catch (Exception $e) {
-            show_error('Database Error Occured', $e->getMessage(), 'error_db', 500);
+            throw new PDOException($e->getMessage());
         }
     }
 
@@ -134,16 +137,16 @@ class Database {
      */
     public function exec()
     {
-            $this->sql .= $this->where;
-            $this->getSQL = $this->sql;
-            $stmt = $this->db->prepare($this->sql);
-            $stmt->execute($this->bindValues);
-            if (strpos( strtoupper($this->sql), "INSERT" ) === 0 ) {
-                $this->lastIDInserted = $this->db->lastInsertId();
-                return $this->lastIDInserted;
-            }
-            else
-                return $stmt->rowCount();
+        $this->sql .= $this->where;
+        $this->getSQL = $this->sql;
+        $stmt = $this->db->prepare($this->sql);
+        $stmt->execute($this->bindValues);
+        if (strpos( strtoupper($this->sql), "INSERT" ) === 0 ) {
+            $this->lastIDInserted = $this->db->lastInsertId();
+            return $this->lastIDInserted;
+        }
+        else
+            return $stmt->rowCount();
     }
 
     /**
@@ -244,7 +247,7 @@ class Database {
     public function table($table_name)
     {
         $this->resetQuery();
-        $this->table = $table_name;
+        $this->table = $this->dbprefix.$table_name;
         return $this;
     }
 
@@ -278,7 +281,7 @@ class Database {
     public function _max_min_sum_count_avg($column, $alias = null, $type = 'MAX')
     {
         if( ! in_array($type, array('MAX', 'MIN', 'SUM', 'COUNT', 'AVG'))) {
-            show_error('Database Error Occured', 'Invalid function type: ' . html_escape($type), 'error_db', 500);
+            throw new RuntimeException('Invalid function type: ' . html_escape($type));
         }
 
         $function = $type . '(' . $column . ')' . (! is_null($alias) ? ' AS ' . $alias : '');
@@ -357,20 +360,8 @@ class Database {
      */
     public function join($table_name, $cond, $type = '')
     {
-        //Planning to add but im worrying about the loading speed.
-        /*
-        $flag = false;
-        foreach ($this->$operators as $operator) {
-            if (strpos($cond, $operator) !== FALSE) {
-                $flag = true;
-            } else {
-                $flag = false;
-            }
-        }
-        */
-       
         $this->join = (is_null($this->join))
-            ? ' ' . $type . 'JOIN' . ' ' . $table_name . ' ON ' . $cond
+            ? ' ' . $type . 'JOIN' . ' ' . $this->dbprefix.$table_name . ' ON ' . $cond
             : $this->join . ' ' . $type . 'JOIN' . ' ' . $table_name . ' ON ' . $cond;
 
         return $this;
@@ -921,7 +912,7 @@ class Database {
             $select = "*";
         }
 
-        $this->sql = "SELECT $select FROM $this->table";
+        $this->sql = "SELECT $select FROM {$this->table}";
         if ($this->join !== NULL) {
             $this->sql .= $this->join;
         }
@@ -962,8 +953,8 @@ class Database {
             $stmt->execute($this->bindValues);
             $this->rowCount = $stmt->rowCount();
             return $stmt->fetch($mode);
-        } catch(PDOException $e) {
-            show_error('Database Error Occured', $e->getMessage().'<br>SQL Query: '.html_escape($this->getSQL), 'error_db', 500);
+        } catch(Exception $e) {
+            throw new PDOException($e->getMessage().'<br>SQL STATEMENT: '.html_escape($this->getSQL));
         }
     }
 
@@ -981,8 +972,8 @@ class Database {
             $stmt->execute($this->bindValues);
             $this->rowCount = $stmt->rowCount();
             return $stmt->fetchAll();
-        } catch(PDOException $e) {
-            show_error('Database Error Occured', $e->getMessage().'<br>SQL Query: '.html_escape($this->getSQL), 'error_db', 500);
+        } catch(Exception $e) {
+            throw new PDOException($e->getMessage().'<br>SQL STATEMENT: '.html_escape($this->getSQL));
         }
     }
 
@@ -1017,7 +1008,7 @@ class Database {
             return $this->db->beginTransaction();
         }
 
-        $this->pdo->exec('SAVEPOINT trans' . $this->transactionCount);
+        $this->db->exec('SAVEPOINT trans' . $this->transactionCount);
         return $this->transactionCount >= 0;
     }
 

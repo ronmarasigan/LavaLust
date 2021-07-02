@@ -1,6 +1,26 @@
 LavaLust Version 2
 
 # Changelog
+
+## Fixed Session Class / flashdata() problem wiht PHP 8. [2.0.4]
+
+## Update model methods inside controller. [2.0.4]
+
+If you are using version <= 2.0.3 you will need to update every calls on your model.
+Before, you are creating model like class Example_model{} and load it using $this->call->model('example')
+
+Now model method has a second optional parameter which is the object name you want to use aside
+from the class name itself. So if you have something like class Example_model {}, you can now call it using
+$this->call->model('example_model', 'example'). Then if you are going to use it, just use $this->example->some_method().
+You can also use array to load methods by using key & value. Example $this->call->model(array('key' => 'value'))
+which is key is the new object name you want to use and value is the actual class name.
+
+Regular usage now is class My_model {}, $this->call->model('my_model')
+
+To easily migrate from 2.0.3 to 2.0.4 change all instances of $this->call->model() to the
+example with second parameter. So if you have class Example_model {} before and you call it this way
+$this->call->model('example') now you shoul do something like this $this->call->model('example_model', 'example')
+
 ## Add Pagination Class [2.0.3]
 
 ## ->exec() was added again for some technical reasons [2.0.2]

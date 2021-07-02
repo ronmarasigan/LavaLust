@@ -46,19 +46,34 @@ class Loader {
 	 *  Load Model
 	 * ------------------------------------------------------
 	 */
-	public function model($classes)
+	public function model($class, $object_name = NULL)
 	{
-		if( ! class_exists('Model'))
+		if( ! class_exists('Model')) {
 			require_once(SYSTEM_DIR.'kernel/Model.php');
-
-		$LAVA = Controller::instance();
-		if(is_array($classes))
-		{
-			foreach($classes as $class)
-				$LAVA->$class =& load_class($class . '_model', 'models');	
 		}
-		else
-			$LAVA->$classes =& load_class($classes . '_model', 'models');
+			
+		$LAVA = Controller::instance();
+
+		if(is_array($class))
+		{
+			foreach($class as $key => $value)
+			{
+				if(! is_int($key))
+				{
+					$LAVA->$key =& load_class($value, 'models', NULL, $key);
+				} else {
+					$LAVA->$value =& load_class($value, 'models', NULL, $value);
+				}	
+			}	
+		} else {
+			if(! is_null($object_name))
+			{
+				$LAVA->$object_name =& load_class($class, 'models', NULL, $object_name);
+			} else {
+				$LAVA->$class =& load_class($class, 'models');
+			}
+		}
+			
 	}
 	
 	/*

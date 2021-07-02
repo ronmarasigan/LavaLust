@@ -44,30 +44,33 @@ if ( ! function_exists('load_class'))
 	 * @param  array $params    Class parameters if present
 	 * @return void
 	 */
-	function &load_class($class, $directory = '', $params = NULL) {
+	function &load_class($class, $directory = '', $params = NULL, $object_name = NULL) {
 
 		$LAVA = Registry::instance();
-		$className = ucfirst(strtolower($class));
+		$class_name = ucfirst(strtolower($class));
 
-		if($LAVA->getObject($className) != NULL) {
-			$object = $LAVA->getObject($className);
+		$object_name = !is_null($object_name) ? strtolower($object_name) : strtolower($class_name);
+
+		if($LAVA->get_object($object_name) != NULL)
+		{
+			$object = $LAVA->get_object($object_name);
 			return $object;
 		}
 
 		foreach (array(APP_DIR, SYSTEM_DIR) as $path)
     	{
-			$fullPathName = $path . $directory  . DIRECTORY_SEPARATOR . $className . '.php';
+			$path = $path . $directory  . DIRECTORY_SEPARATOR . $class_name . '.php';
 					
-			if (file_exists($fullPathName)) {
-				if( ! class_exists($className, FALSE)) {
-					require_once $fullPathName;
+			if (file_exists($path)) {
+				if( ! class_exists($class_name, FALSE)) {
+					require_once $path;
 				}
 			}
 		}
 		
-		loaded_class($class);
-		$LAVA->storeObject($className, isset($params) ? new $className($params) : new $className());
-		$object = $LAVA->getObject($className);
+		loaded_class($class, $object_name);
+		$LAVA->store_object($object_name, isset($params) ? new $class($params) : new $class());
+		$object = $LAVA->get_object($object_name);
 		return $object;
 	}
 }
@@ -83,13 +86,13 @@ if ( ! function_exists('loaded_class'))
 	 * @param	string
 	 * @return	array
 	 */
-	function &loaded_class($class = '')
+	function &loaded_class($class = '', $object_name = '')
 	{
 		static $_is_loaded = array();
 
 		if ($class !== '')
 		{
-			$_is_loaded[$class] = ucfirst(strtolower($class));
+			$_is_loaded[$object_name] = ucfirst(strtolower($class));
 		}
 
 		return $_is_loaded;

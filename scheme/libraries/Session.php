@@ -181,7 +181,7 @@ class Session {
 				{
 					$_SESSION['__lava_vars'][$key] = 'old';
 				}
-				elseif ($value < $current_time)
+				elseif ($value === 'old' || $value < $current_time)
 				{
 					unset($_SESSION[$key], $_SESSION['__lava_vars'][$key]);
 				}

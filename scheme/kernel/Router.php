@@ -100,7 +100,7 @@ class Router
 	 * @param  array $route
 	 * @return string
 	 */
-	public function remapUrl($url, $route)
+	public function remap_url($url, $route)
     {
         foreach($route as $pattern => $replacement)
         {
@@ -119,7 +119,7 @@ class Router
      * 
      * @return string
      */
-	public function parseUrl()
+	public function parse_url()
 	{
 		$request_url = (isset($_SERVER['REQUEST_URI'])) ? $_SERVER['REQUEST_URI'] : '';
 		//hack!
@@ -127,7 +127,7 @@ class Router
 
 		if($request_url != $script_url)
 			$this->url_string = trim(preg_replace('/'. str_replace('/', '\/', str_replace('index.php', '', $script_url)) .'/', '', $request_url, 1), '/');
-			$this->url = explode('/', $this->remapUrl(filter_var($this->url_string, FILTER_SANITIZE_URL), $this->route));
+			$this->url = explode('/', $this->remap_url(filter_var($this->url_string, FILTER_SANITIZE_URL), $this->route));
 			if($this->url[0] != NULL && config_item('enable_query_strings') == FALSE)
 			{
 				foreach($this->url as $uri)
@@ -165,7 +165,7 @@ class Router
 		 * 
 		 * @var array
 		 */
-		$segments = $this->parseUrl();
+		$segments = $this->parse_url();
 		
 		/**
 		 * Get the Controller Segment
