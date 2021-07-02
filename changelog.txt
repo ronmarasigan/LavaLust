@@ -2,7 +2,9 @@ LavaLust Version 2
 
 # Changelog
 
-## Update model and library methods inside controller. [2.0.4]
+## Fixed Session Class / flashdata() problem wiht PHP 8. [2.0.4]
+
+## Update model methods inside controller. [2.0.4]
 
 If you are using version <= 2.0.3 you will need to update every calls on your model.
 Before, you are creating model like class Example_model{} and load it using $this->call->model('example')
