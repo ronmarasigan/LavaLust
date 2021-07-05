@@ -104,9 +104,9 @@ class Router
     {
         foreach($route as $pattern => $replacement)
         {
-            $pattern = str_replace(":any", "(.+)", $pattern);
-            $pattern = str_replace(":num", "(\d+)", $pattern);
-            $pattern = '/' . str_replace("/", "\/", $pattern) . '/i';
+            $pattern = str_replace(':any', '(.+)', $pattern);
+            $pattern = str_replace(':num', '(\d+)', $pattern);
+            $pattern = '/' . str_replace('/', '\/', $pattern) . '/i';
             $route_url = preg_replace($pattern, $replacement, $url);
             if($route_url !== $url && $route_url !== NULL)
 				return $route_url;
@@ -210,7 +210,7 @@ class Router
 			 * 
 			 * @var string
 			 */
-			$this->params = $segments ? array_values($segments) : [];
+			$this->params = $segments ? array_values($segments) : array();
 
 			/**
 			 * Load the controller, method and parameters
