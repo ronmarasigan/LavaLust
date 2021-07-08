@@ -35,40 +35,36 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
-/*
-* ------------------------------------------------------
-*  Class Security
-* ------------------------------------------------------
-*/
+/**
+ * Class Security
+ */
 class Security
 {
 	/**
-	 * Random Hash for Cross Site Request Forgery Protection Cookie
+	 * Random Hash
 	 *
 	 * @var string
-	 * @access protected
 	 */
 	protected $_csrf_hash			= '';
+
 	/**
-	 * Expiration time for Cross Site Request Forgery Protection Cookie
-	 * Defaults to two hours (in seconds)
+	 * Expiration Time
 	 *
-	 * @var int
-	 * @access protected
+	 * @var integer
 	 */
 	protected $_csrf_expire			= 7200;
+
 	/**
-	 * Token name for Cross Site Request Forgery Protection Cookie
+	 * Token Name
 	 *
 	 * @var string
-	 * @access protected
 	 */
 	protected $_csrf_token_name		= 'lava_csrf_token';
+	
 	/**
-	 * Cookie name for Cross Site Request Forgery Protection Cookie
+	 * Cookie Name
 	 *
 	 * @var string
-	 * @access protected
 	 */
 	protected $_csrf_cookie_name	= 'lava_csrf_token';
 
@@ -170,18 +166,6 @@ class Security
 	}
 
 	/**
-	 * XSS Filtering
-	 * 
-	 * @param  string $string
-	 * @return string
-	 */
-	public function xss_clean($string)
-	{
-		$escaper =& load_class('Escaper', 'libraries');
-		return $escaper->filter($string);
-	}
-
-	/**
 	 * Get CSRF Hash
 	 *
 	 * Getter Method
@@ -228,6 +212,18 @@ class Security
 		}
 
 		return $this->_csrf_hash;
+	}
+
+	/**
+	 * XSS Filtering
+	 * 
+	 * @param  string $string
+	 * @return string
+	 */
+	public function xss_clean($string)
+	{
+		$escaper =& load_class('Escaper', 'libraries');
+		return $escaper->filter($string);
 	}
 
 	/**

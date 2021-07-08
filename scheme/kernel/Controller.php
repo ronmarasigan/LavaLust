@@ -35,16 +35,15 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
-/*
- * ------------------------------------------------------
- *  Class Loader
- * ------------------------------------------------------
+/**
+ * Class Loader
  */
 class Loader {
-	/*
-	 * ------------------------------------------------------
-	 *  Load Model
-	 * ------------------------------------------------------
+	/**
+	 * @param mixed $class
+	 * @param null $object_name
+	 * 
+	 * @return object
 	 */
 	public function model($class, $object_name = NULL)
 	{
@@ -76,10 +75,12 @@ class Loader {
 			
 	}
 	
-	/*
-	 * ------------------------------------------------------
-	 *  Load View
-	 * ------------------------------------------------------
+	/**
+	 * Load View File
+	 *
+	 * @param [type] $viewFile
+	 * @param array $data
+	 * @return void
 	 */
 	public function view($viewFile, $data = array())
 	{
@@ -93,10 +94,11 @@ class Loader {
 		echo ob_get_clean();
 	}
 
-	/*
-	 * ------------------------------------------------------
-	 *  Load Helpers
-	 * ------------------------------------------------------
+	/**
+	 * Load Helper
+	 *
+	 * @param [type] $helper
+	 * @return void
 	 */
 	public function helper($helper)
 	{
@@ -121,10 +123,12 @@ class Loader {
 		}
 	}
 	
-	/*
-	 * ------------------------------------------------------
-	 *  Load Library
-	 * ------------------------------------------------------
+	/**
+	 * Load Library
+	 *
+	 * @param [type] $classes
+	 * @param array $params
+	 * @return void
 	 */
 	public function library($classes, $params = array())
 	{
@@ -148,10 +152,10 @@ class Loader {
 		}
 	}
 
-	/*
-	 * ------------------------------------------------------
-	 *  Load Database
-	 * ------------------------------------------------------
+	/**
+	 * Load Database
+	 *
+	 * @return void
 	 */
 	public function database()
 	{
@@ -160,16 +164,18 @@ class Loader {
 		$LAVA->db = $database::instance();
 	}
 }
-/*
- * ------------------------------------------------------
- *  Class Controller that extends loader / singleton
- * ------------------------------------------------------
+
+/**
+ * Class Controller
  */
 class Controller extends Loader
 {
 	private static $instance;
 	public $call, $var;
 	
+	/**
+	 * Class constructor
+	 */
 	public function __construct()
 	{
 		$this->call = $this;
@@ -181,13 +187,9 @@ class Controller extends Loader
 			$this->$var =& load_class($class);
 		}
 
+		//load autoload config
 		$autoload =& autoload_config();
 
-		/*
-		 * ------------------------------------------------------
-		 *  Autoload Classes
-		 * ------------------------------------------------------
-		 */
 		if(count($autoload['libraries']) > 0)
 			$this->call->library($autoload['libraries']);
 		if(count($autoload['models']) > 0)
@@ -196,6 +198,11 @@ class Controller extends Loader
 			$this->call->helper($autoload['helpers']); 
 	}
 	
+	/**
+	 * Instance of controller
+	 *
+	 * @return object
+	 */
 	public static function &instance()
 	{
 		return self::$instance;

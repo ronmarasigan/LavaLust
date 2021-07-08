@@ -46,7 +46,11 @@ if ( ! function_exists('str_insert'))
      */
     function str_insert($keyValue, $string)
     {
-        if (is_assoc($keyValue)) {
+        if(array_keys($keyValue) !== range(0, count($keyValue) - 1))
+        {
+            $is_assoc = TRUE;
+        }
+        if ($is_assoc) {
             foreach ($keyValue as $search => $replace) {
                 $string = str_replace($search, $replace, $string);
             }
@@ -64,7 +68,7 @@ if ( ! function_exists('str_between'))
      * @param  string $left   The left element of the string to search.
      * @param  string $right  The right element of the string to search.
      * @param  string $string The string to search in.
-     * @return array         A result array with all matches of the search.
+     * @return array          A result array with all matches of the search.
      */
     function str_between($left, $right, $string)
     {
@@ -137,7 +141,8 @@ if ( ! function_exists('str_limitchars'))
      */
     function str_limitchars($string, $limit = 100, $end = '...')
     {
-        if (mb_strwidth($string, 'UTF-8') <= $limit) {
+        if (mb_strwidth($string, 'UTF-8') <= $limit)
+        {
             return $string;
         }
 
@@ -359,7 +364,7 @@ if ( ! function_exists('repeater'))
      *
      *
      * @param   string  $data   String to repeat
-     * @param   int $num    Number of repeats
+     * @param   int $num        Number of repeats
      * @return  string
      */
     function repeater($data, $num = 1)

@@ -61,9 +61,10 @@ if ( ! function_exists('redirect'))
 if ( ! function_exists('load_js'))
 {
 	/**
-	 * Pre-loaded JS
-	 * @param  string $paths URL path
-	 * @return mixed
+	 * Use to load of Javascript
+	 *
+	 * @param array $paths
+	 * @return void
 	 */
 	function load_js($paths)
 	{
@@ -76,9 +77,10 @@ if ( ! function_exists('load_js'))
 if ( ! function_exists('load_css'))
 {
 	/**
-	 * Pre-loaded CSS
-	 * @param  string $paths URL path
-	 * @return mixed
+	 * Use to load of Javascript
+	 *
+	 * @param array $paths
+	 * @return void
 	 */
 	function load_css($paths)
 	{
@@ -91,9 +93,10 @@ if ( ! function_exists('load_css'))
 if ( ! function_exists('site_url'))
 {
 	/**
-	 * Site URL
-	 * @param  string $url
-	 * @return string
+	 * Get the site url
+	 *
+	 * @param string $url
+	 * @return void
 	 */
 	function site_url($url='') {
 		return BASE_URL . $url;
@@ -102,15 +105,11 @@ if ( ! function_exists('site_url'))
 
 if ( ! function_exists('active'))
 {
-	/*
-	* ------------------------------------------------------
-	*  Active class for URL
-	* ------------------------------------------------------
-	*/
 	/**
 	 * Active class for URL
-	 * @param  string $currect_page
-	 * @return string
+	 *
+	 * @param string $currect_page
+	 * @return void
 	 */
 	function active($currect_page){
 	$url_array =  explode('/', $_SERVER['REQUEST_URI']) ;
@@ -120,7 +119,7 @@ if ( ! function_exists('active'))
 			$url = $url_array[0];
 		
 		if($currect_page == $url){
-				echo 'active';
+			echo 'active';
 		}
 	}
 }
@@ -129,8 +128,9 @@ if ( ! function_exists('segment'))
 {
 	/**
 	 * URI Segment
-	 * @param  string $seg URI Segment
-	 * @return int      Integer Part
+	 * 
+	 * @param  string $seg	URI Segment
+	 * @return int      	Integer Part
 	 */
 	function segment($seg)
 	{

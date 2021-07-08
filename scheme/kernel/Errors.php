@@ -35,31 +35,38 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * @license https://opensource.org/licenses/MIT MIT License
  */
 /*
-* ------------------------------------------------------
-*  Class Loader
-* ------------------------------------------------------
-*/
+
+/**
+ * Class Error
+ */
 class Errors
 {
-	/*
-	* ------------------------------------------------------
-	*  Show 404 not found error
-	* ------------------------------------------------------
-	*/
-	public function show_404($heading, $message, $page = NULL)
+	/**
+	 * Show 404 Page Not Found
+	 *
+	 * @param string $heading
+	 * @param string $message
+	 * @param string $page
+	 * @return void
+	 */
+	public function show_404($heading, $message, $template = NULL)
 	{
-		$page = isset($page) ? $page : 'error_404';
+		$template = isset($ptemplateage) ? $template : 'error_404';
 		$heading = isset($heading) ? $heading : '404 Page Not Found';
 		$message = isset($message) ? $message : 'The page you requested was not found.';
-		$this->show_error($heading, $message, $page, 404);
+		$this->show_error($heading, $message, $template, 404);
 	}
 
-	/*
-	* ------------------------------------------------------
-	*  Show error for debugging
-	* ------------------------------------------------------
-	*/
-	public function show_error($heading, $message, $template = 'error_general', $error_lvl_code = 500)
+	/**
+	 * Show error for debugging
+	 *
+	 * @param string $heading
+	 * @param string $message
+	 * @param string $template
+	 * @param integer $error_lvl_code
+	 * @return void
+	 */
+	public function show_error($heading = '', $message = '', $template = 'error_general', $error_lvl_code = 500)
 	{
 		$template_path = config_item('error_view_path');
 
@@ -69,14 +76,15 @@ class Errors
 		}
 		http_response_code($error_lvl_code);
 		require_once($template_path.$template.'.php');
-		die();
+		exit();
 	}
-	/*
-	* ------------------------------------------------------
-	*  Show error for debugging
-	* ------------------------------------------------------
-	*/
 
+	/**
+	 * Show Exception error for debugging
+	 *
+	 * @param object $exception
+	 * @return void
+	 */
 	public function show_exception($exception)
 	{
 		$template_path = config_item('error_view_path');
@@ -92,14 +100,18 @@ class Errors
 		}
 
 		require_once($template_path.'error_exception.php');
-		die();
+		exit();
 	}
 
-	/*
-	* ------------------------------------------------------
-	*  Show error for debugging
-	* ------------------------------------------------------
-	*/
+	/**
+	 * Show PHP error for debugging
+	 *
+	 * @param string $severity
+	 * @param string $message
+	 * @param string $filepath
+	 * @param string $line
+	 * @return void
+	 */
 	public function show_php_error($severity, $message, $filepath, $line)
 	{
 		$template_path = config_item('error_view_path');

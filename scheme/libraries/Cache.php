@@ -68,7 +68,7 @@ class Cache
 		$this->_default_expires = $this->_config['cache_default_expires'];
 		if ( ! is_dir($this->_path))
 		{
-			show_error("Cache Path not found: $this->_path");
+			show_error();
 		}
 	}
 

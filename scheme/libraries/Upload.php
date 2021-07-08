@@ -50,7 +50,7 @@ class Upload
 	 */
 	public function __construct(array $allowed_files = NULL) {
 		// instance
-		$this->LAVA =& instance();
+		$this->LAVA =& lava_instance();
 		if($allowed_files == NULL) {
 			$this->allowed_files = $this->default_allowed_files;
 		} else {
@@ -139,7 +139,7 @@ class Upload
 		{
 			$x++;
 		}
-		return"$file$x.$ext";
+		return "$file$x.$ext";
 	}
 
 }

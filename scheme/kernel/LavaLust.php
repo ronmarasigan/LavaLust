@@ -35,27 +35,19 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
-/*
- * ------------------------------------------------------
- *  Required to execute neccessary functions
- * ------------------------------------------------------
+/**
+ * Required to execute neccessary functions
  */
 require_once SYSTEM_DIR . 'kernel/Registry.php';
 require_once SYSTEM_DIR . 'kernel/Routine.php';
 
-/*
- * ------------------------------------------------------
+/**
  * LavaLust BASE URL of your APPLICATION
- * ------------------------------------------------------
  */
 define('BASE_URL', config_item('base_url'));
 
 /**
- * ------------------------------------------------------
- *  Composer (Autoload)
- * ------------------------------------------------------
- * 
- * @var $this
+ * Composer (Autoload)
  */
 if ($composer_autoload = config_item('composer_autoload'))
 {
@@ -75,18 +67,14 @@ if ($composer_autoload = config_item('composer_autoload'))
 	}
 }
 
-/*
- * ------------------------------------------------------
- *  Instantiate the Benchmark class
- * ------------------------------------------------------
+/**
+ * Instantiate the Benchmark class
  */
 $pf =& load_class('performance', 'kernel');
 $pf->tag('lavalust');
 
-/*
- * ------------------------------------------------------
- *  Deployment Environment
- * ------------------------------------------------------
+/**
+ * Deployment Environment
  */
 switch (strtolower(config_item('ENVIRONMENT')))
 {
@@ -108,10 +96,10 @@ switch (strtolower(config_item('ENVIRONMENT')))
 		ini_set('display_errors', 1);
 }
 
-/*
- * ------------------------------------------------------
- *  Error Classes to show errors
- * ------------------------------------------------------
+/**
+ * Error Classes to show errors
+ *
+ * @return void
  */
 function _handlers()
 {
@@ -120,45 +108,35 @@ function _handlers()
 	register_shutdown_function('_shutdown_handler');
 }
 
-/*
- * ------------------------------------------------------
- *  Instantiate the routing class and set the routing
- * ------------------------------------------------------
+/**
+ * Instantiate the routing class and set the routing
  */
 $router =& load_class('router', 'kernel');
 
-/*
- * ------------------------------------------------------
- *  Instantiate the security class for xss and csrf support
- * ------------------------------------------------------
+/**
+ * Instantiate the security class for xss and csrf support
  */
 $security =& load_class('security', 'kernel');
 
-/*
- * ------------------------------------------------------
- *  Instantiate the Input/Ouput class
- * ------------------------------------------------------
+/**
+ * Instantiate the Input/Ouput class
  */
 $io =& load_class('io', 'kernel');
 
-/*
- * ------------------------------------------------------
- *  Instantiate the Language class
- * ------------------------------------------------------
+/**
+ * Instantiate the Language class
  */
 $lang =& load_class('lang', 'kernel');
 
-/*
- * ------------------------------------------------------
- *  Load BaseController
- * ------------------------------------------------------
+/**
+ * Load BaseController
  */
 require_once SYSTEM_DIR . 'kernel/Controller.php';
 
-/*
- * ------------------------------------------------------
- *  Instantiate LavaLust Controller
- * ------------------------------------------------------
+/**
+ * Instantiate LavaLust Controller
+ *
+ * @return object
  */
 function &lava_instance()
 {
@@ -166,10 +144,8 @@ function &lava_instance()
 }
 $pf->tag('lavalust');
 
-/*
- * ------------------------------------------------------
- *  Initiate Router
- * ------------------------------------------------------
+/**
+ * Initiate Router
  */
 $router->initiate();
 ?>

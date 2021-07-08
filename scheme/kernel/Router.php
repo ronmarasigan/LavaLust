@@ -35,11 +35,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
-/*
-* ------------------------------------------------------
-*  Class Router
-* ------------------------------------------------------
-*/
+/**
+ * Class Router
+ */
 class Router
 {
 	/**
@@ -208,7 +206,7 @@ class Router
 			/**
 			 * Check if there are parameters in the URI
 			 * 
-			 * @var string
+			 * @var array
 			 */
 			$this->params = $segments ? array_values($segments) : array();
 

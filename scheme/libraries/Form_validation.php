@@ -35,12 +35,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
-/*
- * ------------------------------------------------------
- *  Form_validation
- * ------------------------------------------------------
+/**
+ * Form Validation Class
  */
-
 class Form_validation {
     /**
      * Reference to the LavaLust instance
@@ -96,18 +93,22 @@ class Form_validation {
     private $value;
 
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->LAVA =& lava_instance();
-        foreach($_POST as $key => $value) {
+        foreach($_POST as $key => $value)
+        {
             $this->post_arrays[$key] = $value;
         }
     }
 
     /**
      * Check if from is submitted and not empty
+     * 
      * @return Bool
      */
-    public function submitted() {
+    public function submitted()
+    {
         return !empty($_POST) ? TRUE : FALSE;
     }
 
@@ -117,7 +118,8 @@ class Form_validation {
      * @param string $default
      * @param string $params
      */
-    public function set_error_message($custom, $default, $params = NULL) {
+    public function set_error_message($custom, $default, $params = NULL)
+    {
         if(empty($custom))
                 $this->errors[] = sprintf($default, $params);
             else
@@ -130,8 +132,10 @@ class Form_validation {
      * @param  string $name name from post
      * @return this
      */
-    public function name($name) {
-        if (strpos($name, '|') !== false) {
+    public function name($name)
+    {
+        if (strpos($name, '|') !== false)
+        {
             $arr = explode('|', $name);
             $this->value = $this->post_arrays[array_shift($arr)];
             $this->name = end($arr);
@@ -149,14 +153,18 @@ class Form_validation {
      * @param  string $name Pattern
      * @return $this
      */
-    public function pattern($name, $custom_error) {
-        if($name == 'array'){
-            if(!is_array($this->value)) {
+    public function pattern($name, $custom_error)
+    {
+        if($name == 'array')
+        {
+            if(!is_array($this->value))
+            {
                 $this->set_error_message($custom_error, self::$err_pattern, $this->name);
             }
         } else {
             $regex = '/^('.$this->patterns[$name].')$/u';
-            if($this->value != '' && !preg_match($regex, $this->value)){
+            if($this->value != '' && !preg_match($regex, $this->value))
+            {
                 $this->set_error_message($custom_error, self::$err_pattern, $this->name);
             }           
         }
@@ -169,9 +177,11 @@ class Form_validation {
      * @param  string $pattern pattern
      * @return $this
      */
-    public function custom_pattern($pattern, $custom_error) {   
+    public function custom_pattern($pattern, $custom_error)
+    {   
         $regex = '/^('.$pattern.')$/u';
-        if($this->value != '' && !preg_match($regex, $this->value)) {
+        if($this->value != '' && !preg_match($regex, $this->value))
+        {
             $this->set_error_message($custom_error, self::$err_pattern, $this->name);
         }
         return $this;
@@ -183,8 +193,10 @@ class Form_validation {
      * @param string $err Custom Error
      * @return $this
      */
-    public function required($custom_error = '') {     
-        if(($this->value == '' || $this->value == null)) {
+    public function required($custom_error = '')
+    {     
+        if(($this->value == '' || $this->value == null))
+        {
             $this->set_error_message($custom_error, self::$err_required, $this->name);
         }            
         return $this;  
@@ -197,8 +209,10 @@ class Form_validation {
      * @param  string $err   Custom Error
      * @return $this
      */
-    public function matches($field, $custom_error = '') {
-        if($this->value !== $this->post_arrays[$field]){
+    public function matches($field, $custom_error = '')
+    {
+        if($this->value !== $this->post_arrays[$field])
+        {
             $this->set_error_message($custom_error, self::$err_matches, $this->name);
         }
         return $this;
@@ -211,8 +225,10 @@ class Form_validation {
      * @param  string $err   Custom Error
      * @return $this
      */
-    public function differs($field, $custom_error = '') {
-        if($this->value === $this->post_arrays[$field]){
+    public function differs($field, $custom_error = '')
+    {
+        if($this->value === $this->post_arrays[$field])
+        {
             $this->set_error_message($custom_error, self::$err_differs, $this->name);
         }
         return $this;
@@ -234,7 +250,9 @@ class Form_validation {
         {
             $this->LAVA->db->table($table)->where($field, $str)->limit(1)->get();
             if($this->LAVA->db->row_count()!==0)
-                 $this->set_error_message($custom_error, self::$err_is_unique, $this->name);
+            {
+                $this->set_error_message($custom_error, self::$err_is_unique, $this->name);
+            }       
         }
         return $this;
     }
@@ -248,10 +266,13 @@ class Form_validation {
      */
     public function exact_length($length, $custom_error = '')
     {
-        if ( ! is_numeric($length))  
+        if ( ! is_numeric($length)) 
+        {
             return FALSE;
+        }
 
-        if(mb_strlen($this->value) === (int) $length){
+        if(mb_strlen($this->value) === (int) $length)
+        {
             $this->set_error_message($custom_error, self::$err_exact_length, $length);
         }
         return $this;
@@ -263,11 +284,15 @@ class Form_validation {
      * @param  int $length
      * @return $this
      */
-    public function min_length($length, $custom_error = '') {
-        if ( ! is_numeric($length))  
+    public function min_length($length, $custom_error = '')
+    {
+        if ( ! is_numeric($length)) 
+        {
             return FALSE;
+        }
 
-        if(mb_strlen($this->value) < $length){
+        if(mb_strlen($this->value) < $length)
+        {
             $this->set_error_message($custom_error, self::$err_min_length, $length);
         }
         return $this;
@@ -279,11 +304,15 @@ class Form_validation {
      * @param  int $length
      * @return this
      */
-    public function max_length($length, $custom_error = '') {
+    public function max_length($length, $custom_error = '')
+    {
         if ( ! is_numeric($length))
+        {
             return FALSE;
+        }
 
-        if(mb_strlen($this->value) > $length){
+        if(mb_strlen($this->value) > $length)
+        {
             $this->set_error_message($custom_error, self::$err_max_length, $length);
         }
         return $this;       
@@ -296,9 +325,12 @@ class Form_validation {
      * @return  bool
      */
 
-    public function valid_email($custom_error = ''){
+    public function valid_email($custom_error = '')
+    {
         if(!filter_var($this->value, FILTER_VALIDATE_EMAIL))
+        {
             $this->set_error_message($custom_error, self::$err_email, $this->name);
+        } 
         return $this;
     }
 
@@ -312,8 +344,12 @@ class Form_validation {
     public function alpha($custom_error = '')
     {
         if(($this->value != '' || $this->value != null))
+        {
             if(!ctype_alpha($this->value))
+            {
                 $this->set_error_message($custom_error, self::$err_alpha, $this->name);
+            }
+        }   
         return $this; 
     }
 
@@ -326,8 +362,12 @@ class Form_validation {
     public function alpha_numeric($custom_error = '')
     {
         if(($this->value != '' || $this->value != null))
+        {
             if(!ctype_alnum((string) $this->value))
+            {
                 $this->set_error_message($custom_error, self::$err_alphanum, $this->name);
+            } 
+        }   
         return $this; 
     }
 
@@ -340,8 +380,12 @@ class Form_validation {
     public function alpha_numeric_space($custom_error = '')
     {
         if(($this->value != '' || $this->value != null))
+        {
             if(!preg_match('/^[A-Z0-9 ]+$/i', $this->value))
+            {
                 $this->set_error_message($custom_error, self::$err_alphanumspace, $this->name);
+            }
+        }  
         return $this; 
     }
 
@@ -354,8 +398,12 @@ class Form_validation {
     public function alpha_space($custom_error = '')
     {
         if(($this->value != '' || $this->value != null))
+        {
             if(!preg_match('/^[A-Z ]+$/i', $this->value))
+            {
                 $this->set_error_message($custom_error, self::$err_alphaspace, $this->name);
+            }   
+        }
         return $this; 
     }
 
@@ -368,8 +416,12 @@ class Form_validation {
     public function alpha_numeric_dash($custom_error = '')
     {
         if(($this->value != '' || $this->value != null))
+        {
             if(!preg_match('/^[a-z0-9_-]+$/i', $this->value))
+            {
                 $this->set_error_message($custom_error, self::$err_alphanumdash, $this->name);
+            }
+        }
         return $this; 
     }
 
@@ -382,8 +434,12 @@ class Form_validation {
     public function numeric($custom_error = '')
     {
         if(($this->value != '' || $this->value != null))
+        {
             if(!preg_match('/^[\-+]?[0-9]*\.?[0-9]+$/', $this->value))
+            {
                 $this->set_error_message($custom_error, self::$err_numeric, $this->name);
+            }
+        }  
         return $this; 
 
     }
@@ -397,8 +453,12 @@ class Form_validation {
     public function integer($custom_error = '')
     {
         if(($this->value != '' || $this->value != null))
+        {
             if(!preg_match('/^[\-+]?[0-9]+$/', $this->value))
+            {
                 $this->set_error_message($custom_error, self::$err_integer, $this->name);
+            }
+        }
         return $this; 
 
     }
@@ -412,8 +472,12 @@ class Form_validation {
     public function decimal($custom_error = '')
     {
         if(($this->value != '' || $this->value != null))
+        {
             if(!preg_match('/^[\-+]?[0-9]+\.[0-9]+$/', $this->value))
+            {
                 $this->set_error_message($custom_error, self::$err_decimal, $this->name);
+            }
+        } 
         return $this; 
 
     }
@@ -428,9 +492,13 @@ class Form_validation {
     public function greater_than($min, $custom_error = '')
     {
         if(!is_numeric($this->value))
+        {
             return FALSE;
+        }
         if($this->value < $min)
+        {
             $$this->set_error_message($custom_error, self::$err_greater_than, $min);
+        }
         return $this; 
     }
 
@@ -444,9 +512,13 @@ class Form_validation {
     public function greater_than_equal_to($min, $custom_error = '')
     {
         if(!is_numeric($this->value))
+        {
             return FALSE;
+        }
         if($this->value <= $min)
+        {
             $$this->set_error_message($custom_error, self::$err_greater_than_equal_to, $min);
+        }
         return $this; 
     }
 
@@ -460,9 +532,13 @@ class Form_validation {
     public function less_than($max, $custom_error = '')
     {
         if(!is_numeric($this->value))
+        {
             return FALSE;
+        }
         if($this->value > $max)
+        {
             $this->set_error_message($custom_error, self::$err_less_than, $max);
+        }
         return $this; 
     }
 
@@ -476,9 +552,13 @@ class Form_validation {
     public function less_than_equal_to($max, $custom_error = '')
     {
         if(!is_numeric($this->value))
+        {
             return FALSE;
+        }
         if($this->value >= $max)
+        {
             $this->set_error_message($custom_error, self::$err_less_than_equal_to, $max);
+        }
         return $this; 
     }
 
@@ -492,35 +572,51 @@ class Form_validation {
     public function in_list($list, $custom_error = '')
     {
         if(!in_array($this->value, explode(',', $list), TRUE))
+        {
             $this->set_error_message($custom_error, self::$err_numeric, $this->value);
+        }
         return $this; 
     }
 
     /**
      * Is validated
+     * 
      * @return bool
      */
     public function run() {
-        if(empty($this->errors)) return true;
+        if(empty($this->errors))
+        {
+            return TRUE;
+        }
     }
 
     /**
      * Get Errors
-     * @return string
+     * 
+     * @return array
      */
     public function get_errors() {
-        if(!$this->run()) return $this->errors;
+        if(! $this->run())
+        {
+            return $this->errors;
+        }
     }
 
     /**
+     * Deprecated in V 2.1
      * Display errors
-     * @return string
+     * 
+     * @return array
      */
-    public function errors() {
-        if($_POST) {
-            if(!empty($this->get_errors())) {
+    public function errors()
+    {
+        if($_POST)
+        {
+            if(!empty($this->get_errors()))
+            {
                 $errors = '';
-                foreach($this->get_errors() as $error){
+                foreach($this->get_errors() as $error)
+                {
                     $errors = $errors.'<br>'.html_escape($error);
                 }
                 $errors = ltrim($errors, '<br>');  

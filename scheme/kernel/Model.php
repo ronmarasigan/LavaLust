@@ -35,11 +35,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
-/*
-* ------------------------------------------------------
-*  Class Database / Model
-* ------------------------------------------------------
-*/
+/**
+ * Class Model
+ */
 class Model {
    
     public function __construct() {}
