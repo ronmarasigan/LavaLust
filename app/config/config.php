@@ -210,6 +210,7 @@ $config['cookie_path']             = '/';
 $config['cookie_secure']           = FALSE;
 $config['cookie_expiration']       = 86400;
 $config['cookie_httponly']         = TRUE;
+$config['cookie_samesite']         = NULL;
 
 /*
 |--------------------------------------------------------------------------

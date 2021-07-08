@@ -129,9 +129,11 @@ class Pagination
         //check if different language was set to session
         //if no session page_language is set use the default language
         if($this->LAVA->session->has_userdata('page_language'))
+        {
             $set_language = $this->LAVA->session->userdata('page_language');
-        else
+        } else {
             $set_language = config_item('language');
+        }
 
         //set language
         language($set_language);
@@ -173,14 +175,18 @@ class Pagination
         $this->page_array['current'] = $this->page_num;
 
         if ($this->page_num == 1)
+        {
             $this->page_array['previous'] = $this->page_num;
-        else
+        } else {
             $this->page_array['previous'] = $this->page_num - 1;
+        }
 
         if ($this->page_num == $last_page)
+        {
             $this->page_array['next'] = $last_page;
-        else
+        } else {
             $this->page_array['next'] = $this->page_num + 1;
+        }
 
         $this->page_array['last'] = $last_page;
         $this->page_array['info'] = 'Page ('.$this->page_num.' of '.$last_page.')';

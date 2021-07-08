@@ -138,7 +138,7 @@ class Email {
 	/**
 	 * Email Content
 	 * 
-	 * @param Email $emailContent Email Content
+	 * @param string $emailContent Email Content
 	 */
 	public function email_content($emailContent, $type = 'plain')
 	{
@@ -180,9 +180,9 @@ class Email {
         	$LAVA =& lava_instance();
         	$LAVA->call->helper('file');
         	$fileinfo = get_file_info($attachment);
-			$fileType = get_mime_by_extension($attachment);
+			$fileType = mime_content_type($attachment);
 			$file_size = $fileinfo['size'];
-			$handle = fopen($attachment, FOPEN_READ);
+			$handle = fopen($attachment, 'rb');
 			$content = fread($handle, $file_size);
 			$content = chunk_split(base64_encode($content));
 			fclose($handle);

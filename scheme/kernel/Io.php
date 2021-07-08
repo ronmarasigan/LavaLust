@@ -35,11 +35,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
-/*
-* ------------------------------------------------------
-*  Class Input
-* ------------------------------------------------------
-*/
+/**
+ * Class Input and Ouput
+ */
 Class Io {
 
 	/**
@@ -48,7 +46,7 @@ Class Io {
 	 * 
 	 * @var boolean
 	 */
-	private $_enable_csrf			= FALSE;
+	private $_enable_csrf = FALSE;
 
 	/**
 	 * Securty instance
@@ -124,10 +122,11 @@ Class Io {
 	}
 
 	/**
-  	 * COOKIE Variable
-  	 * @param  string
-  	 * @return string
-  	 */
+	 * Cookie Variable
+	 *
+	 * @param string $index
+	 * @return void
+	 */
 	public function cookie($index = NULL)
 	{
 		if($index === NULL && !empty($_COOKIE)) {
@@ -147,13 +146,13 @@ Class Io {
 	 * array in the first parameter containing all the values.
 	 *
 	 * @param	string|mixed[]	$name		Cookie name or an array containing parameters
-	 * @param	string		$value		Cookie value
-	 * @param	int		$expire		Cookie expiration time in seconds
-	 * @param	string		$domain		Cookie domain (e.g.: '.yourdomain.com')
-	 * @param	string		$path		Cookie path (default: '/')
-	 * @param	string		$prefix		Cookie name prefix
-	 * @param	bool		$secure		Whether to only transfer cookies via SSL
-	 * @param	bool		$httponly	Whether to only makes the cookie accessible via HTTP (no javascript)
+	 * @param	string			$value		Cookie value
+	 * @param	int				$expire		Cookie expiration time in seconds
+	 * @param	string			$domain		Cookie domain (e.g.: '.yourdomain.com')
+	 * @param	string			$path		Cookie path (default: '/')
+	 * @param	string			$prefix		Cookie name prefix
+	 * @param	bool			$secure		Whether to only transfer cookies via SSL
+	 * @param	bool			$httponly	Whether to only makes the cookie accessible via HTTP (no javascript)
 	 * @return	void
 	 */
 	public function set_cookie($name, $value = '', $expire = '', $domain = '', $path = '/', $prefix = '', $secure = NULL, $httponly = NULL)

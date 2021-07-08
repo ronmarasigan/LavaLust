@@ -42,9 +42,10 @@ if ( ! function_exists('load_class'))
 	 * @param  string $class
 	 * @param  string $directory Class directory
 	 * @param  array $params    Class parameters if present
-	 * @return void
+	 * @return object
 	 */
-	function &load_class($class, $directory = '', $params = NULL, $object_name = NULL) {
+	function &load_class($class, $directory = '', $params = NULL, $object_name = NULL)
+	{
 
 		$LAVA = Registry::instance();
 		$class_name = ucfirst(strtolower($class));
@@ -61,8 +62,10 @@ if ( ! function_exists('load_class'))
     	{
 			$path = $path . $directory  . DIRECTORY_SEPARATOR . $class_name . '.php';
 					
-			if (file_exists($path)) {
-				if( ! class_exists($class_name, FALSE)) {
+			if (file_exists($path))
+			{
+				if( ! class_exists($class_name, FALSE))
+				{
 					require_once $path;
 				}
 			}
@@ -124,10 +127,10 @@ if ( ! function_exists('show_error'))
 	 * @param  string $error_code
 	 * @return string
 	 */
-	function show_error($heading, $message, $template, $error_code)
+	function show_error($heading = NULL, $message = NULL, $template = NULL, $error_code = 500)
 	{
 	  	$errors =& load_class('Errors', 'kernel');
-	  	return $errors->show_error($heading, $message, $template = 'error_general', $error_code);
+	  	return $errors->show_error($heading, $message, $template, $error_code);
 	}
 }
 
@@ -181,10 +184,10 @@ if ( ! function_exists('_error_handler'))
 
 if ( ! function_exists('get_config'))
 {
-	/*
-	 * ------------------------------------------------------
-	 * Loads the main config.php file
-	 * ------------------------------------------------------
+	/**
+	 * To access config from config config/config.php
+	 *
+	 * @return void
 	 */
 	function &get_config()
 	{
@@ -210,10 +213,11 @@ if ( ! function_exists('get_config'))
 
 if ( ! function_exists('config_item'))
 {
-	/*
-	 * ------------------------------------------------------
-	 * Config Item
-	 * ------------------------------------------------------
+	/**
+	 * Global Function to access config
+	 *
+	 * @param string $item
+	 * @return mixed
 	 */
 	function config_item($item)
 	{
@@ -231,11 +235,10 @@ if ( ! function_exists('config_item'))
 
 if ( ! function_exists('autoload_config'))
 {
-	/*
-	 * ------------------------------------------------------
-	 * Loads the main autolaod.php file
-	 * This is for autoloading of libraries, models, and helpers file
-	 * ------------------------------------------------------
+	/**
+	 * To access config from config config/autoload.php
+	 *
+	 * @return void
 	 */
 	function &autoload_config()
 	{
@@ -261,12 +264,10 @@ if ( ! function_exists('autoload_config'))
 
 if ( ! function_exists('database_config'))
 {
-	/*
-	 * ------------------------------------------------------
-	 * Loads the main database.php file
-	 * Note: This will be used commonly inside Model file
-	 * in the core folder
-	 * ------------------------------------------------------
+	/**
+	 * To access config from config config/database.php
+	 *
+	 * @return void
 	 */
 	function &database_config()
 	{
@@ -292,10 +293,10 @@ if ( ! function_exists('database_config'))
 
 if ( ! function_exists('route_config'))
 {
-	/*
-	 * ------------------------------------------------------
-	 * Loads the main routes.php file
-	 * ------------------------------------------------------
+	/**
+	 * To access config from config config/routes.php
+	 *
+	 * @return void
 	 */
 	function &route_config()
 	{
@@ -314,8 +315,9 @@ if ( ! function_exists('route_config'))
 
 				return $route;
 			}
-		} else
+		} else {
 			show_404('404 Not Found', 'The configuration file does not exist');
+		}			
 	}
 }
 

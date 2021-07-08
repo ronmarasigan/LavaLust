@@ -266,7 +266,7 @@ if ( ! function_exists('get_file_info'))
                     $fileinfo['readable'] = is_readable($file);
                     break;
                 case 'writable':
-                    $fileinfo['writable'] = is_really_writable($file);
+                    $fileinfo['writable'] = is_writable($file);
                     break;
                 case 'executable':
                     $fileinfo['executable'] = is_executable($file);

@@ -34,6 +34,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');/**
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
+ /**
+  * Language Class
+  */
 class Lang {
 
 	/**

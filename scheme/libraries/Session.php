@@ -57,19 +57,22 @@ class Session {
 		$this->match_ip = $this->config['sess_match_ip'];
         $this->match_fingerprint = $this->config['sess_match_fingerprint'];
 
-		if ( ! empty($this->config['cookie_prefix']) ) {
+		if ( ! empty($this->config['cookie_prefix']) )
+		{
 	    	$this->config['cookie_name'] = $this->config['sess_cookie_name'] ? $this->config['cookie_prefix'].$this->config['sess_cookie_name'] : NULL;
 	    } else {
 	    	$this->config['cookie_name'] = $this->config['sess_cookie_name'] ? $this->config['sess_cookie_name'] : NULL;
 	    }
 
-	    if (empty($this->config['cookie_name'])) {
+	    if (empty($this->config['cookie_name']))
+		{
 	    	$this->config['cookie_name'] = ini_get('session.name');
 	    } else {
 	    	ini_set('session.name', $this->config['cookie_name']);
 	    }
 
-	    if (empty($this->config['sess_expiration'])) {
+	    if (empty($this->config['sess_expiration']))
+		{
 	    	$this->config['sess_expiration'] = (int) ini_get('session.gc_maxlifetime');
 	    } else {
 	    	$this->config['sess_expiration'] = (int) $this->config['sess_expiration'];
@@ -77,10 +80,11 @@ class Session {
 	    }
 
 	    if (isset($this->config['cookie_expiration']))
+		{
 	    	$this->config['cookie_expiration'] = (int) $this->config['cookie_expiration'];
-	    else
+		} else {
 	    	$this->config['cookie_expiration'] = ( ! isset($this->config['sess_expiration']) AND $this->config['sess_expire_on_close']) ? 0 : (int) $this->config['sess_expiration'];
-
+		}
 	    session_set_cookie_params(
 	    	$this->config['cookie_expiration'],
 	    	$this->config['cookie_path'],
@@ -116,7 +120,8 @@ class Session {
 		//If an IP address is present and we should check to see if it matches
 		if(isset($_SESSION['ip_address']) && $this->match_ip) {
 			//If the IP does NOT match
-			if($_SESSION['ip_address'] != $_SERVER['REMOTE_ADDR']) {
+			if($_SESSION['ip_address'] != $_SERVER['REMOTE_ADDR'])
+			{
 				return FALSE;
 			}
 		}
@@ -124,7 +129,8 @@ class Session {
 		//Set the users IP Address
 		$_SESSION['ip_address'] = $_SERVER['REMOTE_ADDR'];
 
-	    if ( isset($_COOKIE[$this->config['cookie_name']]) ) {
+	    if ( isset($_COOKIE[$this->config['cookie_name']]) )
+		{
 	    	preg_match('/('.session_id().')/', $_COOKIE[$this->config['cookie_name']], $matches);
 	    	if ( empty($matches) ) {
 	        	unset($_COOKIE[$this->config['cookie_name']]);
@@ -132,8 +138,10 @@ class Session {
 	    }
 
 	    $regenerate_time = (int) $this->config['sess_time_to_update'];
-	    if ( (empty($_SERVER['HTTP_X_REQUESTED_WITH']) OR strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') AND ($regenerate_time > 0) ) {
-	    	if ( ! isset($_SESSION['last_session_regenerate'])) {
+	    if ( (empty($_SERVER['HTTP_X_REQUESTED_WITH']) OR strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') AND ($regenerate_time > 0) )
+		{
+	    	if ( ! isset($_SESSION['last_session_regenerate']))
+			{
 	        	$_SESSION['last_session_regenerate'] = time();
 	    	} elseif ( $_SESSION['last_session_regenerate'] < (time() - $regenerate_time) ) {
 		        $this->sess_regenerate((bool) $this->config['sess_regenerate_destroy']);
@@ -159,7 +167,8 @@ class Session {
 	 * IP changes (although this method is not as secure as IP checks).
 	 * @return string
 	 */
-	public function generate_fingerprint()  {
+	public function generate_fingerprint()
+	{
 		//We don't use the ip-adress, because it is subject to change in most cases
 		foreach(array('ACCEPT_CHARSET', 'ACCEPT_ENCODING', 'ACCEPT_LANGUAGE', 'USER_AGENT') as $name) {
 			$key[] = empty($_SERVER['HTTP_'. $name]) ? NULL : $_SERVER['HTTP_'. $name];
@@ -198,6 +207,7 @@ class Session {
 
 	/**
 	 * SID length
+	 * 
 	 * @return int SID length
 	 */
 	private function _get_sid_length()
@@ -211,6 +221,7 @@ class Session {
 	
 	/**
 	 * Regenerate Session ID
+	 * 
 	 * @param  bool FALSE by Default
 	 * @return string    Session ID
 	 */
@@ -222,6 +233,7 @@ class Session {
 
 	/**
 	 * Mark as Flash
+	 * 
 	 * @param  string $key Session
 	 * @return bool
 	 */
@@ -272,6 +284,7 @@ class Session {
 
 	/**
 	 * Check if session variable has data
+	 * 
 	 * @param  string $key Session
 	 * @return boolean
 	 */
@@ -286,6 +299,7 @@ class Session {
 	
 	/**
 	 * Set Data to Session Key
+	 * 
 	 * @param array $keys array of Sessions
 	 */
 	public function set_userdata($keys = array())
@@ -301,6 +315,7 @@ class Session {
 	
 	/**
 	 * Unset Session Data
+	 * 
 	 * @param  array  $keys Array of Sessions
 	 * @return function
 	 */
@@ -317,6 +332,7 @@ class Session {
 	
    	/**
    	 * Get specific session key value
+
    	 * @param  array $key Session Keys
    	 * @return string      Session Data
    	 */
@@ -327,6 +343,7 @@ class Session {
 	
 	/**
 	 * Session Destroy
+	 * 
 	 * @return function
 	 */
 	public function sess_destroy()
@@ -336,6 +353,7 @@ class Session {
 
 	/**
 	 * Get flash data to Session
+	 * 
 	 * @param  array $key Session Keys
 	 * @return string      Session Data
 	 */
@@ -363,6 +381,7 @@ class Session {
 
 	/**
 	 * Set flash data to Session
+	 * 
 	 * @param  array $key Session Keys
 	 * @return function
 	 */

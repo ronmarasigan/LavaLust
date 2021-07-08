@@ -49,6 +49,12 @@ class Escaper extends HTMLPurifier {
         parent::__construct($this->config);
     }
 
+    /**
+     * Filter HTML
+     *
+     * @param string $string
+     * @return void
+     */
     public function filter($string)
     {
         return $this->purify($string);
