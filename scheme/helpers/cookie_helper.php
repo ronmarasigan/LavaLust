@@ -38,21 +38,16 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 if ( ! function_exists('set_cookie'))
 {
 	/**
-	 * [set_cookie description]
-	 * @param mixed $name
-	 * @param string $value    the value of the cookie
-	 * @param string $expire   the number of seconds until expiration
-	 * @param string $domain   the cookie domain.  Usually:  .yourdomain.com
-	 * @param string $path     the cookie path
-	 * @param string $prefix   the cookie prefix
-	 * @param [type] $secure   true makes the cookie secure
-	 * @param [type] true makes the cookie accessible via http(s) only (no javascript)
+	 * Setting up cookie in your application
+	 *
+	 * @param string $name the cookie name
+	 * @param string $value the cookie value
+	 * @param array $options other cookie options
 	 * @return void
 	 */
-	function set_cookie($name, $value = '', $expire = '', $domain = '', $path = '/', $prefix = '', $secure = NULL, $httponly = NULL)
+	function set_cookie($name, $value = '', $expiration = 0, $options = array())
 	{
-		// Set the config file options
-		lava_instance()->io->set_cookie($name, $value, $expire, $domain, $path, $prefix, $secure, $httponly);
+		lava_instance()->io->set_cookie($name, $value, $expiration, $options);
 	}
 }
 
@@ -60,33 +55,30 @@ if ( ! function_exists('get_cookie'))
 {
 	/**
 	 * Fetch an item from the COOKIE array
-	 * @param  string  $index
+	 * 
+	 * @param  string  $name name of the cookie
 	 * @return mixed
 	 */
-	function get_cookie($index)
+	function get_cookie($name)
 	{
-		$prefix = isset($_COOKIE[$index]) ? '' : config_item('cookie_prefix');
-		return lava_instance()->io->cookie($prefix.$index);
+		$prefix = isset($_COOKIE[$name]) ? '' : config_item('cookie_prefix');
+		return lava_instance()->io->cookie($prefix.$name);
 	}
 }
 
 if ( ! function_exists('delete_cookie'))
 {
-	/*
-	* ------------------------------------------------------
-	*  Delete cookie
-	* ------------------------------------------------------
-	*/
 	/**
 	 * Delete a cookie
-	 * @param  [type] $name   [description]
-	 * @param  string $domain the cookie domain. Usually: .yourdomain.com
+	 * 
+	 * @param  string $name 
+	 * @param  string $domain the cookie domain
 	 * @param  string $path   the cookie path
 	 * @param  string $prefix the cookie prefix
 	 * @return void
 	 */
 	function delete_cookie($name, $domain = '', $path = '/', $prefix = '')
 	{
-		set_cookie($name, '', '', $domain, $path, $prefix);
+		lava_instance()->io->set_cookie($name, '', '', array('domain' => $domain, 'path' => $path, 'prefix' => $prefix));
 	}
 }

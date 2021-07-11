@@ -47,7 +47,7 @@ if ( ! function_exists('force_download'))
 	 * @param	bool	whether to try and send the actual file MIME type
 	 * @return	void
 	 */
-    function force_download($file, $name, $mime_type='')
+    function force_download($file, $name, $mime_type = '')
     {
         $LAVA =& lava_instance();
         $LAVA->call->helper('file');
@@ -55,7 +55,8 @@ if ( ! function_exists('force_download'))
         $size = filesize($file);
         $name = rawurldecode($name);
 
-        if($mime_type==''){
+        if($mime_type=='')
+        {
             $mime_type = mime_content_type($file);
         };
         @ob_end_clean();
@@ -72,7 +73,8 @@ if ( ! function_exists('force_download'))
             list($range) = explode(",",$range,2);
             list($range, $range_end) = explode("-", $range);
             $range=intval($range);
-            if(!$range_end) {
+            if(!$range_end)
+            {
                 $range_end=$size-1;
             } else {
                 $range_end=intval($range_end);
@@ -92,7 +94,9 @@ if ( ! function_exists('force_download'))
         if ($file = fopen($file, 'r'))
         {
             if(isset($_SERVER['HTTP_RANGE']))
-            fseek($file, $range);
+            {
+                fseek($file, $range);
+            }            
 
             while(!feof($file) &&
                 (!connection_aborted()) &&
@@ -105,8 +109,8 @@ if ( ! function_exists('force_download'))
                 $bytes_send += strlen($buffer);
             }
             fclose($file);
-        } else
-            throw new Exception('Cannot read file');
-        exit();
+        } else {
+            throw new Exception('Unable to read this file.');
+        }   
     }
 }

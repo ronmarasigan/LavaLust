@@ -68,13 +68,6 @@ $config['VERSION']                 = '2.0.4';
 $config['ENVIRONMENT']             = 'development';
 
 /*
-| -------------------------------------------------------------------
-| Default Timezone
-| -------------------------------------------------------------------
-*/
-date_default_timezone_set('Asia/Manila');
-
-/*
 |--------------------------------------------------------------------------
 | Base Site URL
 |--------------------------------------------------------------------------
@@ -221,8 +214,8 @@ $config['cookie_samesite']         = NULL;
 |
 |--------------------------------------------------------------------------
 */
-$config['cache_dir'] = 'runtime/cache/';
-$config['cache_default_expires'] = 0;
+$config['cache_dir']               = 'runtime/cache/';
+$config['cache_default_expires']   = 0;
 
 /*
 |--------------------------------------------------------------------------
@@ -236,8 +229,10 @@ $config['cache_default_expires'] = 0;
 | 'csrf_cookie_name' = The cookie name
 | 'csrf_expire' = The number in seconds the token should expire.
 */
-$config['csrf_protection'] = FALSE;
-$config['csrf_token_name'] = 'csrf_test_name';
-$config['csrf_cookie_name'] = 'csrf_cookie_name';
-$config['csrf_expire'] = 7200;
+$config['csrf_protection']         = FALSE;
+$config['csrf_exclude_uris']       = array();
+$config['csrf_token_name']         = 'csrf_test_name';
+$config['csrf_cookie_name']        = 'csrf_cookie_name';
+$config['csrf_expire']             = 7200;
+$config['csrf_regenerate']         = FALSE;
 ?>

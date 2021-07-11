@@ -48,47 +48,41 @@ if ( ! function_exists('xss_clean'))
 	{
 		return lava_instance()->security->xss_clean($str);
 	}
-}
 
-if ( ! function_exists('sanitize_filename'))
+if( ! function_exists('filter_var'))
 {
 	/**
-	 * Sanitize Filename
+	 * Filter variables
 	 *
-	 * @param	string
-	 * @return	string
+	 * @param string $type can be string, integer, etc...
+	 * @param string $var the data to be filtered
+	 * @return void
 	 */
-	function sanitize_filename($filename)
+	function filter_var($type, $var)
 	{
-		return lava_instance()->security->sanitize_filename($filename);
+		switch(strtolower($type))
+		{
+			case 'string':
+				return filter_var($var, FILTER_SANITIZE_STRING);
+				break;
+			case 'int':
+			case 'integer':
+				return filter_var($var, FILTER_SANITIZE_NUMBER_INT);
+				break;
+			case 'float':
+				return filter_var($var, FILTER_SANITIZE_NUMBER_FLOAT);
+				break;
+			case 'url':
+				return filter_var($var, FILTER_SANITIZE_URL);
+				break;
+			case 'email':
+				return filter_var($var, FILTER_SANITIZE_EMAIL);
+				break;
+			default:
+				return filter_var($var, FILTER_SANITIZE_STRING);
+		}
 	}
 }
 
-if ( ! function_exists('strip_image_tags'))
-{
-	/**
-	 * Strip Image Tags
-	 *
-	 * @param	string
-	 * @return	string
-	 */
-	function strip_image_tags($str)
-	{
-		return lava_instance()->security->strip_image_tags($str);
-	}
-}
-
-if ( ! function_exists('encode_php_tags'))
-{
-	/**
-	 * Convert PHP tags to entities
-	 *
-	 * @param	string
-	 * @return	string
-	 */
-	function encode_php_tags($str)
-	{
-		return str_replace(array('<?', '?>'), array('&lt;?', '?&gt;'), $str);
-	}
 }
 ?>

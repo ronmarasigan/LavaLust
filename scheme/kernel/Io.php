@@ -81,7 +81,7 @@ Class Io {
 		 */
 		if ($this->_enable_csrf === TRUE)
 		{
-			$this->security->csrf_verify();
+			$this->security->csrf_validate();
 		}
 	}
 	
@@ -140,69 +140,69 @@ Class Io {
 	}
 
 	/**
-	 * Set cookie
+	 * Set cookie in your application
 	 *
-	 * Accepts an arbitrary number of parameters (up to 7) or an associative
-	 * array in the first parameter containing all the values.
-	 *
-	 * @param	string|mixed[]	$name		Cookie name or an array containing parameters
-	 * @param	string			$value		Cookie value
-	 * @param	int				$expire		Cookie expiration time in seconds
-	 * @param	string			$domain		Cookie domain (e.g.: '.yourdomain.com')
-	 * @param	string			$path		Cookie path (default: '/')
-	 * @param	string			$prefix		Cookie name prefix
-	 * @param	bool			$secure		Whether to only transfer cookies via SSL
-	 * @param	bool			$httponly	Whether to only makes the cookie accessible via HTTP (no javascript)
-	 * @return	void
+	 * @param string $name
+	 * @param string $value
+	 * @param string $expiration
+	 * @param array $options
+	 * @return 
 	 */
-	public function set_cookie($name, $value = '', $expire = '', $domain = '', $path = '/', $prefix = '', $secure = NULL, $httponly = NULL)
+	public function set_cookie($name, $value = '', $expiration = 0, $options = array())
 	{
-		if (is_array($name))
+		//list of defaults
+		$lists = array('prefix', 'path', 'domain', 'secure', 'httponly', 'samesite');
+
+		//hold options elements
+		$arr = array();
+		
+		if(is_array($options))
 		{
-			foreach (array('value', 'expire', 'domain', 'path', 'prefix', 'secure', 'httponly', 'name') as $item)
+			if(count($options) > 0)
 			{
-				if (isset($name[$item]))
+				foreach($options as $key => $value)
 				{
-				$$item = $name[$item];
+					if(isset($options[$key]) && $options[$key] != 'expiration')
+					{
+						$arr[$key] = $value;
+					} else {
+						$arr[$key] = config_item('cookie_' . $key);
+					}
+					$pos = array_search($key, $lists);
+					unset($lists[$pos]);
 				}
 			}
 		}
 
-	if ($prefix === '' && config_item('cookie_prefix') !== '')
-	{
-		$prefix = config_item('cookie_prefix');
+		if(! is_numeric($expiration) || $expiration < 0)
+		{
+			$arr['expiration'] = 1;
+		} else {
+			$arr['expiration'] =  ($expiration > 0) ? time() + $expiration : 0;
+		}
+		
+		foreach($lists as $key)
+		{
+			$arr[$key] = config_item('cookie_' . $key);
+		}
+
+		//check for PHP Version later than 7.3.0
+		if (PHP_VERSION_ID < 70300)
+		{
+			setcookie($arr['prefix'].$name, $value, $arr['expiration'], $arr['path'].'; samesite='.$arr['samesite'], $arr['domain'], $arr['secure'], $arr['httponly']);
+		} else {
+			setcookie($arr['prefix'].$name, $value,
+				array(
+					'expires' => $arr['expiration'],
+					'path' => $arr['path'],
+					'domain' => $arr['domain'],
+					'secure' => (bool) $arr['secure'],
+					'httponly' => (bool) $arr['httponly'],
+					'samesite' => $arr['samesite']
+				));
+		}
 	}
-
-	if ($domain == '' && config_item('cookie_domain') != '')
-	{
-		$domain = config_item('cookie_domain');
-	}
-
-	if ($path === '/' && config_item('cookie_path') !== '/')
-	{
-		$path = config_item('cookie_path');
-	}
-
-	$secure = ($secure === NULL && config_item('cookie_secure') !== NULL)
-	? (bool) config_item('cookie_secure')
-	: (bool) $secure;
-
-	$httponly = ($httponly === NULL && config_item('cookie_httponly') !== NULL)
-	? (bool) config_item('cookie_httponly')
-	: (bool) $httponly;
-
-	if ( ! is_numeric($expire))
-	{
-		$expire = time() - 86500;
-	}
-	else
-	{
-		$expire = ($expire > 0) ? time() + $expire : 0;
-	}
-
-	setcookie($prefix.$name, $value, $expire, $path, $domain, $secure, $httponly);
-	}
-
+	
 	/**
 	 * Is Ajax
 	 * 
