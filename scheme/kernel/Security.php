@@ -41,136 +41,166 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 class Security
 {
 	/**
-	 * Random Hash
+	 * hash hmac string
 	 *
 	 * @var string
 	 */
-	protected $_csrf_hash			= '';
+	private $_csrf_hmac_string = 	'HIOtrs19yBm76xDz710LkNmFAbL';
 
 	/**
-	 * Expiration Time
+	 * CSRF hash
+	 *
+	 * @var [type]
+	 */
+	protected $_csrf_hash;
+
+	/**
+	 * CSRF token name
+	 *
+	 * @var string
+	 */
+	protected $_csrf_token_name = 	'lava_csrf_token';
+
+	/**
+	 * CSRF cookie name
+	 *
+	 * @var string
+	 */
+	protected $_csrf_cookie_name =	'lava_csrf_token';
+
+	/**
+	 * CSRF token expire
 	 *
 	 * @var integer
 	 */
-	protected $_csrf_expire			= 7200;
+	protected $_csrf_expire = 7200;
 
 	/**
-	 * Token Name
-	 *
-	 * @var string
-	 */
-	protected $_csrf_token_name		= 'lava_csrf_token';
-	
-	/**
-	 * Cookie Name
-	 *
-	 * @var string
-	 */
-	protected $_csrf_cookie_name	= 'lava_csrf_token';
-
-	/**
-	 * Constructor
+	 * Class constructor
 	 */
 	public function __construct()
 	{
-		// CSRF config
-		foreach(array('csrf_expire', 'csrf_token_name', 'csrf_cookie_name') as $key)
+		//check if csrf protection was enabled
+		if (config_item('csrf_protection'))
 		{
-			if (FALSE !== ($val = config_item($key)))
+			foreach (array('csrf_expire', 'csrf_token_name', 'csrf_cookie_name') as $key)
 			{
-				$this->{'_'.$key} = $val;
+				$this->{'_'.$key} = config_item($key);
 			}
-		}
 
-		// Append application specific cookie prefix
-		if (config_item('cookie_prefix'))
-		{
-			$this->_csrf_cookie_name = config_item('cookie_prefix').$this->_csrf_cookie_name;
-		}
+			$this->_csrf_cookie_name = ! empty(config_item('cookie_prefix')) ? config_item('cookie_prefix').$this->_csrf_cookie_name : $this->_csrf_cookie_name;
 
-		// Set the CSRF hash
-		$this->_csrf_set_hash();
+			//set Hmac Hash
+			$this->_csrf_set_hash();
+		}
 	}
 
 	/**
-	 * Verify Cross Site Request Forgery Protection
+	 * Set hash_hmac
 	 *
-	 * @return	object
+	 * @param string $token
+	 * @return void
 	 */
-	public function csrf_verify()
+	public function _hash_hmac($token)
 	{
-		// If no POST data exists we will set the CSRF cookie
-		if (count($_POST) == 0)
+		return hash_hmac('SHA256', $this->_csrf_hmac_string, $token);
+	}
+
+	/**
+	 * Setting up hash_hmac token
+	 *
+	 * @return void
+	 */
+	public function _csrf_set_hash()
+    {
+		if(isset($_COOKIE[$this->_csrf_cookie_name]))
+		{
+			return $this->_csrf_hash = $_COOKIE[$this->_csrf_cookie_name];
+		}
+		$this->_csrf_hash = $this->_hash_hmac(bin2hex(random_bytes(32)));
+
+		return $this->_csrf_hash;
+    }
+
+	/**
+	 * CSRF Validate
+	 *
+	 * @return void
+	 */
+	public function csrf_validate()
+	{
+		// If it's not a POST request we will just ignore it
+		if (strtoupper($_SERVER['REQUEST_METHOD']) !== 'POST')
 		{
 			return $this->csrf_set_cookie();
 		}
 
-		// Do the tokens exist in both the _POST and _COOKIE arrays?
-		if ( ! isset($_POST[$this->_csrf_token_name]) OR
-			 ! isset($_COOKIE[$this->_csrf_cookie_name]))
+		$uri = filter_var(ltrim($_SERVER['REQUEST_URI'], '/'), FILTER_SANITIZE_URL) ?? '';
+
+		if(count(config_item('csrf_exclude_uris')) > 0)
 		{
-			$this->csrf_show_error();
+			foreach(config_item('csrf_exclude_uris') as $excluded)
+			{
+				if (! preg_match('#^'.$excluded.'$#i',  $uri))
+				{
+					$is_valid = isset($_POST[$this->_csrf_token_name], $_COOKIE[$this->_csrf_cookie_name])
+					&& is_string($_POST[$this->_csrf_token_name]) && is_string($_COOKIE[$this->_csrf_cookie_name])
+					&& hash_equals($_POST[$this->_csrf_token_name], $_COOKIE[$this->_csrf_cookie_name]);
+
+					unset($_POST[$this->_csrf_token_name]);
+
+					if (config_item('csrf_regenerate'))
+					{
+						unset($_COOKIE[$this->_csrf_cookie_name]);
+						$this->_csrf_hash = NULL;
+					}
+
+					$this->_csrf_set_hash();
+					$this->csrf_set_cookie();
+
+					if ($is_valid === FALSE)
+					{
+						show_error('403 Forbidden Error', 'The action you have requested is not allowed.', 'error_general', 403);
+					}
+
+					return $this;
+				}
+			}
 		}
-
-		// Do the tokens match?
-		if ($_POST[$this->_csrf_token_name] != $_COOKIE[$this->_csrf_cookie_name])
-		{
-			$this->csrf_show_error();
-		}
-
-		// We kill this since we're done and we don't want to
-		// polute the _POST array
-		unset($_POST[$this->_csrf_token_name]);
-
-		// Nothing should last forever
-		unset($_COOKIE[$this->_csrf_cookie_name]);
-		$this->_csrf_set_hash();
-		$this->csrf_set_cookie();
-
-		return $this;
 	}
 
 	/**
-	 * Set Cross Site Request Forgery Protection Cookie
+	 * Setting up CSRF cookie
 	 *
-	 * @return	object
+	 * @return void
 	 */
 	public function csrf_set_cookie()
 	{
-		$expire = time() + $this->_csrf_expire;
-		$secure_cookie = (config_item('cookie_secure') === TRUE) ? 1 : 0;
+		$expiration = time() + $this->_csrf_expire;
 
-		if ($secure_cookie)
+		//check for PHP Version later than 7.3.0
+		if (PHP_VERSION_ID < 70300)
 		{
-			$req = isset($_SERVER['HTTPS']) ? $_SERVER['HTTPS'] : FALSE;
-
-			if ( ! $req OR $req == 'off')
-			{
-				return FALSE;
-			}
+			setcookie(
+				$this->_csrf_cookie_name, $this->_csrf_hash, $expiration, config_item('cookie_path'), config_item('cookie_domain'), config_item('cookie_secure'), config_item('cookie_httponly'));
+		} else {
+			setcookie($this->_csrf_cookie_name,
+					$this->_csrf_hash,
+					array('samesite' => 'Strict',
+					'secure'   => FALSE,
+					'expires'  => $expiration,
+					'path'     => config_item('cookie_path'),
+					'domain'   => config_item('cookie_domain'),
+					'httponly' => config_item('cookie_httponly'))
+			);
 		}
-
-		setcookie($this->_csrf_cookie_name, $this->_csrf_hash, $expire, config_item('cookie_path'), config_item('cookie_domain'), $secure_cookie);
-
 		return $this;
 	}
 
 	/**
-	 * Show CSRF Error
+	 * Get csrf hash
 	 *
-	 * @return	void
-	 */
-	public function csrf_show_error()
-	{
-		show_error('Not Allowed Error', 'The action you have requested is not allowed.', '', 403);
-	}
-
-	/**
-	 * Get CSRF Hash
-	 *
-	 * Getter Method
-	 *
-	 * @return 	string 	self::_csrf_hash
+	 * @return void
 	 */
 	public function get_csrf_hash()
 	{
@@ -178,40 +208,13 @@ class Security
 	}
 
 	/**
-	 * Get CSRF Token Name
+	 * Set  CSRF hash
 	 *
-	 * Getter Method
-	 *
-	 * @return 	string 	self::csrf_token_name
+	 * @return void
 	 */
 	public function get_csrf_token_name()
 	{
 		return $this->_csrf_token_name;
-	}
-
-	/**
-	 * Set Cross Site Request Forgery Protection Cookie
-	 *
-	 * @return	string
-	 */
-	protected function _csrf_set_hash()
-	{
-		if ($this->_csrf_hash == '')
-		{
-			// If the cookie exists we will use it's value.
-			// We don't necessarily want to regenerate it with
-			// each page load since a page could contain embedded
-			// sub-pages causing this feature to fail
-			if (isset($_COOKIE[$this->_csrf_cookie_name]) &&
-				$_COOKIE[$this->_csrf_cookie_name] != '')
-			{
-				return $this->_csrf_hash = $_COOKIE[$this->_csrf_cookie_name];
-			}
-
-			return $this->_csrf_hash = md5(uniqid(rand(), TRUE));
-		}
-
-		return $this->_csrf_hash;
 	}
 
 	/**
@@ -225,25 +228,6 @@ class Security
 		$escaper =& load_class('Escaper', 'libraries');
 		return $escaper->filter($string);
 	}
-
-	/**
-	 * Sanitize for a file system
-	 * 
-	 * @param  string $name
-	 * @return string
-	 */
-	public function sanitize_filename($name) {
-	    // remove illegal file system characters https://en.wikipedia.org/wiki/Filename#Reserved_characters_and_words
-	    $name = str_replace(array_merge(
-	        array_map('chr', range(0, 31)),
-	        array('<', '>', ':', '"', '/', '\\', '|', '?', '*')
-	    ), '', $name);
-	    // maximise filename length to 255 bytes http://serverfault.com/a/9548/44086
-	    $ext = pathinfo($name, PATHINFO_EXTENSION);
-	    $name= mb_strcut(pathinfo($name, PATHINFO_FILENAME), 0, 255 - ($ext ? strlen($ext) + 1 : 0), mb_detect_encoding($name)) . ($ext ? '.' . $ext : '');
-	    return $name;
-	}
-
 }
 
 ?>

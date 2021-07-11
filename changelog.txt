@@ -2,6 +2,9 @@ LavaLust Version 2
 
 # Changelog
 
+## Fixed Cookie samesite error in PHP version < 7.3
+set_cookie($name, $value, $expiration, array())
+
 ## Fixed Session Class / flashdata() problem wiht PHP 8. [2.0.4]
 
 ## Update model methods inside controller. [2.0.4]
