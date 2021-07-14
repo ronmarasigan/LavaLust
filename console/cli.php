@@ -5,22 +5,22 @@
 //Constant 
 define('ROOT_DIR',  dirname(__DIR__) . DIRECTORY_SEPARATOR);
 define('APP_DIR', ROOT_DIR . 'app' . DIRECTORY_SEPARATOR);
-echo '-----------------------';
-echo "\n";
-echo 'CREATE A NEW FILE:';
-echo "\n";
-echo '-----------------------';
-echo "\n";
-echo 'Type M => Model';
-echo "\n";
-echo 'Type C => Controller';
-echo "\n";
-echo '-----------------------';
-echo "\n";
+$flag = FALSE;
+do
+{
+echo '
+------------------------------------------------------------
+CREATE A NEW FILE:
+------------------------------------------------------------
+Type M => Model
+Type C => Controller
+------------------------------------------------------------
+';
 
 $option = strtoupper(readline('File: '));
-$flag = FALSE;
-switch ($option) {
+
+switch ($option)
+{
 	case 'M':
 		$option = 'Model';
 		$flag = TRUE;
@@ -30,29 +30,68 @@ switch ($option) {
 		$flag = TRUE;
 		break;
 	default:
-		echo 'Invalid input. Please choose from M, V, C';
+		echo 'Invalid input. Please choose from M, C';
+		$flag = FALSE;
 		echo "\n";
 		break;
 }
-if($flag) {
+$content = "
+<?php
+defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
+
+class {class} extends {extends} {
+	public function index() {
+		
+	}
+}
+?>
+";
+
+if($flag)
+{
 	$class = ucfirst(readline('Enter ' . $option . ' name: '));
 	$_m = '';
-	if(strtolower($option) == 'model') $_m = '_model';
-	if(! file_exists(APP_DIR . strtolower($option) . 's\\' . $class . ''.$_m.'.php')) {
-		$file_handle = fopen(APP_DIR . strtolower($option) . 's\\' . $class . ''.$_m.'.php', 'w');
-		fwrite($file_handle, '<?php');
-		fwrite($file_handle, "\n");
-		fwrite($file_handle, "defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');");
-		fwrite($file_handle, "\n\n");
-		fwrite($file_handle, "class ".$class."".$_m." extends ".$option." {");
-		fwrite($file_handle, "\n\n");
-		fwrite($file_handle, "}");
-		fwrite($file_handle, "\n\n");
-		fwrite($file_handle, '?>');
-		fclose($file_handle);
-	} else {
-		echo 'File already exist.';
+	if(strtolower($option) == 'model')
+	{
+		$_m = '_model';
 	}
+	if(! file_exists(APP_DIR . strtolower($option) . 's\\' . $class . ''.$_m.'.php'))
+	{
+		$file_handle = fopen(APP_DIR . strtolower($option) . 's\\' . $class . ''.$_m.'.php', 'w');
+		$search = array('{class}', '{extends}');
+		$replace = array($class.$_m, $option);
+		$content = str_replace($search, $replace, $content);
+		fwrite($file_handle, $content);
+		fclose($file_handle);
+		echo success($option .  ' was successfully created');
+	} else {
+		echo danger($option . ' already exist.');
+	}
+	$continue = readline('Do you want to continue? [Y/N]');
+}
+} while(strtoupper($continue) == 'Y');
+
+function danger($string = '', $padding = true)
+{
+$length = strlen($string) + 4;
+$output = '';
+
+if ($padding)
+{
+	$output .= "\e[0;41m".str_pad(' ', $length, " ", STR_PAD_LEFT)."\e[0m".PHP_EOL;
+}
+$output .= "\e[0;41m".($padding ? '  ' : '').$string.($padding ? '  ' : '')."\e[0m".PHP_EOL;
+if ($padding) 
+{
+	$output .= "\e[0;41m".str_pad(' ', $length, " ", STR_PAD_LEFT)."\e[0m".PHP_EOL;
+}
+
+return $output;
+}
+
+function success($string = '')
+{
+	return "\e[0;32m".$string."\e[0m";
 }
 
 ?>
