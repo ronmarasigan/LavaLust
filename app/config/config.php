@@ -80,7 +80,7 @@ $config['ENVIRONMENT']             = 'development';
 | WARNING: You MUST set this value!
 |
 */
-$config['base_url'] 				= '';
+$config['base_url'] 				= 'https://lavalust-dev.local/';
 
 /*
 |--------------------------------------------------------------------------
@@ -142,7 +142,7 @@ $config['charset']					= 'UTF-8';
 | Default Controllers and Methods
 |--------------------------------------------------------------------------
 |
-| This config will be used in the babaeron.php file inside core.
+| This config will be used in the Router Class inside kernel.
 |
 */
 $config['default_controller'] 		= 'Welcome';
@@ -203,7 +203,7 @@ $config['cookie_path']             = '/';
 $config['cookie_secure']           = FALSE;
 $config['cookie_expiration']       = 86400;
 $config['cookie_httponly']         = TRUE;
-$config['cookie_samesite']         = NULL;
+$config['cookie_samesite']         = 'None';
 
 /*
 |--------------------------------------------------------------------------
@@ -225,6 +225,7 @@ $config['cache_default_expires']   = 0;
 | checked on a submitted form. If you are accepting user data, it is strongly
 | recommended CSRF protection be enabled.
 |
+| 'csrf_exclude_uris' = Array of uris that will not go throught protection
 | 'csrf_token_name' = The token name
 | 'csrf_cookie_name' = The cookie name
 | 'csrf_expire' = The number in seconds the token should expire.
