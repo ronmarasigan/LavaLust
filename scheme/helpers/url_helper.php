@@ -68,7 +68,8 @@ if ( ! function_exists('load_js'))
 	 */
 	function load_js($paths)
 	{
-		foreach ($paths as $path) {
+		foreach ($paths as $path)
+		{
 			echo '<script src="' . BASE_URL . PUBLIC_DIR . '/' . $path . '.js"></script>' . "\r\n";
 		}
 	}
@@ -84,7 +85,8 @@ if ( ! function_exists('load_css'))
 	 */
 	function load_css($paths)
 	{
-		foreach ($paths as $path) {
+		foreach ($paths as $path)
+		{
 			echo '<link rel="stylesheet" href="' . BASE_URL . PUBLIC_DIR .'/' . $path . '.css" type="text/css" />' . "\r\n";
 		}
 	}
@@ -98,8 +100,9 @@ if ( ! function_exists('site_url'))
 	 * @param string $url
 	 * @return void
 	 */
-	function site_url($url='') {
-		return BASE_URL . $url;
+	function site_url($url = '') 
+	{
+		return strpos($_SERVER['REQUEST_URI'], 'index.php') ? BASE_URL . 'index.php/' . $url : BASE_URL . $url;
 	}
 }
 

@@ -2,6 +2,11 @@ LavaLust Version 2
 
 # Changelog
 
+## Optional usage of mod_rewrite
+You can remove the .htaccess file and access the url like http://website.com/index.php/controller/model/args
+If you want to use the previous way like http://website.com/index.php/controller/model/args, edit the .htaccess
+file accordingly.
+
 ## Fixed Cookie samesite error in PHP version < 7.3
 set_cookie($name, $value, $expiration, array())
 
