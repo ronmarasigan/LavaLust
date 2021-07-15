@@ -35,6 +35,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
+ /**
+  * FileSessionHandler
+  */
 class FileSessionHandler extends Session implements SessionHandlerInterface {
     private $savePath, $data, $file_path;
 
@@ -50,10 +53,11 @@ class FileSessionHandler extends Session implements SessionHandlerInterface {
     }
 
     /**
-     * Opening the Session
-     * @param  string $savePath
-     * @param  string $sessionName
-     * @return bool
+     * Open
+     *
+     * @param string $savePath
+     * @param string $sessionName
+     * @return void
      */
     public function open($savePath, $sessionName) {
         $this->savePath = $savePath;
@@ -65,17 +69,19 @@ class FileSessionHandler extends Session implements SessionHandlerInterface {
     }
 
     /**
-     * Closing the Session
-     * @return bool
+     * Close
+     *
+     * @return void
      */
     public function close() {
         return true;
     }
 
     /**
-     * Reading the Session
-     * @param  varchar $id
-     * @return string
+     * Read
+     *
+     * @param string $id
+     * @return void
      */
     public function read($id) {
         $this->data = false;
@@ -87,10 +93,11 @@ class FileSessionHandler extends Session implements SessionHandlerInterface {
     }
 
     /**
-     * Writing the Session
-     * @param  varchar $id
-     * @param  varchar $data
-     * @return this
+     * Write
+     *
+     * @param string $id
+     * @param string $data
+     * @return void
      */
     public function write($id, $data) {
         $filename = $this->file_path.$id;
@@ -102,8 +109,9 @@ class FileSessionHandler extends Session implements SessionHandlerInterface {
     }
 
     /**
-     * Destroying the session
-     * @param  varchar $id
+     * Destroy
+     * 
+     * @param  string $id
      * @return bool
      */
     public function destroy($id) {
@@ -115,7 +123,8 @@ class FileSessionHandler extends Session implements SessionHandlerInterface {
 
     /**
      * Session Lifetime
-     * @param  time $maxlifetime
+     * 
+     * @param  int $maxlifetime
      * @return bool
      */
     public function gc($maxlifetime) {

@@ -35,35 +35,39 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
-/*
-* ------------------------------------------------------
-*  Class Session
-* ------------------------------------------------------
-*/
-
+/**
+ * Session Session
+ */
 class Session {
 
+	/**
+	 * Config var to hold Config files
+	 *
+	 * @var mixed
+	 */
 	private $config;
 
 	public function __construct()
 	{
-		/*
-	    * ------------------------------------------------------
-	    *  The session Configs
-	    * ------------------------------------------------------
-	    */
+		/**
+		 * Session Configs
+		 */
 		$this->config = get_config();
-
+		
+		//IP Matching
 		$this->match_ip = $this->config['sess_match_ip'];
+
+		//Fingerprint Matching
         $this->match_fingerprint = $this->config['sess_match_fingerprint'];
 
-		if ( ! empty($this->config['cookie_prefix']) )
-		{
+		//Set up cookie name
+		if ( ! empty($this->config['cookie_prefix']) ) {
 	    	$this->config['cookie_name'] = $this->config['sess_cookie_name'] ? $this->config['cookie_prefix'].$this->config['sess_cookie_name'] : NULL;
 	    } else {
 	    	$this->config['cookie_name'] = $this->config['sess_cookie_name'] ? $this->config['sess_cookie_name'] : NULL;
 	    }
-
+		
+		//Set up cookie name
 	    if (empty($this->config['cookie_name']))
 		{
 	    	$this->config['cookie_name'] = ini_get('session.name');
@@ -71,6 +75,7 @@ class Session {
 	    	ini_set('session.name', $this->config['cookie_name']);
 	    }
 
+		//Set up session expiration
 	    if (empty($this->config['sess_expiration']))
 		{
 	    	$this->config['sess_expiration'] = (int) ini_get('session.gc_maxlifetime');
@@ -78,6 +83,7 @@ class Session {
 	    	$this->config['sess_expiration'] = (int) $this->config['sess_expiration'];
 	    	ini_set('session.gc_maxlifetime', $this->config['sess_expiration']);
 	    }
+
 
 	    if (isset($this->config['cookie_expiration']))
 		{
@@ -92,6 +98,7 @@ class Session {
 	    	$this->config['cookie_secure'],
 	    	TRUE
 	    );
+		
 	    ini_set('session.use_trans_sid', 0);
 	    ini_set('session.use_strict_mode', 1);
 	    ini_set('session.use_cookies', 1);
@@ -107,18 +114,18 @@ class Session {
 			
 		}
 
-
 	    //On creation store the useragent fingerprint
-		if(empty($_SESSION['fingerprint'])) {
+		if(empty($_SESSION['fingerprint']))
+		{
 			$_SESSION['fingerprint'] = $this->generate_fingerprint();
-
 		//If we should verify user agent fingerprints (and this one doesn't match!)
 		} elseif($this->match_fingerprint && $_SESSION['fingerprint'] != $this->generate_fingerprint()) {
 			return FALSE;
 		}
 
 		//If an IP address is present and we should check to see if it matches
-		if(isset($_SESSION['ip_address']) && $this->match_ip) {
+		if(isset($_SESSION['ip_address']) && $this->match_ip)
+		{
 			//If the IP does NOT match
 			if($_SESSION['ip_address'] != $_SERVER['REMOTE_ADDR'])
 			{
@@ -132,12 +139,16 @@ class Session {
 	    if ( isset($_COOKIE[$this->config['cookie_name']]) )
 		{
 	    	preg_match('/('.session_id().')/', $_COOKIE[$this->config['cookie_name']], $matches);
-	    	if ( empty($matches) ) {
+	    	if ( empty($matches) )
+			{
 	        	unset($_COOKIE[$this->config['cookie_name']]);
 	      	}
 	    }
 
+		//Set time before session updates
 	    $regenerate_time = (int) $this->config['sess_time_to_update'];
+
+		//Check for Ajax
 	    if ( (empty($_SERVER['HTTP_X_REQUESTED_WITH']) OR strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') AND ($regenerate_time > 0) )
 		{
 	    	if ( ! isset($_SESSION['last_session_regenerate']))
@@ -146,16 +157,35 @@ class Session {
 	    	} elseif ( $_SESSION['last_session_regenerate'] < (time() - $regenerate_time) ) {
 		        $this->sess_regenerate((bool) $this->config['sess_regenerate_destroy']);
 	      }
-	    } elseif (isset($_COOKIE[$this->config['cookie_name']]) AND $_COOKIE[$this->config['cookie_name']] === session_id()) {
-	    	setcookie(
-		        $this->config['cookie_name'],
-		        session_id(),
-		        (empty($this->config['cookie_expiration']) ? 0 : time() + $this->config['cookie_expiration']),
-		        $this->config['cookie_path'],
-		        $this->config['cookie_domain'],
-		        $this->config['cookie_secure'],
-		        TRUE
-		      );
+	    } elseif (isset($_COOKIE[$this->config['cookie_name']]) AND $_COOKIE[$this->config['cookie_name']] === $this->session_id()){
+			
+			//check for PHP Version later than 7.3.0
+			if (PHP_VERSION_ID < 70300)
+			{
+				//Check for expiration time
+				$expiration = empty($this->config['cookie_expiration']) ? 0 : time() + $this->config['cookie_expiration'];
+				setcookie(
+					$this->config['cookie_name'],
+					$this->session_id(),
+					$expiration,
+					$this->config['cookie_path'],
+					$this->config['cookie_domain'],
+					$this->config['cookie_secure'],
+					TRUE
+				);
+			} else {
+				setcookie(
+						$this->config['cookie_name'],
+						$this->session_id(),
+						array('samesite' => $this->config['cookie_samesite'],
+						'secure'   => $this->config['cookie_secure'],
+						'expires'  => $expiration,
+						'path'     => $this->config['cookie_path'],
+						'domain'   => $this->config['cookie_domain'],
+						'httponly' => $this->config['cookie_httponly'],
+						)
+				);
+			}
 	    }
 
 	    $this->_lava_init_vars();
