@@ -98,8 +98,9 @@ if ( ! function_exists('site_url'))
 	 * @param string $url
 	 * @return void
 	 */
-	function site_url($url='') {
-		return BASE_URL . $url;
+	function site_url($url = '') 
+	{
+		return strpos($_SERVER['REQUEST_URI'], 'index.php') ? BASE_URL . 'index.php/' . $url : BASE_URL . $url;
 	}
 }
 

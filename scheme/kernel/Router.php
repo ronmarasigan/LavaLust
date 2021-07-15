@@ -52,7 +52,7 @@ class Router
 	 * 
 	 * @var string
 	 */
-	protected $url_string = '';
+	protected $uri_string = '';
 
 	/**
 	 * Controller
@@ -109,7 +109,7 @@ class Router
             if($route_url !== $url && $route_url !== NULL)
 				return $route_url;
         }
-        return $this->url_string;
+        return $this->uri_string;
     }
 
     /**
@@ -119,24 +119,22 @@ class Router
      */
 	public function parse_url()
 	{
-		$request_url = (isset($_SERVER['REQUEST_URI'])) ? $_SERVER['REQUEST_URI'] : '';
-		//hack!
-		$script_url  = (isset($_SERVER['PHP_SELF'])) ? substr_replace($_SERVER['PHP_SELF'], '', strpos($_SERVER['PHP_SELF'], 'index.php') + 9) : '';
+		//Get the URI String
+		$this->uri_string = trim(str_replace($_SERVER['SCRIPT_NAME'], '', $_SERVER['PHP_SELF']), '/');  
 
-		if($request_url != $script_url)
-			$this->url_string = trim(preg_replace('/'. str_replace('/', '\/', str_replace('index.php', '', $script_url)) .'/', '', $request_url, 1), '/');
-			$this->url = explode('/', $this->remap_url(filter_var($this->url_string, FILTER_SANITIZE_URL), $this->route));
-			if($this->url[0] != NULL && config_item('enable_query_strings') == FALSE)
+		//Get the segments
+		$this->url = explode('/', $this->remap_url(filter_var($this->uri_string, FILTER_SANITIZE_URL), $this->route));
+		if($this->url[0] != NULL && config_item('enable_query_strings') == FALSE)
+		{
+			foreach($this->url as $uri)
 			{
-				foreach($this->url as $uri)
+				if (! preg_match('/^['.config_item('permitted_uri_chars').']+$/i', $uri))
 				{
-					if (! preg_match('/^['.config_item('permitted_uri_chars').']+$/i', $uri))
-					{
-						throw new Exception('The URI you submitted has disallowed characters.');
-					}	
-				}
+					throw new Exception('The URI you submitted has disallowed characters.');
+				}	
 			}
-			return $this->url;				
+		}
+		return $this->url;				
 	}
 
 	/**
