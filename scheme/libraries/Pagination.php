@@ -35,6 +35,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
+ /**
+  * Class Pagination
+  */
 class Pagination
 {
     /**

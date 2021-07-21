@@ -97,7 +97,7 @@ class Upload
 
 		// Make sure we can use the destination directory
 		$this->LAVA->call->helper('directory');
-		usable($dir);
+		is_dir_usable($dir);
 
 		// Create a unique name if we don't want files overwritten
 		$name = $overwrite ? "$filename.$ext" : $this->unique_filename($dir, $filename, $extension);

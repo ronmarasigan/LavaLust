@@ -228,6 +228,24 @@ class Security
 		$escaper =& load_class('Escaper', 'libraries');
 		return $escaper->filter($string);
 	}
+
+	/**
+	 * Sanitize for a file system
+	 * 
+	 * @param  string $name
+	 * @return string
+	 */
+	public function sanitize_filename($name) {
+	    // remove illegal file system characters https://en.wikipedia.org/wiki/Filename#Reserved_characters_and_words
+	    $name = str_replace(array_merge(
+	        array_map('chr', range(0, 31)),
+	        array('<', '>', ':', '"', '/', '\\', '|', '?', '*')
+	    ), '', $name);
+	    // maximise filename length to 255 bytes http://serverfault.com/a/9548/44086
+	    $ext = pathinfo($name, PATHINFO_EXTENSION);
+	    $name= mb_strcut(pathinfo($name, PATHINFO_FILENAME), 0, 255 - ($ext ? strlen($ext) + 1 : 0), mb_detect_encoding($name)) . ($ext ? '.' . $ext : '');
+	    return $name;
+	}
 }
 
 ?>

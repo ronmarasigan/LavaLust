@@ -36,7 +36,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  */
 
 /**
- * Form Validation Class
+ * Class Form Validation
  */
 class Form_validation {
     /**

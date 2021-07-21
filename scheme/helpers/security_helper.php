@@ -48,6 +48,7 @@ if ( ! function_exists('xss_clean'))
 	{
 		return lava_instance()->security->xss_clean($str);
 	}
+}
 
 if( ! function_exists('filter_var'))
 {
@@ -84,5 +85,17 @@ if( ! function_exists('filter_var'))
 	}
 }
 
+if ( ! function_exists('sanitize_filename'))
+{
+	/**
+	 * Sanitize Filename
+	 *
+	 * @param	string
+	 * @return	string
+	 */
+	function sanitize_filename($filename)
+	{
+		return lava_instance()->security->sanitize_filename($filename);
+	}
 }
 ?>

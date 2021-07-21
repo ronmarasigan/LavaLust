@@ -93,39 +93,6 @@ if(! function_exists('delete_files'))
     }
 }
 
-if(! function_exists('find_subdirectories'))
-{
-    /**
-     * List all subdirectories of a given directory
-     *
-     * @param string $path
-     * @param boolean $include_path
-     * @return void
-     */
-    function find_subdirectories($path, $include_path = FALSE)
-    {
-        $directories = array();
-
-        $items = scandir($path);
-
-        foreach ($items as $item)
-        {
-            if($item == '..' || $item == '.')
-            {
-                continue;
-            }
-                
-            if(is_dir($path . $item))
-            {
-                $directories[] = $include_path ? $path  . $item : $item; 
-            }
-
-        }
-        
-        return $directories;
-    }
-}
-
 if(! function_exists('copy_file'))
 {
     /**

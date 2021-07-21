@@ -35,12 +35,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
-/*
- * ------------------------------------------------------
- *  Class Mail / For sending email
- * ------------------------------------------------------
+/**
+ * Class Email
  */
-
 class Email {
 
 	public $sender;
@@ -177,16 +174,12 @@ class Email {
     {
         if(file_exists($attachment) === true)
         {
-        	$LAVA =& lava_instance();
-        	$LAVA->call->helper('file');
-        	$fileinfo = get_file_info($attachment);
 			$fileType = mime_content_type($attachment);
-			$file_size = $fileinfo['size'];
+			$file_size = filesize($attachment);
 			$handle = fopen($attachment, 'rb');
 			$content = fread($handle, $file_size);
 			$content = chunk_split(base64_encode($content));
 			fclose($handle);
-
             $out = "\r\n";
             $contents = 'Content-Type: '.$fileType.'; name='.basename($attachment).$out;
             $contents .= 'Content-Transfer-Encoding: base64'.$out;

@@ -35,13 +35,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
-/*
- * ------------------------------------------------------
- *  Cache Class
- * ------------------------------------------------------
+/**
+ * Cache Class
  */
-
-
 class Cache
 {
 	private $_lava;
