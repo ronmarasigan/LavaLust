@@ -164,7 +164,7 @@ class Router
 		 * @var array
 		 */
 		$segments = $this->parse_url();
-		
+
 		/**
 		 * Get the Controller Segment
 		 */
