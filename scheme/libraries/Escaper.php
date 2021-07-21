@@ -35,12 +35,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
-/*
- * ------------------------------------------------------
- *  Escaper Class
- * ------------------------------------------------------
+/**
+ * Class Escaper / XSS Prevention
  */
-
 require_once('Escaper/HTMLPurifier.php');
 class Escaper extends HTMLPurifier {
 
