@@ -62,13 +62,6 @@ class Pagination
     protected $rows_per_page;
 
     /**
-     * Crumbs
-     * 
-     * @var integer
-     */
-    protected $crumbs = 10;
-
-    /**
      * Links
      * 
      * @var string
@@ -161,6 +154,7 @@ class Pagination
      */
     public function initialize($total_rows, $rows_per_page, $page_num, $url)
     {
+        $this->crumbs = ceil($total_rows / $rows_per_page);
         $this->rows_per_page = (int) $rows_per_page;
         $this->page_array['url'] = $url;
         $last_page = ceil($total_rows / $this->rows_per_page);
