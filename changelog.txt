@@ -2,10 +2,31 @@ LavaLust Version 2
 
 # Changelog
 
+## Security
+To access your index file from public folder, put index.php inside it and change the ff:
+1. ROOT_DIR should be dirname(__DIR__);
+2. add .htaccess file inside your root directly
+    AddDefaultCharset UTF-8
+    <IfModule mod_rewrite.c>
+    RewriteEngine On
+    # Route all other requests
+    RewriteRule ^(.*) public/$1 [L]
+    </IfModule>
+3. add .htaccess file inside your public folder
+    <IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ index.php/$1 [QSA,L]
+    </IfModule>
+
+## Update url_helper
+Add exit option as 4th parameter of the function
+
 ## Optional usage of mod_rewrite
 You can remove the .htaccess file and access the url like http://website.com/index.php/controller/model/args
-If you want to use the previous way like http://website.com/index.php/controller/model/args, edit the .htaccess
-file accordingly.
+If you want to use the previous way like http://website.com/index.php/controller/model/args, rename the htaccess.example
+to .htaccess only.
 
 ## Fixed Cookie samesite error in PHP version < 7.3
 set_cookie($name, $value, $expiration, array())

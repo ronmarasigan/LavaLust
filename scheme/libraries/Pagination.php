@@ -63,10 +63,10 @@ class Pagination
 
     /**
      * Crumbs
-     * 
-     * @var integer
+     *
+     * @var int
      */
-    protected $crumbs = 10;
+    protected $crumbs;
 
     /**
      * Links
@@ -159,8 +159,9 @@ class Pagination
      * @param int $rows_per_page
      * @param int $page_num
      */
-    public function initialize($total_rows, $rows_per_page, $page_num, $url)
+    public function initialize($total_rows, $rows_per_page, $page_num, $url, $crumbs = 5)
     {
+        $this->crumbs = $crumbs;
         $this->rows_per_page = (int) $rows_per_page;
         $this->page_array['url'] = $url;
         $last_page = ceil($total_rows / $this->rows_per_page);
@@ -255,19 +256,13 @@ class Pagination
             <nav class="'.$this->classes['nav'].'">
                 <ul class="'.$this->classes['ul'].'">
         '; 
-
-        //To adjust the showing of links based on crumbs
-        $page_crumbs = ceil($this->crumbs / 2);
-
-        if($this->page_array['current'] != 1 && $this->page_num > $page_crumbs)
-        {
-            $this->pagination .= '
-                <li class="'.$this->classes['li'].'"><a class="'.$this->classes['a'].'" href="'.site_url($this->page_array['url']).''.$this->page_delimiter.'1">'.$this->first_link.'</a></li>
-            ';
-            $this->pagination .= '
-                <li class="'.$this->classes['li'].'"><a class="'.$this->classes['a'].'" href="'.site_url($this->page_array['url']).''.$this->page_delimiter.''.$this->page_array['previous'].'">'.$this->prev_link.'</a></li>
-            ';
-        }
+        
+        $this->pagination .= '
+            <li class="'.$this->classes['li'].'"><a class="'.$this->classes['a'].'" href="'.site_url($this->page_array['url']).''.$this->page_delimiter.'1">'.$this->first_link.'</a></li>
+        ';
+        $this->pagination .= '
+            <li class="'.$this->classes['li'].'"><a class="'.$this->classes['a'].'" href="'.site_url($this->page_array['url']).''.$this->page_delimiter.''.$this->page_array['previous'].'">'.$this->prev_link.'</a></li>
+        ';
 
         foreach($this->page_array['pages'] as $pages)
         {
@@ -282,16 +277,12 @@ class Pagination
             ';
         }
         
-        if($this->page_num != $this->page_array['last'])
-        {
-            $this->pagination .= '
-                <li class="'.$this->classes['li'].'"><a class="'.$this->classes['a'].'" href="'.site_url($this->page_array['url']).''.$this->page_delimiter.''.$this->page_array['next'].'">'.$this->next_link.'</a></li>
-                <li class="'.$this->classes['li'].'"><a class="'.$this->classes['a'].'" href="'.site_url($this->page_array['url']).''.$this->page_delimiter.''.$this->page_array['last'].'">'.$this->last_link.'</a></li>
-                </ul>
-            </nav>
-            ';
-        }
-
+        $this->pagination .= '
+            <li class="'.$this->classes['li'].'"><a class="'.$this->classes['a'].'" href="'.site_url($this->page_array['url']).''.$this->page_delimiter.''.$this->page_array['next'].'">'.$this->next_link.'</a></li>
+            <li class="'.$this->classes['li'].'"><a class="'.$this->classes['a'].'" href="'.site_url($this->page_array['url']).''.$this->page_delimiter.''.$this->page_array['last'].'">'.$this->last_link.'</a></li>
+            </ul>
+        </nav>
+        ';
         return $this->pagination;
     }
 }

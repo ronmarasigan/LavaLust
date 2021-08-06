@@ -38,22 +38,28 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 if ( ! function_exists('redirect'))
 {
 	/**
-	 * Redirect to a location
-	 * @param  string  $uri    Redirect URL
-	 * @param  string  $method Refresh or Location
-	 * @param  integer $sec    [description]
-	 * @return mixed
+	 * redirect helper
+	 *
+	 * @param string $uri
+	 * @param string $method
+	 * @param integer $sec
+	 * @param boolean $exit
+	 * @return void
 	 */
-	function redirect($uri = '', $method = NULL, $sec = 0)
+	function redirect($url = '', $method = NULL, $sec = 0, $exit = FALSE)
 	{
 		switch ($method)
 		{
 			case 'refresh':
-				header('Refresh:' .$sec. ';url='. site_url($uri).'');
+				header('Refresh:' .$sec. ';url='. site_url($url).'');
 				break;
 			default:
-				header('Location: '. site_url($uri), TRUE);
+				header('Location: '. site_url($url), TRUE);
 				break;
+		}
+		if($exit)
+		{
+			exit;
 		}
 	}
 }
