@@ -67,7 +67,7 @@ if($flag)
 	} else {
 		echo danger($option . ' already exist.');
 	}
-	$continue = readline('Do you want to continue? [Y/N]');
+	$continue = readline("\nDo you want to continue? [Y/N]: ");
 }
 } while(strtoupper($continue) == 'Y');
 

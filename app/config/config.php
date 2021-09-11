@@ -186,7 +186,7 @@ $config['sess_match_ip']           = TRUE;
 $config['sess_match_fingerprint']  = TRUE;
 $config['sess_time_to_update']     = 300;
 $config['sess_regenerate_destroy'] = TRUE;
-$config['sess_expire_on_close']    = TRUE;
+$config['sess_expire_on_close']    = FALSE;
 
 /*
 |--------------------------------------------------------------------------
@@ -200,10 +200,10 @@ $config['sess_expire_on_close']    = TRUE;
 $config['cookie_prefix']           = '';
 $config['cookie_domain']           = '';
 $config['cookie_path']             = '/';
-$config['cookie_secure']           = FALSE;
+$config['cookie_secure']           = TRUE;
 $config['cookie_expiration']       = 86400;
-$config['cookie_httponly']         = TRUE;
-$config['cookie_samesite']         = 'None';
+$config['cookie_httponly']         = FALSE;
+$config['cookie_samesite']         = 'Lax';
 
 /*
 |--------------------------------------------------------------------------
