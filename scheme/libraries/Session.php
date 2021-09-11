@@ -84,7 +84,6 @@ class Session {
 	    	ini_set('session.gc_maxlifetime', $this->config['sess_expiration']);
 	    }
 
-
 	    if (isset($this->config['cookie_expiration']))
 		{
 	    	$this->config['cookie_expiration'] = (int) $this->config['cookie_expiration'];
@@ -109,7 +108,6 @@ class Session {
 			require_once 'Session/FileSessionHandler.php';
 			$handler = new FileSessionHandler();
 			session_set_save_handler($handler, TRUE);
-			session_start();
 		} elseif ( ! empty($this->config['sess_driver']) AND $this->config['sess_driver'] == 'database' ) {
 			
 		}
@@ -144,6 +142,8 @@ class Session {
 	        	unset($_COOKIE[$this->config['cookie_name']]);
 	      	}
 	    }
+
+		session_start();
 
 		//Set time before session updates
 	    $regenerate_time = (int) $this->config['sess_time_to_update'];

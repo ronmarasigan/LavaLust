@@ -248,7 +248,7 @@ class Email {
 
 		$recipients = implode(',', $this->recipients);
 
-        return mail($recipients, $this->subject, $contents, implode($out, $headers));
+        return mail($recipients, $this->subject, $contents, implode($out, $headers), '-f'.$this->sender);
 	}
 
 }
