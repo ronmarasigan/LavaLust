@@ -71,7 +71,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
                 <li>At least use PHP 7.2</li>
                 <li>MySQL 5 or higher</li>
                 <li>PDO is installed</li>
-                <li>mod_rewrite is enabled</li>
+                <li>enable mod_rewrite(optional but recommended)</li>
             </ul>
         </code>
         <p>This view is located inside: </p>
