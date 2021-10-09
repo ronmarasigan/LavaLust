@@ -159,7 +159,7 @@ class Database {
         $this->table = NULL;
         $this->columns = NULL;
         $this->sql = NULL;
-        $this->bindValues = NULL;
+        $this->bindValues = array();
         $this->limit = NULL;
         $this->orderBy = NULL;
         $this->groupBy = NULL;
