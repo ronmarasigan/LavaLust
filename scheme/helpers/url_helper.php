@@ -38,29 +38,23 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 if ( ! function_exists('redirect'))
 {
 	/**
-	 * redirect helper
+	 * Undocumented function
 	 *
 	 * @param string $uri
-	 * @param string $method
-	 * @param integer $sec
-	 * @param boolean $exit
+	 * @param boolean $permanent
 	 * @return void
 	 */
-	function redirect($url = '', $method = NULL, $sec = 0, $exit = FALSE)
+	function redirect($uri = '', $permanent = false)
 	{
-		switch ($method)
+		if ( ! preg_match('#^(\w+:)?//#i', $uri))
 		{
-			case 'refresh':
-				header('Refresh:' .$sec. ';url='. site_url($url).'');
-				break;
-			default:
-				header('Location: '. site_url($url), TRUE);
-				break;
+			$uri = site_url($uri);
 		}
-		if($exit)
+		if (headers_sent() === false)
 		{
-			exit;
+			header('Location: ' . $uri, true, ($permanent === true) ? 301 : 302);
 		}
+		exit();
 	}
 }
 
@@ -138,15 +132,15 @@ if ( ! function_exists('segment'))
 	/**
 	 * URI Segment
 	 * 
-	 * @param  string $seg	URI Segment
+	 * @param  int $seg	URI Segment
 	 * @return int      	Integer Part
 	 */
 	function segment($seg)
 	{
-		if(!is_int($seg)) return false;
+		if(! is_int($seg)) return false;
 		
 		$parts = explode('/', $_SERVER['REQUEST_URI']);
-	    return isset($parts[$seg]) ? $parts[$seg] : false;
+	    return isset($parts[$seg]) ? html_escape($parts[$seg]) : false;
 	}
 }
 
