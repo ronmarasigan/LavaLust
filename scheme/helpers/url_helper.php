@@ -38,7 +38,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 if ( ! function_exists('redirect'))
 {
 	/**
-	 * Undocumented function
+	 * Handle redirection function using header()
 	 *
 	 * @param string $uri
 	 * @param boolean $permanent
