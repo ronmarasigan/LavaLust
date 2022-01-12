@@ -127,10 +127,10 @@ if ( ! function_exists('show_error'))
 	 * @param  string $error_code
 	 * @return string
 	 */
-	function show_error($heading = NULL, $message = NULL, $template = 'error_general', $error_code = 500)
+	function show_error($template = 'error_general', $error_code = 500)
 	{
 	  	$errors =& load_class('Errors', 'kernel');
-	  	return $errors->show_error($heading, $message, $template, $error_code);
+	  	return $errors->show_error($template, $error_code);
 	}
 }
 
