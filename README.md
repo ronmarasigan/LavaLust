@@ -1,6 +1,6 @@
 ## LavaLust Version 2.1
 
-    This is the first version to fixed compatibility issues in PHP 8.1. Please download the latest release if you want to develop your application using the latest version of PHP.
+    This is the first version to fixed compatibility issues in PHP 8.1. Please download the latest release if you want to develop your application using the latest version of PHP..
 
 ### Overview of Changes in Version 2
 
