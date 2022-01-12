@@ -29,9 +29,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  *
  * @package LavaLust
  * @author Ronald M. Marasigan <ronald.marasigan@yahoo.com>
- * @copyright Copyright 2020 (https://techron.info)
+ * @copyright Copyright 2020 (https://ronmarasigan.github.io)
  * @since Version 1
- * @link https://lavalust.com
+ * @link https://lavalust.pinoywap.org
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
@@ -39,7 +39,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
   * FileSessionHandler
   */
 class FileSessionHandler extends Session implements SessionHandlerInterface {
-    private $save_path, $data, $file_path;
+    private $save_path, $file_path;
 
     public function __construct()
     {
@@ -49,19 +49,19 @@ class FileSessionHandler extends Session implements SessionHandlerInterface {
         } else {
             $this->save_path = rtrim(ini_get('session.save_path'), '/\\');
         }
+
     }
 
     /**
      * Open
      *
      * @param string $save_path
-     * @param string $name
+     * @param string $session_name
      * @return void
      */
-  	#[\ReturnTypeWillChange]
-    public function open($save_path, $name) {
+    public function open($save_path, $session_name): bool {
         $this->save_path = $save_path;
-        $this->file_path = $this->save_path.DIRECTORY_SEPARATOR.$name . '_';
+        $this->file_path = $this->save_path.DIRECTORY_SEPARATOR.$session_name . '_';
         if ( !is_dir($this->save_path) ) {
             mkdir($this->save_path, 0700, TRUE);
         }
@@ -73,21 +73,19 @@ class FileSessionHandler extends Session implements SessionHandlerInterface {
      *
      * @return void
      */
-  	#[\ReturnTypeWillChange]
-    public function close() {
+    public function close(): bool {
         return true;
     }
 
     /**
      * Read
      *
-     * @param string $id
+     * @param string $session_id
      * @return void
      */
-    #[\ReturnTypeWillChange]
-    public function read($id) {
+    public function read($session_id): string {
         $this->data = false;
-        $filename = $this->file_path.$id;
+        $filename = $this->file_path.$session_id;
         if ( file_exists($filename) ) $this->data = @file_get_contents($filename);
         if ( $this->data === false ) $this->data = '';
 
@@ -97,16 +95,15 @@ class FileSessionHandler extends Session implements SessionHandlerInterface {
     /**
      * Write
      *
-     * @param string $id
-     * @param string $data
+     * @param string $session_id
+     * @param string $session_data
      * @return void
      */
-  	#[\ReturnTypeWillChange]
-    public function write($id, $data) {
-        $filename = $this->file_path.$id;
+    public function write($session_id, $session_data): bool {
+        $filename = $this->file_path.$session_id;
 
-        if ( $data !== $this->data ) {
-            return @file_put_contents($filename, $data, LOCK_EX) === false ? false : true;
+        if ( $session_data !== $this->data ) {
+            return @file_put_contents($filename, $session_data, LOCK_EX) === false ? false : true;
         }
         else return @touch($filename);
     }
@@ -114,12 +111,11 @@ class FileSessionHandler extends Session implements SessionHandlerInterface {
     /**
      * Destroy
      * 
-     * @param  string $id
+     * @param  string $session_id
      * @return bool
      */
-  	#[\ReturnTypeWillChange]
-    public function destroy($id) {
-        $filename = $this->file_path . $id;
+    public function destroy($session_id): bool {
+        $filename = $this->file_path . $session_id;
         if ( file_exists($filename) ) @unlink($filename);
 
         return true;
@@ -131,8 +127,7 @@ class FileSessionHandler extends Session implements SessionHandlerInterface {
      * @param  int $maxlifetime
      * @return bool
      */
-    #[\ReturnTypeWillChange]
-    public function gc($maxlifetime) {
+    public function gc($maxlifetime): bool {
         foreach ( glob("$this->file_path*") as $filename ) {
             if ( filemtime($filename) + $maxlifetime < time() && file_exists($filename) ) {
                 @unlink($filename);
