@@ -39,32 +39,30 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
   * FileSessionHandler
   */
 class FileSessionHandler extends Session implements SessionHandlerInterface {
-    private $savePath, $data, $file_path;
+    private $save_path, $data, $file_path;
 
     public function __construct()
     {
         if (!empty(config_item('sess_save_path'))) {
-            $this->savePath = rtrim(config_item('sess_save_path'), '/\\');
-            ini_set('session.save_path', $this->savePath);
+            $this->save_path = rtrim(config_item('sess_save_path'), '/\\');
+            ini_set('session.save_path', $this->save_path);
         } else {
-            $this->savePath = rtrim(ini_get('session.save_path'), '/\\');
+            $this->save_path = rtrim(ini_get('session.save_path'), '/\\');
         }
-
     }
 
     /**
      * Open
      *
-     * @param string $savePath
-     * @param string $sessionName
+     * @param string $save_path
+     * @param string $name
      * @return void
      */
-    #[\ReturnTypeWillChange]
-    public function open($savePath, $sessionName) {
-        $this->savePath = $savePath;
-        $this->file_path = $this->savePath.DIRECTORY_SEPARATOR.$sessionName . '_';
-        if ( !is_dir($this->savePath) ) {
-            mkdir($this->savePath, 0700, TRUE);
+    public function open($save_path, $name): bool {
+        $this->save_path = $save_path;
+        $this->file_path = $this->save_path.DIRECTORY_SEPARATOR.$name . '_';
+        if ( !is_dir($this->save_path) ) {
+            mkdir($this->save_path, 0700, TRUE);
         }
         return true;
     }
@@ -74,8 +72,7 @@ class FileSessionHandler extends Session implements SessionHandlerInterface {
      *
      * @return void
      */
-    #[\ReturnTypeWillChange]
-    public function close() {
+    public function close(): bool {
         return true;
     }
 
@@ -86,7 +83,7 @@ class FileSessionHandler extends Session implements SessionHandlerInterface {
      * @return void
      */
     #[\ReturnTypeWillChange]
-    public function read($id) {
+    public function read($id): mixed {
         $this->data = false;
         $filename = $this->file_path.$id;
         if ( file_exists($filename) ) $this->data = @file_get_contents($filename);
@@ -102,8 +99,7 @@ class FileSessionHandler extends Session implements SessionHandlerInterface {
      * @param string $data
      * @return void
      */
-    #[\ReturnTypeWillChange]
-    public function write($id, $data) {
+    public function write($id, $data): bool {
         $filename = $this->file_path.$id;
 
         if ( $data !== $this->data ) {
@@ -118,8 +114,7 @@ class FileSessionHandler extends Session implements SessionHandlerInterface {
      * @param  string $id
      * @return bool
      */
-    #[\ReturnTypeWillChange]
-    public function destroy($id) {
+    public function destroy($id): bool {
         $filename = $this->file_path . $id;
         if ( file_exists($filename) ) @unlink($filename);
 
@@ -133,7 +128,7 @@ class FileSessionHandler extends Session implements SessionHandlerInterface {
      * @return bool
      */
     #[\ReturnTypeWillChange]
-    public function gc($maxlifetime) {
+    public function gc($maxlifetime): mixed {
         foreach ( glob("$this->file_path*") as $filename ) {
             if ( filemtime($filename) + $maxlifetime < time() && file_exists($filename) ) {
                 @unlink($filename);
