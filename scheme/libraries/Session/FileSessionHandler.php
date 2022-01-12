@@ -59,6 +59,7 @@ class FileSessionHandler extends Session implements SessionHandlerInterface {
      * @param string $sessionName
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function open($savePath, $sessionName) {
         $this->savePath = $savePath;
         $this->file_path = $this->savePath.DIRECTORY_SEPARATOR.$sessionName . '_';
@@ -73,6 +74,7 @@ class FileSessionHandler extends Session implements SessionHandlerInterface {
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function close() {
         return true;
     }
@@ -83,6 +85,7 @@ class FileSessionHandler extends Session implements SessionHandlerInterface {
      * @param string $id
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function read($id) {
         $this->data = false;
         $filename = $this->file_path.$id;
@@ -99,6 +102,7 @@ class FileSessionHandler extends Session implements SessionHandlerInterface {
      * @param string $data
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function write($id, $data) {
         $filename = $this->file_path.$id;
 
@@ -114,6 +118,7 @@ class FileSessionHandler extends Session implements SessionHandlerInterface {
      * @param  string $id
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function destroy($id) {
         $filename = $this->file_path . $id;
         if ( file_exists($filename) ) @unlink($filename);
@@ -127,6 +132,7 @@ class FileSessionHandler extends Session implements SessionHandlerInterface {
      * @param  int $maxlifetime
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function gc($maxlifetime) {
         foreach ( glob("$this->file_path*") as $filename ) {
             if ( filemtime($filename) + $maxlifetime < time() && file_exists($filename) ) {

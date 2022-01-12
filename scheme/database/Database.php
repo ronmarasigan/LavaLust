@@ -362,7 +362,7 @@ class Database {
     {
         $this->join = (is_null($this->join))
             ? ' ' . $type . 'JOIN' . ' ' . $this->dbprefix.$table_name . ' ON ' . $cond
-            : $this->join . ' ' . $type . 'JOIN' . ' ' . $table_name . ' ON ' . $cond;
+            : $this->join . ' ' . $type . 'JOIN' . ' ' . $this->dbprefix.$table_name . ' ON ' . $cond;
 
         return $this;
     }
