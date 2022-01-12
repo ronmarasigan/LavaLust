@@ -58,7 +58,8 @@ class FileSessionHandler extends Session implements SessionHandlerInterface {
      * @param string $name
      * @return void
      */
-    public function open($save_path, $name): bool {
+  	#[\ReturnTypeWillChange]
+    public function open($save_path, $name) {
         $this->save_path = $save_path;
         $this->file_path = $this->save_path.DIRECTORY_SEPARATOR.$name . '_';
         if ( !is_dir($this->save_path) ) {
@@ -72,7 +73,8 @@ class FileSessionHandler extends Session implements SessionHandlerInterface {
      *
      * @return void
      */
-    public function close(): bool {
+  	#[\ReturnTypeWillChange]
+    public function close() {
         return true;
     }
 
@@ -83,7 +85,7 @@ class FileSessionHandler extends Session implements SessionHandlerInterface {
      * @return void
      */
     #[\ReturnTypeWillChange]
-    public function read($id): mixed {
+    public function read($id) {
         $this->data = false;
         $filename = $this->file_path.$id;
         if ( file_exists($filename) ) $this->data = @file_get_contents($filename);
@@ -99,7 +101,8 @@ class FileSessionHandler extends Session implements SessionHandlerInterface {
      * @param string $data
      * @return void
      */
-    public function write($id, $data): bool {
+  	#[\ReturnTypeWillChange]
+    public function write($id, $data) {
         $filename = $this->file_path.$id;
 
         if ( $data !== $this->data ) {
@@ -114,7 +117,8 @@ class FileSessionHandler extends Session implements SessionHandlerInterface {
      * @param  string $id
      * @return bool
      */
-    public function destroy($id): bool {
+  	#[\ReturnTypeWillChange]
+    public function destroy($id) {
         $filename = $this->file_path . $id;
         if ( file_exists($filename) ) @unlink($filename);
 
@@ -128,7 +132,7 @@ class FileSessionHandler extends Session implements SessionHandlerInterface {
      * @return bool
      */
     #[\ReturnTypeWillChange]
-    public function gc($maxlifetime): mixed {
+    public function gc($maxlifetime) {
         foreach ( glob("$this->file_path*") as $filename ) {
             if ( filemtime($filename) + $maxlifetime < time() && file_exists($filename) ) {
                 @unlink($filename);
