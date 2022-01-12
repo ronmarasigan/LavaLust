@@ -36,11 +36,10 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  */
 
 interface SessionHandlerInterface {
-
-	public function open($save_path, $name);
-	public function close();
-	public function read($session_id);
-	public function write($session_id, $session_data);
-	public function destroy($session_id);
-	public function gc($maxlifetime);
+	public function open(string $save_path, string $session_name): bool;
+	public function close(): bool;
+	public function read(string $session_id): string;
+	public function write(string $session_id, string $session_data): bool;
+	public function destroy(string $session_id): bool;
+	public function gc(int $maxlifetime): bool;
 }
