@@ -1,6 +1,6 @@
 ## LavaLust Version 2.0.5
 
-    This is the continuous development using PHP 7.2 to 7.4+. This is more stable version compare to 2.1 which is only release for PHP 8.1 compatibility. V2.0+ will be the official release of Lavalust until further notice.
+    This is the continuous development using PHP 7.2 to 7.4+. This version is more stable compare to v2.1 which was only released for PHP 8.1 compatibility. V2.0+ will be the official release of Lavalust until further notice.
 
 ### Overview of Changes in Version 2
 
