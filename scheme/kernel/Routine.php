@@ -108,13 +108,13 @@ if ( ! function_exists('show_404'))
 	 * 404 Error Not Found
 	 * @param  string $heading
 	 * @param  string $message
-	 * @param  string $page
+	 * @param  string $template
 	 * @return string
 	 */
-	function show_404($heading = NULL, $message = NULL, $page = NULL)
+	function show_404($heading = '', $message = '', $template = NULL)
 	{
 		$errors =& load_class('Errors', 'kernel');
-		return $errors->show_404($heading, $message, $page);
+		return $errors->show_404($heading, $message, $template);
 	}
 }
 
@@ -124,13 +124,13 @@ if ( ! function_exists('show_error'))
 	 * Show error for debugging
 	 * @param  string $heading
 	 * @param  string $message
-	 * @param  string $error_code
+	 * @param  string $code
 	 * @return string
 	 */
-	function show_error($template = 'error_general', $error_code = 500)
+	function show_error($heading = '', $message = '', $template = 'error_general', $code = 500)
 	{
 	  	$errors =& load_class('Errors', 'kernel');
-	  	return $errors->show_error($template, $error_code);
+	  	return $errors->show_error($template, $code);
 	}
 }
 
