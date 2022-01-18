@@ -37,76 +37,147 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 
 class Upload
 {
-	//vars
+	/**
+	 * LavaLust Instance Object
+	 *
+	 * @var object
+	 */
 	private $LAVA;
 
-	// Default list of allowed file extensions separated by "|"
-	public $default_allowed_files = array('gif', 'jpg', 'jpeg', 'png', 'txt', 'zip', 'rar', 'tar', 'gz', 'mov', 'flv', 'mpg','mpeg', 'mp4', 'wmv', 'avi', 'mp3', 'wav', 'ogg');
-	// List of allowed file extensions
-	public $allowed_files;
+	/**
+	 * Uploaded file from forms
+	 *
+	 * @var array
+	 */
+	protected $file = array();
+	/**
+	 * Default list of allowed file extensions separated by "|"
+	 *
+	 * @var array
+	 */
+	protected $default_allowed_files = array('gif', 'jpg', 'jpeg', 'png', 'txt', 'zip', 'rar', 'tar', 'gz', 'mov', 'flv', 'mpg','mpeg', 'mp4', 'wmv', 'avi', 'mp3', 'wav', 'ogg');
+	/**
+	 * List of allowed file extensions
+	 *
+	 * @var array
+	 */
+	protected $allowed_files = array();
 
 	/**
-	 * Constructor - Initializes and references LAVA
+	 * Upload Directory
+	 *
+	 * @var string
 	 */
-	public function __construct(array $allowed_files = NULL) {
+	protected $dir = '';
+
+	/**
+	 * Max file size
+	 *
+	 * @var integer
+	 */
+	protected $max_size = 1024;
+
+	/**
+	 * Arrays of errors during uploading
+	 *
+	 * @var array
+	 */
+	protected $errors = array();
+	 
+
+	/**
+	 * Upload
+	 *
+	 * @param array $file
+	 */
+	public function __construct($file = array())
+	{
 		// instance
 		$this->LAVA =& lava_instance();
-		if($allowed_files == NULL) {
-			$this->allowed_files = $this->default_allowed_files;
-		} else {
-			$this->allowed_files = $allowed_files;
+		$this->file = $file;
+		$this->allowed_files = $this->default_allowed_files;
+	}
+
+	/**
+	 * Allowed extension. Use default if not set
+	 *
+	 * @param array $ext
+	 * @return void
+	 */
+	public function allowed_extension($ext = array()) {
+		if(is_array($ext)) {
+			$this->allowed_files = $ext;
 		}
+	}
+
+	public function set_dir($dir)
+	{
+		return $this->dir = $dir . '/';
+	}
+
+	public function max_size($size) {
+		return $this->max_size = $size;
+	}
+
+	public function is_image() {
+		if(getimagesize($this->file['tmp_name'])) {
+			return true;
+		}
+		return false;
+	}
+
+	public function errors() {
+		return $this->errors;
 	}
 
 	/**
 	 * Try to Upload the given file returning the filename on success
 	 *
 	 * @param array $file $_FILES array element
-	 * @param string $dir destination directory
 	 * @param boolean $overwrite existing files of the same name?
-	 * @param integer $size maximum size allowed (can also be set in php.ini or server config)
 	 */
-	public function do_upload($file, $dir, $overwrite = FALSE, $size = FALSE)
+	public function do_upload($overwrite = FALSE)
 	{
 		// Invalid upload?
-		if( ! isset($file['tmp_name'], $file['name'], $file['error'], $file['size']) OR $file['error'] != UPLOAD_ERR_OK)
+		if( ! isset($this->file['tmp_name'], $this->file['name'], $this->file['error'], $this->file['size']) OR $this->file['error'] != UPLOAD_ERR_OK)
 		{
-			return FALSE;
+			return $this->errors = array_push($this->errors, 'Invalid file to uplod');
 		}
 
-		// File to large?
-		if($size AND $size > $file['size'])
+		// File too large?
+		if($this->max_size AND $this->max_size > $this->file['size'])
 		{
-			return FALSE;
+			return $this->errors = array_push($this->errors, 'File too large');
 		}
 
 		// Create $basename, $filename, $dirname, & $extension variables
-		extract(pathinfo($file['name']) + array('extension' => ''));
+		extract(pathinfo($this->file['name']) + array('extension' => ''));
 
 		// Make the name file system safe
 		$this->LAVA->call->helper('security');
 		$filename = sanitize_filename($filename);
 
 		// We must have a valid name and file type
-		if(empty($filename) OR empty($extension)) return FALSE;
+		if(empty($filename) OR empty($extension)) {
+			return $this->errors = array_push($this->errors, 'Invalid name or mime type');
+		}
 
 		$extension = strtolower($extension);
 
 		// Don't allow just any file!
-		if( ! $this->allowed_file($extension)) return FALSE;
+		if( ! $this->allowed_file($extension)) {
+			return $this->errors = array_push($this->errors, 'Invalid mime type');
+		}
 
 		// Make sure we can use the destination directory
 		$this->LAVA->call->helper('directory');
-		is_dir_usable($dir);
+		is_dir_usable($this->dir);
 
 		// Create a unique name if we don't want files overwritten
-		$name = $overwrite ? "$filename.$ext" : $this->unique_filename($dir, $filename, $extension);
+		$name = $overwrite ? "$filename.$ext" : $this->unique_filename($this->dir, $filename, $extension);
 
 		// Move the file to the correct location
-		if(move_uploaded_file($file['tmp_name'], $dir . $name))
-		{
-			return $name;
-		}
+		return (move_uploaded_file($this->file['tmp_name'], $this->dir . $name)) ? TRUE : FALSE;
 	}
 
 
@@ -118,7 +189,6 @@ class Upload
 	 */
 	public function allowed_file($ext)
 	{
-		if( ! $this->allowed_files) return TRUE;
 		return in_array($ext, $this->allowed_files);
 	}
 

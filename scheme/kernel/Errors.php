@@ -66,7 +66,7 @@ class Errors
 	 * @param integer $error_lvl_code
 	 * @return void
 	 */
-	public function show_error($template = null, $error_lvl_code = null)
+	public function show_error($heading = '', $message = '', $template = null, $error_lvl_code = null)
 	{
 		$template_path = config_item('error_view_path');
 

@@ -218,18 +218,6 @@ class Security
 	}
 
 	/**
-	 * XSS Filtering
-	 * 
-	 * @param  string $string
-	 * @return string
-	 */
-	public function xss_clean($string)
-	{
-		$escaper =& load_class('Escaper', 'libraries');
-		return $escaper->filter($string);
-	}
-
-	/**
 	 * Sanitize for a file system
 	 * 
 	 * @param  string $name

@@ -1,32 +1,17 @@
-## LavaLust Version 2.0.5
+## LavaLust Version 3
 
-    This is the continuous development using PHP 7.2 to 7.4+. This version is more stable compare to v2.1 which was only released for PHP 8.1 compatibility. V2.0+ will be the official release of Lavalust until further notice.
+    This version will hold the mass updates of the kernel files and built-in libraries of LavaLust Framework. It will also attempt to fix all issues from the its version 2 with PHP 8.1+
 
-### Overview of Changes in Version 2
+### Overview of Changes in Version 3
 
-#### Note: you can still use the framework version 2 the way you use the version 1 before
+#### Note: you can still use the framework version 3 the way you use the version 2 and 1 before
 
-    -> $this->load is now $this->call
-    -> super object get_instance is now lava_instance()
-    ->folder structures but you can still change it to your preferred names and path
-    	* application is now app
-    	* system is now scheme
-    	* assets is now public
-    	* core is now kernel
-    	* benchmark class is now performance. see the changelog.txt for more details
-    	* Constants and mimes file inside config folder was also deleted. We are making the framework as simple and as
-    	light as possible
-    ->cache is now inside runtime folder
-
-### Update Version 1 to Version 2
-
-    1. Backup your files..
-    2. Replace all files and directories in your system/ directory with the files and directories from scheme/ folder of version 2.
-    3. If you are using the constants and mimes that were deleted in version 2, please take note of those things and update your app manually.
+    See the repository brach "dev" to see the difference of version 2 to version 1
+    *** Changelog of v3 against v2 will be posted if the official release of v3.0 was created.
 
 ## What is LavaLust?
 
-    LavaLust is an lightweight Web Framework - (using MVC pattern) - for people who are developing web sites using PHP. It helps
+    LavaLust is a lightweight Web Framework - (using MVC pattern) - for people who are developing web sites using PHP. It helps
     you write code easily using Object-Oriented Approach. It also provides set of libraries for commonly needed tasks, as well as
     a helper functions to minimize the amount of time coding.
 
@@ -43,7 +28,7 @@
 ## Special Thanks/Credits to the following
 
     CodeIgniter (some helpers, libraries and many other things)
-    HTMLPurifier (for XSS filtering)
+    HTMLPurifier (for XSS filtering) - This will be deleted from the default installation soon. So install it separately if you are using version 2 and planning to use it. This will be deleted in version 3 together with the xss_clean function in the security_helper
     Github Comunity / Youtube for all the resouces I read to make this work.
 
 ### Licence

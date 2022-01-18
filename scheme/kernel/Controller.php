@@ -82,15 +82,27 @@ class Loader {
 	 * @param array $data
 	 * @return void
 	 */
-	public function view($viewFile, $data = array())
+	public function view($view_file, $data = NULL)
 	{
-		if(!empty($data))
-			extract($data, EXTR_SKIP);
+		if(! is_null($data)) {
+			//it will hold the data after looping
+			$page_vars = array();
+			if(is_array($data)) {
+				foreach($data as $key => $value) {
+					$page_vars[$key] = $value;
+				}
+			} elseif(is_string($data)) {
+				$page_vars[$data] = $data;
+			} else {
+				throw new Exception('View parameter only accepts array and string types');
+			}
+			extract($page_vars, EXTR_SKIP);
+		}	
 		ob_start();
-		if(file_exists(APP_DIR .'views/' . $viewFile . '.php'))
-			require_once(APP_DIR .'views/' . $viewFile . '.php');
+		if(file_exists(APP_DIR .'views/' . $view_file . '.php'))
+			require_once(APP_DIR .'views/' . $view_file . '.php');
 		else
-			throw new Exception(''.$viewFile.' view file did not exist.');
+			throw new Exception(''.$view_file.' view file did not exist.');
 		echo ob_get_clean();
 	}
 
