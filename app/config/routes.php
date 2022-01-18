@@ -61,5 +61,4 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 |	if you have 'default folder' and '404.php file' inside error folder in view
 */
 $route['404_override']       	= '';
-$route['default_controller'] 	= 'welcome';
 $route['translate_uri_dashes'] 	= FALSE;
