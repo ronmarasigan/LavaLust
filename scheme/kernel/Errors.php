@@ -63,10 +63,10 @@ class Errors
 	 * @param string $heading
 	 * @param string $message
 	 * @param string $template
-	 * @param integer $error_lvl_code
+	 * @param integer code
 	 * @return void
 	 */
-	public function show_error($heading = '', $message = '', $template = null, $error_lvl_code = null)
+	public function show_error($heading = '', $message = '', $template = NULL, $code = 500)
 	{
 		$template_path = config_item('error_view_path');
 
@@ -74,7 +74,7 @@ class Errors
 		{
 			$template_path = APP_DIR.'views/errors'.DIRECTORY_SEPARATOR;
 		}
-		http_response_code($error_lvl_code);
+		http_response_code($code);
 		require_once($template_path.$template.'.php');
 		exit();
 	}

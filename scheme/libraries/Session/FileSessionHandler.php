@@ -57,7 +57,7 @@ class FileSessionHandler extends Session implements SessionHandlerInterface {
      *
      * @param string $save_path
      * @param string $session_name
-     * @return void
+     * @return bool
      */
     public function open($save_path, $session_name): bool {
         $this->save_path = $save_path;
@@ -127,7 +127,7 @@ class FileSessionHandler extends Session implements SessionHandlerInterface {
      * @param  int $maxlifetime
      * @return bool
      */
-    public function gc($maxlifetime): bool {
+    public function gc($maxlifetime): int {
         foreach ( glob("$this->file_path*") as $filename ) {
             if ( filemtime($filename) + $maxlifetime < time() && file_exists($filename) ) {
                 @unlink($filename);
