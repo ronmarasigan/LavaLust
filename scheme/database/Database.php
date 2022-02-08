@@ -52,7 +52,6 @@ class Database {
     private $join = NULL;
     private $where;
     private $grouped = false;
-    private $whereCount = 0;
     private $rowCount = 0;
     private $limit;
     private $orderBy;
@@ -142,7 +141,7 @@ class Database {
         $stmt = $this->db->prepare($this->sql);
         $stmt->execute($this->bindValues);
         if (strpos( strtoupper($this->sql), "INSERT" ) === 0 ) {
-            $this->lastIDInserted = $this->db->lastInsertId();
+            $this->lastIDInserted = (int) $this->db->lastInsertId();
             return $this->lastIDInserted;
         }
         else
@@ -179,8 +178,8 @@ class Database {
     public function delete()
     {
         $this->sql = "DELETE FROM {$this->table}";
-        
-        return $this;
+
+        return $this->exec();
     }
 
     public function update($fields = [])
@@ -199,7 +198,7 @@ class Database {
 
         $this->sql = "UPDATE {$this->table} SET {$set}";
 
-        return $this;
+        return $this->exec();
     }
 
 
@@ -225,7 +224,7 @@ class Database {
  
         $this->sql = "INSERT INTO {$this->table} ({$keys}) VALUES ({$values})";
         
-        return $this;
+        return $this->exec();
     }
 
     /**
@@ -278,9 +277,9 @@ class Database {
      * @param  string $type
      * @return $this
      */
-    public function _max_min_sum_count_avg($column, $alias = null, $type = 'MAX')
+    public function _sql_function($column, $alias = null, $type = 'MAX')
     {
-        if( ! in_array($type, array('MAX', 'MIN', 'SUM', 'COUNT', 'AVG'))) {
+        if( ! in_array($type, array('MAX', 'MIN', 'SUM', 'COUNT', 'AVG', 'DISTINCT'))) {
             throw new RuntimeException('Invalid function type: ' . html_escape($type));
         }
 
@@ -299,7 +298,7 @@ class Database {
      */
     public function select_max($column, $alias = null)
     {
-        return $this->_max_min_sum_count_avg($column, $alias, $type = 'MAX');
+        return $this->_sql_function($column, $alias, $type = 'MAX');
     }
 
     /**
@@ -311,7 +310,7 @@ class Database {
      */
     public function select_min($column, $alias = null)
     {
-        return $this->_max_min_sum_count_avg($column, $alias, $type = 'MIN');
+        return $this->_sql_function($column, $alias, $type = 'MIN');
     }
 
     /**
@@ -323,7 +322,7 @@ class Database {
      */
     public function select_sum($column, $alias = null)
     {
-        return $this->_max_min_sum_count_avg($column, $alias, $type = 'SUM');
+        return $this->_sql_function($column, $alias, $type = 'SUM');
     }
 
     /**
@@ -335,7 +334,7 @@ class Database {
      */
     public function select_count($column, $alias = null)
     {
-        return $this->_max_min_sum_count_avg($column, $alias, $type = 'COUNT');
+        return $this->_sql_function($column, $alias, $type = 'COUNT');
     }
 
     /**
@@ -347,7 +346,19 @@ class Database {
      */
     public function select_avg($column, $alias = null)
     {
-        return $this->_max_min_sum_count_avg($column, $alias, $type = 'AVG');
+        return $this->_sql_function($column, $alias, $type = 'AVG');
+    }
+
+    /**
+     * select distinct
+     *
+     * @param string $column
+     * @param string $alias
+     * @return void
+     */
+    public function select_distinct($column, $alias = null)
+    {
+        return $this->_sql_function($column, $alias, $type = 'DISTINCT');
     }
 
     /**

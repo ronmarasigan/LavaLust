@@ -55,12 +55,12 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 |				    to the table name when using the  Query Builder class
 */
 
-$database['driver']		= '';
-$database['hostname']	= '';
-$database['port']		= '';
-$database['username']	= '';
+$database['driver']		= 'mysql';
+$database['hostname']	= 'localhost';
+$database['port']		= '3306';
+$database['username']	= 'root';
 $database['password']	= '';
-$database['database']	= '';
-$database['charset']	= '';
+$database['database']	= 'dummy';
+$database['charset']	= 'utf8';
 $database['dbprefix']	= '';
 ?>

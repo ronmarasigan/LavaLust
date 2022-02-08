@@ -108,13 +108,13 @@ if ( ! function_exists('show_404'))
 	 * 404 Error Not Found
 	 * @param  string $heading
 	 * @param  string $message
-	 * @param  string $page
+	 * @param  string $template
 	 * @return string
 	 */
-	function show_404($heading = NULL, $message = NULL, $page = NULL)
+	function show_404($heading = NULL, $message = NULL, $template = NULL)
 	{
 		$errors =& load_class('Errors', 'kernel');
-		return $errors->show_404($heading, $message, $page);
+		return $errors->show_404($heading, $message, $template);
 	}
 }
 
