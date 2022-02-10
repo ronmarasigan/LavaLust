@@ -11,30 +11,41 @@
    variable.)
    $this->call->database();
    _ This will enable $this->db variable to handle queries.
-   $this->call->database('other_connection');
-   _ This will open new connection based on the parameter "other_connection". You will
+   $this->call->database('other*connection');
+   * This will open new connection based on the parameter "other_connection". You will
    need to create new index in database array named "other_connection" inside database.php
    file. It will enable $this->other_connection to handle queries.
 3. Inside view fie, if you pass $data variable from controller, you can easily use the array key of
-it inside the view.
-    Example: Controller
+   it inside the view.
+   Example: Controller
+
+```php
         function index() {
             $this->call->model('user_model');
             $data['users] = $this->user_model->get_all_users();
             $this->call->view('user_view_file', $data);
         }
+```
+
         Inside view file you can extract values of $data['users] by just using its key "users"
         Example: View
+
+```php
             foreach($users as $user) {
-   echo $user['some_index'];
-   }
-   Moreover, you can also pass a plain string to view file.
-   Example:
-   function index() {
-   $this->call->model('user_model');
-   $data = "This is a string.";
-   $this->call->view('user_view_file', $data);
-   }
+                echo $user['some_index'];
+            }
+```
+
+        Moreover, you can also pass a plain string to view file.
+        Example: Controller
+
+```php function index() {
+                $this->call->model('user_model');
+                $data = "This is a string.";
+                $this->call->view('user_view_file', $data);
+            }
+```
+
 4. Updating new methods in Database Class and Form Form_validation
 
 ### Overview of Changes in Version 3
