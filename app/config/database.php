@@ -55,12 +55,15 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 |				    to the table name when using the  Query Builder class
 */
 
-$database['driver']		= '';
-$database['hostname']	= '';
-$database['port']		= '';
-$database['username']	= '';
-$database['password']	= '';
-$database['database']	= '';
-$database['charset']	= '';
-$database['dbprefix']	= '';
+$database['main'] = array(
+    'driver'	=> '',
+    'hostname'	=> '',
+    'port'		=> '',
+    'username'	=> '',
+    'password'	=> '',
+    'database'	=> '',
+    'charset'	=> '',
+    'dbprefix'	=> '',
+);
+
 ?>

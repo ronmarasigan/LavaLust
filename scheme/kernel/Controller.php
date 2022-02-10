@@ -142,7 +142,7 @@ class Loader {
 	 * @param array $params
 	 * @return void
 	 */
-	public function library($classes, $params = array())
+	public function library($classes, $params = NULL)
 	{
 		$LAVA = Controller::instance();
 		if(is_array($classes))
@@ -151,15 +151,11 @@ class Loader {
 			{
 				if($class == 'database') {
 					$database =& load_class('database', 'database');
-					$LAVA->db = $database::instance();
+					$LAVA->db = $database::instance(NULL);
 				}
-				$LAVA->$class =& load_class($class, 'libraries', $params);
+				$LAVA->$class =& load_class($class, 'libraries');
 			}
 		} else {
-			if($classes == 'database') {
-				$database =& load_class('database', 'database');
-				$LAVA->db = $database::instance();
-			}
 			$LAVA->$classes =& load_class($classes, 'libraries', $params);
 		}
 	}
@@ -169,11 +165,15 @@ class Loader {
 	 *
 	 * @return void
 	 */
-	public function database()
+	public function database($dbname = NULL)
 	{
 		$LAVA =& Controller::instance();
-		$database =& load_class('database','database');
-		$LAVA->db = $database::instance();
+		$database =& load_class('database','database', $dbname);
+		if(is_null($dbname)) {
+			$LAVA->db = $database::instance(NULL);
+		} else {			
+			$LAVA->{$dbname} = $database::instance($dbname);
+		}
 	}
 }
 

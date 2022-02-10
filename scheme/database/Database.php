@@ -62,9 +62,17 @@ class Database {
     private $operators = array('=', '!=', '<', '>', '<=', '>=', '<>');
 
 
-    public function __construct()
+    public function __construct($dbname = NULL)
     {
-        $database_config = database_config();
+        if(is_null($dbname)) {
+            $database_config = database_config()['main'];
+        } else {
+            if(isset(database_config()[$dbname])) {
+                $database_config = database_config()[$dbname];
+            } else {
+                throw new PDOException('No active configuration for this database.');
+            }
+        }
         $this->dbprefix = $database_config['dbprefix'];
         $this->driver = $database_config['driver'];
         $this->charset = $database_config['charset'];
@@ -95,11 +103,9 @@ class Database {
      * 
      * @return instance
      */
-    public static function instance()
+    public static function instance($dbname)
     {
-        if (!self::$instance) {
-            self::$instance = new Database();
-        }
+        self::$instance = new Database($dbname);
         return self::$instance;
     }
 
