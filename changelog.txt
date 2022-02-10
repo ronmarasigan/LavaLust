@@ -2,32 +2,31 @@ LavaLust Version 3
 
 # Changelog
 
-## Scheme Folder changes
-1. Remove xss_clean() using htmlpurifier class. If you want to use it, install the class then
+1. Remove xss_clean() using Escaper class. If you want to use it, install htmlpurifier library then
 create a function "xss_clean" inside a helper.
-2. In version 3, you can use different instance of database connection. Changes also affectfa-spin
-the database.php file inside the config folder. (You can't autoload database if you are planning
-to use multiple connection.)
+2. You can now use different instances of database connections. Changes also affect
+the database.php file inside the config folder. (Every instances depends on the key of database array
+variable.)
     $this->call->database();
         * This will enable $this->db variable to handle queries.
     $this->call->database('other_connection');
         * This will open new connection based on the parameter "other_connection". You will
         need to create new index in database array named "other_connection" inside database.php
-        file.
-3. Inside view fie, if you pass $data variable from controller, you can easily use the array key of the
+        file. It will enable $this->other_connection to handle queries.
+3. Inside view fie, if you pass $data variable from controller, you can easily use the array key of
 it inside the view.
-    Example:
+    Example: Controller
         function index() {
             $this->call->model('user_model');
             $data['users] = $this->user_model->get_all_users();
             $this->call->view('user_view_file', $data);
         }
-        inside view file you can extract values of $data['users] by just using its key "users"
-        Example:
+        Inside view file you can extract values of $data['users] by just using its key "users"
+        Example: View
             foreach($users as $user) {
                 echo $user['some_index'];
             }
-        More over, you can also pass a plain string to view file.
+        Moreover, you can also pass a plain string to view file.
         Example:
             function index() {
             $this->call->model('user_model');
