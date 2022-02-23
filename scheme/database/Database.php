@@ -61,28 +61,27 @@ class Database {
     private $transactionCount = 0;
     private $operators = array('=', '!=', '<', '>', '<=', '>=', '<>');
 
-
     public function __construct($dbname = NULL)
     {
         if(is_null($dbname)) {
-            $database_config = database_config()['main'];
+            $database_config =& database_config()['main'];
         } else {
             if(isset(database_config()[$dbname])) {
-                $database_config = database_config()[$dbname];
+                $database_config =& database_config()[$dbname];
             } else {
                 throw new PDOException('No active configuration for this database.');
             }
         }
         $this->dbprefix = $database_config['dbprefix'];
-        $this->driver = $database_config['driver'];
-        $this->charset = $database_config['charset'];
-        $this->dbost = $database_config['hostname'];
-        $this->port = $database_config['port'];
-        $this->dbname = $database_config['database'];
-        $this->dbuser = $database_config['username'];
-        $this->dbpass = $database_config['password'];
+        $driver = $database_config['driver'];
+        $charset = $database_config['charset'];
+        $dbost = $database_config['hostname'];
+        $port = $database_config['port'];
+        $dbname = $database_config['database'];
+        $dbuser = $database_config['username'];
+        $dbpass = $database_config['password'];
         
-        $this->dsn = ''.$this->driver.':host=' . $this->dbost . ';dbname=' . $this->dbname . ';charset=' . $this->charset . ';port=' . $this->port;
+        $dsn = ''.$driver.':host=' . $dbost . ';dbname=' . $dbname . ';charset=' . $charset . ';port=' . $port;
 
         $options = array(
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
@@ -91,8 +90,8 @@ class Database {
         );
 
         try {
-            $this->db = new PDO($this->dsn, $this->dbuser, $this->dbpass, $options);
-            $database_config = NULL;
+            $this->db = new PDO($dsn, $dbuser, $dbpass, $options);
+            $this->database_config = NULL;
         } catch (Exception $e) {
             throw new PDOException($e->getMessage());
         }

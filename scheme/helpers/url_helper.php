@@ -102,7 +102,7 @@ if ( ! function_exists('site_url'))
 	 */
 	function site_url($url = '') 
 	{
-		return strpos($_SERVER['REQUEST_URI'], 'index.php') ? BASE_URL . 'index.php/' . $url : BASE_URL . $url;
+		return ! empty(config_item('index_page')) ? BASE_URL . config_item('index_page').'/' . $url : BASE_URL . $url;
 	}
 }
 

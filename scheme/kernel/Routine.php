@@ -111,7 +111,7 @@ if ( ! function_exists('show_404'))
 	 * @param  string $template
 	 * @return string
 	 */
-	function show_404($heading = NULL, $message = NULL, $template = NULL)
+	function show_404($heading = '', $message = '', $template = '')
 	{
 		$errors =& load_class('Errors', 'kernel');
 		return $errors->show_404($heading, $message, $template);

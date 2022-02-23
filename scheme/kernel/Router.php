@@ -88,7 +88,7 @@ class Router
 	public function __construct() {
 
 		//Routes
-		$this->route = route_config();
+		$this->route =& route_config();
 	}
 
 	/**

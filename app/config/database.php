@@ -53,6 +53,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 |	['charset']		The default character set
 |   ['dbprefix']    You can add an optional prefix, which will be added
 |				    to the table name when using the  Query Builder class
+|   You can create new instance of the database by adding new element of
+|   $database variable.
+|   Example: $database['another_example'] = array('key' => 'value')
 */
 
 $database['main'] = array(

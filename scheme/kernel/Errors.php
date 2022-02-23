@@ -49,11 +49,11 @@ class Errors
 	 * @param string $page
 	 * @return void
 	 */
-	public function show_404($heading, $message, $template = NULL)
+	public function show_404($heading, $message, $template)
 	{
-		$template = isset($ptemplateage) ? $template : 'error_404';
-		$heading = isset($heading) ? $heading : '404 Page Not Found';
-		$message = isset($message) ? $message : 'The page you requested was not found.';
+		$template = ! empty($template) ? $template : 'error_404';
+		$heading =  ! empty($heading) ? $heading : '404 Page Not Found';
+		$message =  ! empty($message) ? $message : 'The page you requested was not found.';
 		$this->show_error($heading, $message, $template, 404);
 	}
 
@@ -66,14 +66,14 @@ class Errors
 	 * @param integer code
 	 * @return void
 	 */
-	public function show_error($heading = '', $message = '', $template = NULL, $code = 500)
+	public function show_error($heading, $message, $template, $code = 500)
 	{
 		$template_path = config_item('error_view_path');
-
 		if (empty($template_path))
 		{
 			$template_path = APP_DIR.'views/errors'.DIRECTORY_SEPARATOR;
 		}
+
 		http_response_code($code);
 		require_once($template_path.$template.'.php');
 		exit();

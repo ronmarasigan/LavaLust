@@ -49,7 +49,7 @@ if( ! function_exists('filter_var'))
 		switch(strtolower($type))
 		{
 			case 'string':
-				return filter_var($var, FILTER_SANITIZE_STRING);
+				return filter_var($var, FILTER_UNSAFE_RAW);
 				break;
 			case 'int':
 			case 'integer':
@@ -65,7 +65,7 @@ if( ! function_exists('filter_var'))
 				return filter_var($var, FILTER_SANITIZE_EMAIL);
 				break;
 			default:
-				return filter_var($var, FILTER_SANITIZE_STRING);
+				return filter_var($var, FILTER_UNSAFE_RAW);
 		}
 	}
 }
@@ -81,6 +81,45 @@ if ( ! function_exists('sanitize_filename'))
 	function sanitize_filename($filename)
 	{
 		return lava_instance()->security->sanitize_filename($filename);
+	}
+}
+
+if( ! function_exists('csrf_field'))
+{
+	function csrf_field() {
+		/**
+		 * LavaLust Super Object
+		 */
+		$LAVA =& lava_instance();
+
+		if (FALSE !== ($noise = random_bytes(1)))
+            {
+                list(, $noise) = unpack('c', $noise);
+            }
+            else
+            {
+                $noise = mt_rand(-128, 127);
+            }
+
+            $prepend = $append = '';
+            if ($noise < 0)
+            {
+                $prepend = str_repeat(" ", abs($noise));
+            }
+            elseif ($noise > 0)
+            {
+                $append  = str_repeat(" ", $noise);
+            }
+            
+            $form = sprintf(
+                '%s<input type="hidden" name="%s" value="%s" />%s%s',
+                $prepend,
+                $LAVA->security->get_csrf_token_name(),
+                $LAVA->security->get_csrf_hash(),
+                $append,
+                "\n"
+            );
+		return $form;
 	}
 }
 ?>
