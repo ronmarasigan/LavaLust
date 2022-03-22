@@ -6,9 +6,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 <head>
     <meta charset="utf-8">
     <title>Welcome to LavaLust</title>
+    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
     <style type="text/css">
         html {
-            height: 100%;
             margin: 20px;
         }
 

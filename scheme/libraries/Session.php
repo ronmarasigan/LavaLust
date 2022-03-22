@@ -158,12 +158,12 @@ class Session {
 		        $this->sess_regenerate((bool) $this->config['sess_regenerate_destroy']);
 	      }
 	    } elseif (isset($_COOKIE[$this->config['cookie_name']]) AND $_COOKIE[$this->config['cookie_name']] === $this->session_id()){
-			
+			//Check for expiration time
+			$expiration = empty($this->config['cookie_expiration']) ? 0 : time() + $this->config['cookie_expiration'];
+
 			//check for PHP Version later than 7.3.0
 			if (PHP_VERSION_ID < 70300)
 			{
-				//Check for expiration time
-				$expiration = empty($this->config['cookie_expiration']) ? 0 : time() + $this->config['cookie_expiration'];
 				setcookie(
 					$this->config['cookie_name'],
 					$this->session_id(),
@@ -175,15 +175,15 @@ class Session {
 				);
 			} else {
 				setcookie(
-						$this->config['cookie_name'],
-						$this->session_id(),
-						array('samesite' => $this->config['cookie_samesite'],
-						'secure'   => $this->config['cookie_secure'],
-						'expires'  => $expiration,
-						'path'     => $this->config['cookie_path'],
-						'domain'   => $this->config['cookie_domain'],
-						'httponly' => $this->config['cookie_httponly'],
-						)
+					$this->config['cookie_name'],
+					$this->session_id(),
+					array('samesite' => $this->config['cookie_samesite'],
+					'secure'   => $this->config['cookie_secure'],
+					'expires'  => $expiration,
+					'path'     => $this->config['cookie_path'],
+					'domain'   => $this->config['cookie_domain'],
+					'httponly' => $this->config['cookie_httponly'],
+					)
 				);
 			}
 	    }

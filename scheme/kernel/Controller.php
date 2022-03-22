@@ -65,11 +65,18 @@ class Loader {
 				}	
 			}	
 		} else {
+			$sub_dir = '';
+			if(strpos($class, '/')) {
+				$model = explode('/', $class);
+				$class = end($model);
+				array_pop($model);
+				$sub_dir = '/' . implode('/', $model);
+			}
 			if(! is_null($object_name))
 			{
-				$LAVA->$object_name =& load_class($class, 'models', NULL, $object_name);
+				$LAVA->$object_name =& load_class($class, 'models' . $sub_dir, NULL, $object_name);
 			} else {
-				$LAVA->$class =& load_class($class, 'models');
+				$LAVA->$class =& load_class($class, 'models' . $sub_dir);
 			}
 		}
 			
@@ -78,7 +85,7 @@ class Loader {
 	/**
 	 * Load View File
 	 *
-	 * @param [type] $viewFile
+	 * @param string $viewFile
 	 * @param array $data
 	 * @return void
 	 */
@@ -87,29 +94,45 @@ class Loader {
 		if(! is_null($data)) {
 			//it will hold the data after looping
 			$page_vars = array();
-			if(is_array($data)) {
-				foreach($data as $key => $value) {
+			if(is_array($data))
+			{
+				foreach($data as $key => $value)
+				{
 					$page_vars[$key] = $value;
 				}
-			} elseif(is_string($data)) {
+			} elseif(is_string($data))
+			{
 				$page_vars[$data] = $data;
 			} else {
 				throw new Exception('View parameter only accepts array and string types');
 			}
 			extract($page_vars, EXTR_SKIP);
-		}	
+		}
 		ob_start();
-		if(file_exists(APP_DIR .'views/' . $view_file . '.php'))
-			require_once(APP_DIR .'views/' . $view_file . '.php');
-		else
-			throw new Exception(''.$view_file.' view file did not exist.');
+		$view = APP_DIR .'views' . DIRECTORY_SEPARATOR . $view_file;
+		if(strpos($view_file, '.') === false)
+		{
+			if(file_exists($view . '.php'))
+			{
+				require_once($view. '.php');
+			} else {
+				throw new Exception(''.$view_file.' view file did not exist.');
+			}		
+		} else {
+			if(file_exists($view))
+			{
+				require_once($view);
+			} else {
+				throw new Exception(''.$view_file.' view file did not exist.');
+			}
+		}
 		echo ob_get_clean();
 	}
 
 	/**
 	 * Load Helper
 	 *
-	 * @param [type] $helper
+	 * @param mixed $helper
 	 * @return void
 	 */
 	public function helper($helper)
@@ -138,7 +161,7 @@ class Loader {
 	/**
 	 * Load Library
 	 *
-	 * @param [type] $classes
+	 * @param mixed $classes
 	 * @param array $params
 	 * @return void
 	 */
@@ -163,6 +186,7 @@ class Loader {
 	/**
 	 * Load Database
 	 *
+	 * @param mixed $dbname
 	 * @return void
 	 */
 	public function database($dbname = NULL)
@@ -186,7 +210,7 @@ class Controller extends Loader
 	public $call, $var;
 	
 	/**
-	 * Class constructor
+	 * Constructor
 	 */
 	public function __construct()
 	{
