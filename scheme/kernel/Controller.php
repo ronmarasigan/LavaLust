@@ -40,6 +40,33 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  */
 class Loader {
 	/**
+	 * Hold class name
+	 *
+	 * @var mixed
+	 */
+	private $class;
+
+	/**
+	 * Hold the sub directory of the class
+	 *
+	 * @var string
+	 */
+	private $sub_dir;
+	/**
+	 * Get Subdirectories
+	 *
+	 * @return void
+	 */
+	private function get_sub_dir($url) {
+		if(strpos($url, '/')) {
+			$model = explode('/', $url);
+			$this->class = end($model);
+			array_pop($model);
+			$this->sub_dir = '/' . implode('/', $model);
+		}
+	}
+
+	/**
 	 * @param mixed $class
 	 * @param null $object_name
 	 * 
@@ -57,26 +84,21 @@ class Loader {
 		{
 			foreach($class as $key => $value)
 			{
+				$this->get_sub_dir($value);
 				if(! is_int($key))
 				{
-					$LAVA->$key =& load_class($value, 'models', NULL, $key);
+					$LAVA->$key =& load_class($this->class, 'models' . $this->sub_dir, NULL, $key);
 				} else {
-					$LAVA->$value =& load_class($value, 'models', NULL, $value);
+					$LAVA->{$this->class} =& load_class($this->class, 'models' . $this->sub_dir, NULL, $this->class);
 				}	
 			}	
-		} else {
-			$sub_dir = '';
-			if(strpos($class, '/')) {
-				$model = explode('/', $class);
-				$class = end($model);
-				array_pop($model);
-				$sub_dir = '/' . implode('/', $model);
-			}
+		} else {	
+			$this->get_sub_dir($class);
 			if(! is_null($object_name))
 			{
-				$LAVA->$object_name =& load_class($class, 'models' . $sub_dir, NULL, $object_name);
+				$LAVA->$object_name =& load_class($this->class, 'models' . $this->sub_dir, NULL, $object_name);
 			} else {
-				$LAVA->$class =& load_class($class, 'models' . $sub_dir);
+				$LAVA->{$this->class} =& load_class($this->class, 'models' . $this->sub_dir);
 			}
 		}
 			
