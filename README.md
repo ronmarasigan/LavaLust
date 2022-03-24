@@ -49,15 +49,15 @@
 4. In models, you dont't need to add exec() method in insert(), update() and delete() because Lavalust
         automatically added it for you.
     Example: model
-        ```php
+```php
             $this->db->insert($bind);
-        ```
+```
 5. You can now use put models inside sub directories.
     Example: model/sub_dir/Sample_model.php
-        ```php
-            $thi->call->model('sub_dir/sample');
+```php
+            $this->call->model('sub_dir/sample');
             $this->sample->method();
-        ```
+```
 
 ### Overview of Changes in Version 3
 
