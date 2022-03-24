@@ -33,7 +33,14 @@ it inside the view.
             $data = "This is a string.";
             $this->call->view('user_view_file', $data);
         }
-4. Updating new methods in Database Class and Form Form_validation
+4. In models, you dont't need to add exec() method in insert(), update() and delete() because Lavalust
+        automatically added it for you.
+    Example: model
+            $this->db->insert($bind)
+5. You can now use put models inside sub directories.
+    Example: model/sub_dir/Sample_model.php
+            $thi->call->model('sub_dir/sample');
+            $this->sample->method();
 # Todo
 ## Clean the scheme folder files.
 

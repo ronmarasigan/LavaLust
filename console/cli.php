@@ -1,5 +1,4 @@
 #!/usr/bin/php -q
-
 <?php
 (PHP_SAPI !== 'cli' || isset($_SERVER['HTTP_USER_AGENT'])) && die('cli only');
 //Constant 
@@ -16,9 +15,7 @@ Type M => Model
 Type C => Controller
 ------------------------------------------------------------
 ';
-
 $option = strtoupper(readline('File: '));
-
 switch ($option)
 {
 	case 'M':
@@ -35,18 +32,14 @@ switch ($option)
 		echo "\n";
 		break;
 }
-$content = "
-<?php
+$content = "<?php
 defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 
 class {class} extends {extends} {
-	public function index() {
-		
-	}
+	
 }
 ?>
 ";
-
 if($flag)
 {
 	$class = ucfirst(readline('Enter ' . $option . ' name: '));
