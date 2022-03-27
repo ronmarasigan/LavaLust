@@ -51,7 +51,7 @@ class Loader {
 	 *
 	 * @var string
 	 */
-	private $sub_dir;
+	private $sub_dir = '';
 	/**
 	 * Get Subdirectories
 	 *
@@ -63,6 +63,8 @@ class Loader {
 			$this->class = end($model);
 			array_pop($model);
 			$this->sub_dir = '/' . implode('/', $model);
+		} else {
+			$this->class = $url;
 		}
 	}
 
