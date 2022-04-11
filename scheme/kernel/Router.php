@@ -100,8 +100,23 @@ class Router
 	 */
 	public function remap_url($url, $route)
     {
+		$http_verb = isset($_SERVER['REQUEST_METHOD']) ? strtolower($_SERVER['REQUEST_METHOD']) : '';
+
         foreach($route as $pattern => $replacement)
         {
+			$replacement = $replacement;
+			if (is_array($replacement))
+			{
+				$replacement = array_change_key_case($replacement, CASE_LOWER);
+				
+				if (isset($replacement[$http_verb]))
+				{
+					$replacement = $replacement[$http_verb];
+				} else {
+					continue;
+				}
+			}
+
             $pattern = str_replace(':any', '(.+)', $pattern);
             $pattern = str_replace(':num', '(\d+)', $pattern);
             $pattern = '/' . str_replace('/', '\/', $pattern) . '/i';
@@ -113,7 +128,7 @@ class Router
     }
 
     /**
-     * URL Parsing using $_SERVER['REQUEST_URI']
+     * URL Parsing using $_SERVER['SCRIPT_NAME']
      * 
      * @return string
      */

@@ -39,15 +39,67 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * Class Email
  */
 class Email {
+	/**
+	 * Sender Email
+	 *
+	 * @var string
+	 */
+	private $sender;
 
-	public $sender;
-	public $recipients = array();
-	public $reply_to;
-	public $subject;
-	public $attach_files = array();
-	public $emailContent;
-	public $emailType;
+	/**
+	 * Sender Name if needed
+	 *
+	 * @var string
+	 */
+	public $sender_name = '';
 
+	/**
+	 * Receipient Emails
+	 *
+	 * @var array
+	 */
+	private $recipients = array();
+
+	/**
+	 * Specified Email to receive replies
+	 *
+	 * @var string
+	 */
+	private $reply_to;
+
+	/**
+	 * Email Subject
+	 *
+	 * @var string
+	 */
+	private $subject;
+
+	/**
+	 * Email Attachement
+	 *
+	 * @var array
+	 */
+	private $attach_files = array();
+
+	/**
+	 * Email Content
+	 *
+	 * @var string
+	 */
+	private $emailContent;
+
+	/**
+	 * Email type
+	 * Default: plain
+	 * Other value: html
+	 *
+	 * @var [type]
+	 */
+	private $emailType;
+
+	/**
+	 * Class constructor
+	 */
 	public function __construct() {
 
 	}
@@ -55,11 +107,22 @@ class Email {
 	 * Check if email is in correct format
 	 * 
 	 * @param  string  $email Email to check
-	 * @return boolean        [description]
+	 * @return boolean
 	 */
 	public function valid_email($email)
 	{
-		return (bool) filter_var($email, FILTER_VALIDATE_EMAIL);
+		$email = filter_var($email,FILTER_SANITIZE_EMAIL);
+		if(filter_var($email, FILTER_VALIDATE_EMAIL))
+		{
+			return true;
+		} else {
+			throw new Exception('Invalid email address');
+		}
+	}
+
+	public function filter_string($string)
+	{
+		return filter_var($string, FILTER_UNSAFE_RAW, FILTER_FLAG_STRIP_HIGH);
 	}
 
 	/**
@@ -68,14 +131,17 @@ class Email {
 	 * @param string $sender Email of the sender
 	 * @return string Validated email
 	 */
-	public function sender($sender)
+	public function sender($sender_email, $display_name = '')
 	{
-		if( ! empty($sender) && $this->valid_email($sender) )
+		if( ! empty($sender_email) && $this->valid_email($sender_email) )
 		{
-			$this->sender = $sender;
+			$this->sender = $sender_email;
+			
+			if(! is_null($display_name))
+			{
+				$this->sender_name = $this->filter_string($display_name);
+			}
 			return $this->sender;
-		} else {
-			throw new Exception("Invalid email address");	
 		}
 	}
 
@@ -93,8 +159,6 @@ class Email {
 			{
 				$this->recipients[] = $recipient;
 			}
-		} else {
-			throw new Exception("Invalid email address");	
 		}
 	}
 
@@ -110,8 +174,6 @@ class Email {
 		{
 			$this->reply_to = $reply_to;
 			return $this->reply_to;
-		} else {
-			throw new Exception("Invalid email address");	
 		}
 	}
 
@@ -125,7 +187,7 @@ class Email {
 	{
 		if( ! empty($subject) )
 		{
-			$this->subject = $subject;
+			$this->subject = $this->filter_string($subject);
 			return $this->subject;
 		} else {
 			throw new Exception("Email subject is empty");	
@@ -147,7 +209,7 @@ class Email {
 	/**
 	 * Email Attachment
 	 * 
-	 * @param [type] $attach_file [description]
+	 * @param string $attach_file Email Attachment
 	 * @return array Email Attachments
 	 */
 	public function attachment($attach_file)
@@ -216,7 +278,9 @@ class Email {
         $headers[] = 'X-Mailer: PHP/'.phpversion();
         $headers[] = 'Content-Type: multipart/related;boundary='.$bm;
         $headers[] = 'Content-Transfer-Encoding: base64';
-        $headers[] = 'From: '.$this->sender;
+        $headers[] = 'From: '.$this->sender_name.' <'.$this->sender.'>';
+		$headers[] = 'Return-Path: '.$this->sender_name.' <'.$this->sender.'>';
+      	$headers[] = 'X-Priority: 3';
 
         if(trim($this->reply_to) !== '') {
             $headers[] = 'Reply-To: '.$this->reply_to;

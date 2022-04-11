@@ -58,6 +58,12 @@
             $this->call->model('sub_dir/sample');
             $this->sample->method();
 ```
+6. You can now use http verb in routes. Just add the type of request after the route
+    Example: 
+```php
+    $route['delete/:num']['delete'] = 'welcome/delete/$1';
+```
+    See docs for more info.
 
 ### Overview of Changes in Version 3
 
