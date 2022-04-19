@@ -57,7 +57,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 | LavaLust Version
 | -------------------------------------------------------------------
 */
-$config['VERSION']                 = '3.0.0 Beta 3';
+$config['VERSION']                 = '3.0.0 Beta 4';
 
 /*
 | -------------------------------------------------------------------
@@ -99,7 +99,7 @@ $config['index_page'] = 'index.php';
 |--------------------------------------------------------------------------
 |
 | Enabling this setting will tell LavaLust to look for a Composer
-| package auto-loader script in application/vendor/autoload.php.
+| package auto-loader script in app/vendor/autoload.php.
 |
 |	$config['composer_autoload'] = TRUE;
 |
@@ -111,7 +111,7 @@ $config['index_page'] = 'index.php';
 | For more information about Composer, please visit http://getcomposer.org/
 |
 | Note: This will NOT disable or override the LavaLust-specific
-|	autoloading (application/config/autoload.php)
+|	autoloading (app/config/autoload.php)
 */
 $config['composer_autoload']        = FALSE;
 
@@ -164,7 +164,7 @@ $config['default_method'] 			= 'index';
 | Error Views Directory Path
 |--------------------------------------------------------------------------
 |
-| application/views/errors/ directory.  Use a full server path with trailing slash.
+| app/views/errors/ directory.  Use a full server path with trailing slash.
 |
 */
 $config['error_view_path']         	= APP_DIR . 'views' . DIRECTORY_SEPARATOR . 'errors' . DIRECTORY_SEPARATOR;

@@ -49,41 +49,105 @@ class Upload
 	 *
 	 * @var array
 	 */
-	protected $file = array();
+	public $file = array();
+	
 	/**
-	 * Default list of allowed file extensions separated by "|"
+	 * File extension
+	 *
+	 * @var string
+	 */
+	private $extension;
+
+	/**
+	 * File size
+	 *
+	 * @var int
+	 */
+	private $file_size;
+
+	/**
+	 * Default list of allowed file extensions
 	 *
 	 * @var array
 	 */
-	protected $default_allowed_files = array('gif', 'jpg', 'jpeg', 'png', 'txt', 'zip', 'rar', 'tar', 'gz', 'mov', 'flv', 'mpg','mpeg', 'mp4', 'wmv', 'avi', 'mp3', 'wav', 'ogg');
+	private $default_allowed_extensions = array('gif', 'jpg', 'jpeg', 'png');
+
+	/**
+	 * Default list of allowed file mimes
+	 *
+	 * @var array
+	 */
+	private $default_allowed_mimes = array('image/gif', 'image/jpg', 'image/jpeg', 'image/png');
+	
 	/**
 	 * List of allowed file extensions
 	 *
 	 * @var array
 	 */
-	protected $allowed_files = array();
+	private $allowed_extensions = array();
+
+	/**
+	 * List of allowed file mimes
+	 *
+	 * @var array
+	 */
+	private $allowed_mimes = array();
 
 	/**
 	 * Upload Directory
 	 *
 	 * @var string
 	 */
-	protected $dir = '';
+	private $dir = '';
 
 	/**
-	 * Max file size
+	 * Max file size (MB)
 	 *
-	 * @var integer
+	 * @var int
 	 */
-	protected $max_size = 1024;
+	private $max_size;
+	
+	/**
+	 * Min file size (MB)
+	 *
+	 * @var int
+	 */
+	private $min_size;
 
 	/**
 	 * Arrays of errors during uploading
 	 *
 	 * @var array
 	 */
-	protected $errors = array();
-	 
+	private $upload_errors = array();
+	
+	/**
+	 * Filename
+	 *
+	 * @var string
+	 */
+	private $filename;
+
+	/**
+	 * check if image
+	 *
+	 * @var bool
+	 */
+	private $is_image = FALSE;
+
+	/**
+	 * Check if encrypted
+	 *
+	 * @var boolean
+	 */
+	public $encrypted = FALSE;
+
+	/**
+	 * Check mime type
+	 *
+	 * @var string
+	 */
+	public $mime;
 
 	/**
 	 * Upload
@@ -92,10 +156,14 @@ class Upload
 	 */
 	public function __construct($file = array())
 	{
-		// instance
+		// Instance
 		$this->LAVA =& lava_instance();
+		//Uploaded file
 		$this->file = $file;
-		$this->allowed_files = $this->default_allowed_files;
+		// Allowed extensions
+		$this->allowed_extensions = $this->default_allowed_extensions;
+		// Allowed mimes
+		$this->allowed_mimes = $this->default_allowed_mimes;
 	}
 
 	/**
@@ -104,30 +172,84 @@ class Upload
 	 * @param array $ext
 	 * @return void
 	 */
-	public function allowed_extension($ext = array()) {
-		if(is_array($ext)) {
-			$this->allowed_files = $ext;
+	public function allowed_extensions($ext = array())
+	{
+		if(is_array($ext))
+		{
+			$this->allowed_extensions = $ext;
 		}
+		return $this;
 	}
 
+	/**
+	 * Allowed mime type
+	 *
+	 * @param array $mime
+	 * @return void
+	 */
+	public function allowed_mimes($mimes = array())
+	{
+		if(is_array($mimes))
+		{
+			$this->allowed_mimes = $mimes;
+		}
+		return $this;
+	}
+
+	/**
+	 * Setting directory
+	 *
+	 * @param string $dir
+	 * @return void
+	 */
 	public function set_dir($dir)
 	{
-		return $this->dir = $dir . '/';
+		$this->dir = $dir . '/';
+		return $this;
 	}
 
-	public function max_size($size) {
-		return $this->max_size = $size;
+	/**
+	 * Maximum size
+	 *
+	 * @param int $size
+	 * @return void
+	 */
+	public function max_size($size)
+	{
+		$this->max_size = $size * pow(1024, 2);
+		return $this;
 	}
 
-	public function is_image() {
-		if(getimagesize($this->file['tmp_name'])) {
-			return true;
-		}
-		return false;
+	/**
+	 * Minimum size
+	 *
+	 * @param int $size
+	 * @return void
+	 */
+	public function min_size($size)
+	{
+		$this->min_size = $size * pow(1024, 2);
+		return $this;
 	}
 
-	public function errors() {
-		return $this->errors;
+	/**
+	 * Check if file is image
+	 *
+	 * @return boolean
+	 */
+	public function is_image()
+	{
+		$this->is_image = TRUE;
+		return $this;
+	}
+
+	/**
+	 * Upload errors
+	 *
+	 * @return void
+	 */
+	public function get_errors() {
+		return $this->upload_errors;
 	}
 
 	/**
@@ -136,48 +258,95 @@ class Upload
 	 * @param array $file $_FILES array element
 	 * @param boolean $overwrite existing files of the same name?
 	 */
-	public function do_upload($overwrite = FALSE)
+	public function do_upload($overwrite = FALSE, $no_extension = FALSE)
 	{
 		// Invalid upload?
 		if( ! isset($this->file['tmp_name'], $this->file['name'], $this->file['error'], $this->file['size']) OR $this->file['error'] != UPLOAD_ERR_OK)
 		{
-			return $this->errors = array_push($this->errors, 'Invalid file to uplod');
+			array_push($this->upload_errors, 'No file selected');
+		}
+
+		// Check if file is image
+		if($this->is_image)
+		{
+			if(! getimagesize($this->file['tmp_name']))
+			{
+				array_push($this->upload_errors, 'File is not an image.');
+			}
 		}
 
 		// File too large?
-		if($this->max_size AND $this->max_size > $this->file['size'])
+		if(isset($this->max_size) && $this->file['size'] > $this->max_size)
 		{
-			return $this->errors = array_push($this->errors, 'File too large');
+			array_push($this->upload_errors, 'File size too large.');
+		}
+
+		// File too small?
+		if(isset($this->min_size) && $this->file['size'] < $this->min_size)
+		{
+			array_push($this->upload_errors, 'File size too small.');
 		}
 
 		// Create $basename, $filename, $dirname, & $extension variables
-		extract(pathinfo($this->file['name']) + array('extension' => ''));
+		$file_info = pathinfo($this->file['name']);
 
 		// Make the name file system safe
 		$this->LAVA->call->helper('security');
-		$filename = sanitize_filename($filename);
+		$filename = sanitize_filename($file_info['filename']);
 
-		// We must have a valid name and file type
-		if(empty($filename) OR empty($extension)) {
-			return $this->errors = array_push($this->errors, 'Invalid name or mime type');
+		// Get file extension
+		$this->extension = strtolower($file_info['extension']);
+
+		// Don't allow just any file extension!
+		if( ! $this->allowed_extension($this->extension))
+		{
+			array_push($this->upload_errors, 'Invalid file extension.');
 		}
 
-		$extension = strtolower($extension);
+		// Get mime type
+		$this->mime = mime_content_type($this->file['tmp_name']);
 
-		// Don't allow just any file!
-		if( ! $this->allowed_file($extension)) {
-			return $this->errors = array_push($this->errors, 'Invalid mime type');
+		// Don't allow just any file mime!
+		if( ! $this->allowed_mime($this->mime))
+		{
+			array_push($this->upload_errors, 'Invalid file mime.');
 		}
 
 		// Make sure we can use the destination directory
 		$this->LAVA->call->helper('directory');
-		is_dir_usable($this->dir);
+		if(! is_dir_usable($this->dir))
+		{
+			array_push($this->upload_errors, 'Directory is not usable.');
+		}
 
-		// Create a unique name if we don't want files overwritten
-		$name = $overwrite ? "$filename.$ext" : $this->unique_filename($this->dir, $filename, $extension);
-
-		// Move the file to the correct location
-		return (move_uploaded_file($this->file['tmp_name'], $this->dir . $name)) ? TRUE : FALSE;
+		// Create a unique name if we don't want files overwritten	
+		if($overwrite)
+		{
+			$this->filename = $no_extension ? $filename : $filename.'.'.$this->extension;
+		}
+		else
+		{
+			if($this->encrypted)
+			{
+				$filename = sha1($filename . "-" . rand(10000, 99999) . "-" . time());
+				$this->filename = $no_extension ? $filename : sha1($filename . "-" . rand(10000, 99999) . "-" . time()).'.'.$this->extension;
+			}
+			else
+			{
+				$this->filename = $this->unique_filename($this->dir, $filename, $no_extension ? NULL : $this->extension);
+			}
+		}
+		
+		if(empty($this->upload_errors))
+		{
+			// Move the file to the correct location
+			return (move_uploaded_file($this->file['tmp_name'], $this->dir . $this->filename)) ? TRUE : FALSE;
+		}
+		else
+		{
+			return FALSE;
+		}
+		
 	}
 
 
@@ -187,11 +356,21 @@ class Upload
 	 * @param string $ext of the file
 	 * @return boolean
 	 */
-	public function allowed_file($ext)
+	private function allowed_extension($ext)
 	{
-		return in_array($ext, $this->allowed_files);
+		return in_array($ext, $this->allowed_extensions);
 	}
 
+	/**
+	 * Is file mime allowed
+	 *
+	 * @param string $mime
+	 * @return boolean
+	 */
+	public function allowed_mime($mime)
+	{
+		return in_array($mime, $this->allowed_mimes);
+	}
 
 	/**
 	 * Create a unique filename by appending a number to the end of the file
@@ -205,11 +384,57 @@ class Upload
 	{
 		// We start at null so a number isn't added unless needed
 		$x = NULL;
-		while(file_exists("$dir$file$x.$ext"))
+
+		// Check if no extension is required
+		$ext = is_null($ext) ? NULL : ".$ext";
+
+		while(file_exists("$dir$file$x$ext"))
 		{
 			$x++;
 		}
-		return "$file$x.$ext";
+		return "$file$x$ext";
+	}
+
+	/**
+	 * Get filename
+	 *
+	 * @return void
+	 */
+	public function get_filename()
+	{
+		return $this->filename;
+	}
+
+	/**
+	 * File extension
+	 *
+	 * @return void
+	 */
+	public function get_extension()
+	{
+		return $this->extension;
+	}
+
+	/**
+	 * Get file size
+	 *
+	 * @return void
+	 */
+	public function get_size()
+	{
+		return ($this->file_size);
+	}
+
+	/**
+	 * Encrypt filename
+	 *
+	 * @param string $filename
+	 * @return void
+	 */
+	public function encrypt_name()
+	{
+		$this->encrypted = TRUE;
+		return $this;
 	}
 
 }

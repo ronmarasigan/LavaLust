@@ -93,7 +93,7 @@ class Email {
 	 * Default: plain
 	 * Other value: html
 	 *
-	 * @var [type]
+	 * @var string
 	 */
 	private $emailType;
 

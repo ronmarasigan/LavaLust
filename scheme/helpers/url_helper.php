@@ -106,6 +106,19 @@ if ( ! function_exists('site_url'))
 	}
 }
 
+if ( ! function_exists('base_url'))
+{
+	/**
+	 * Base URL
+	 *
+	 * @return void
+	 */
+	function base_url() 
+	{
+		return  filter_var(BASE_URL, FILTER_SANITIZE_URL);
+	}
+}
+
 if ( ! function_exists('active'))
 {
 	/**
@@ -114,15 +127,28 @@ if ( ! function_exists('active'))
 	 * @param string $currect_page
 	 * @return void
 	 */
-	function active($currect_page){
-	$url_array =  explode('/', $_SERVER['REQUEST_URI']) ;
-		if(count($url_array) > 1)
-			$url = $url_array[1];
+	function active($currect_page, $css_class = 'active')
+	{
+		// Explode REQUEST_URI
+		$uri_array =  explode('/', $_SERVER['REQUEST_URI']);
+		// Explode the BASE_URL
+		$url_array = explode('/', trim(preg_replace('(^https?://)', '', BASE_URL), '/'));
+		// Find the installation folder index base on $url_array
+		$folder_index = array_search(end($url_array), array_values($uri_array));
+		// Check if index_page is not empty in config file
+		if(! empty(config_item('index_page')))
+		{
+			// +2 to the installation folder index to get the index of controller and the rest of the segments if index_page is not empty
+			$url = implode('/', array_slice($uri_array, $folder_index + 2));
+		}
 		else
-			$url = $url_array[0];
-		
-		if($currect_page == $url){
-			echo 'active';
+		{
+			// +1 to the installation folder index to get the index of controller and the rest of the segments if index_page is not empty
+			$url = implode('/', array_slice($uri_array, $folder_index + 1));
+		}
+		if($currect_page == $url)
+		{
+			echo $css_class;
 		}
 	}
 }
@@ -133,13 +159,11 @@ if ( ! function_exists('segment'))
 	 * URI Segment
 	 * 
 	 * @param  int $seg	URI Segment
-	 * @return int      	Integer Part
+	 * @return int
 	 */
 	function segment($seg)
 	{
-		if(! is_int($seg)) return false;
-		
-		$parts = explode('/', $_SERVER['REQUEST_URI']);
+		$parts = is_int($seg) ? explode('/', $_SERVER['REQUEST_URI']) : FALSE;
 	    return isset($parts[$seg]) ? $parts[$seg] : false;
 	}
 }
