@@ -10,8 +10,8 @@
    the database.php file inside the config folder. (Every instances depends on the key of database array
    variable.)
    $this->call->database();
-   _ This will enable $this->db variable to handle queries.
-   $this->call->database('other*connection');
+   This will enable $this->db variable to handle queries.
+   $this->call->database('other_connection');
    * This will open new connection based on the parameter "other_connection". You will
    need to create new index in database array named "other_connection" inside database.php
    file. It will enable $this->other_connection to handle queries.
