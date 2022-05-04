@@ -39,17 +39,18 @@ if ( ! function_exists('lang'))
 {
 	/**
 	 * Use to translate text on you app in different languages
-	 * 
-	 * @param  string  $key    key value from your language file
-	 * @param  array   $params optional parameters
-	 * @return string
+	 *
+	 * @param string $key
+	 * @param array $params
+	 * @param boolean $escape
+	 * @return void
 	 */
-	function lang($key, $params = array(), $xss = FALSE)
+	function lang($key, $params = array(), $escape = FALSE)
 	{
 		$translated = lava_instance()->lang->translate($key, $params);
 
-		if($xss == TRUE)
-			return lava_instance()->security->xss_clean($translated);
+		if($escape == TRUE)
+			return html_escape($translated);
 		else
 			return $translated;
 	}
