@@ -156,7 +156,7 @@ class Session {
 	        	$_SESSION['last_session_regenerate'] = time();
 	    	} elseif ( $_SESSION['last_session_regenerate'] < (time() - $regenerate_time) ) {
 		        $this->sess_regenerate((bool) $this->config['sess_regenerate_destroy']);
-	      }
+	      	}
 	    } elseif (isset($_COOKIE[$this->config['cookie_name']]) AND $_COOKIE[$this->config['cookie_name']] === $this->session_id()){
 			//Check for expiration time
 			$expiration = empty($this->config['cookie_expiration']) ? 0 : time() + $this->config['cookie_expiration'];
@@ -296,6 +296,17 @@ class Session {
 		$_SESSION['__lava_vars'][$key] = 'new';
 		return TRUE;
 	}
+
+	/**
+	 * Keep flash data
+	 *
+	 * @param mixed $key
+	 * @return void
+	 */
+	public function keep_flashdata($key)
+	{
+		$this->mark_as_flash($key);
+	}
    	
    	/**
    	 * Return Session ID
@@ -306,10 +317,11 @@ class Session {
 		$seed = str_split('abcdefghijklmnopqrstuvwxyz0123456789');
         $rand_id = '';
         shuffle($seed);
-        foreach (array_rand($seed, 32) as $k) { // sessions ids are 32 chars in length.
+        foreach (array_rand($seed, 32) as $k)
+		{
             $rand_id .= $seed[$k];
         }
-           return $rand_id; 
+        return $rand_id; 
 	}
 
 	/**
@@ -320,11 +332,14 @@ class Session {
 	 */
 	public function has_userdata($key = null)
 	{
-		if(!is_null($key)) {
+		if(! is_null($key))
+		{
 			if(isset($_SESSION[$key]))
-				return true;
+			{
+				return TRUE;
+			}	
 		}
-		return false;
+		return FALSE;
 	}
 	
 	/**
@@ -332,7 +347,7 @@ class Session {
 	 * 
 	 * @param array $keys array of Sessions
 	 */
-	public function set_userdata($keys = array())
+	public function set_userdata($keys, $value = NULL)
 	{
 		if(is_array($keys))
 		{
@@ -340,6 +355,8 @@ class Session {
 			{
 				$_SESSION[$key] = $val;
 			}
+		} else {
+			$_SESSION[$keys] = $value;
 		}
 	}
 	
@@ -349,14 +366,72 @@ class Session {
 	 * @param  array  $keys Array of Sessions
 	 * @return function
 	 */
-	public function unset_userdata($keys = array())
+	public function unset_userdata($keys)
 	{
 		if(is_array($keys))
 		{
-			foreach ($keys as $key) {
+			foreach ($keys as $key)
+			{
 				if($this->has_userdata($key))
+				{
 					unset($_SESSION[$key]);
+				}
 			}
+		} else {
+			if($this->has_userdata($keys))
+			{
+				unset($_SESSION[$keys]);
+			}
+		}
+	}
+
+	/**
+	 * Get Flash Keys
+	 *
+	 * @return void
+	 */
+	public function get_flash_keys()
+	{
+		if ( ! isset($_SESSION['__lava_vars']))
+		{
+			return array();
+		}
+
+		$keys = array();
+		foreach (array_keys($_SESSION['__lava_vars']) as $key)
+		{
+			is_int($_SESSION['__lava_vars'][$key]) OR $keys[] = $key;
+		}
+
+		return $keys;
+	}
+	
+	/**
+	 * Unmark Flash keys
+	 *
+	 * @param mixed $key
+	 * @return void
+	 */
+	public function unmark_flash($key)
+	{
+		if (empty($_SESSION['__ci_vars']))
+		{
+			return;
+		}
+
+		is_array($key) OR $key = array($key);
+
+		foreach ($key as $k)
+		{
+			if (isset($_SESSION['__ci_vars'][$k]) && ! is_int($_SESSION['__ci_vars'][$k]))
+			{
+				unset($_SESSION['__ci_vars'][$k]);
+			}
+		}
+
+		if (empty($_SESSION['__ci_vars']))
+		{
+			unset($_SESSION['__ci_vars']);
 		}
 	}
 	
@@ -366,9 +441,31 @@ class Session {
    	 * @param  array $key Session Keys
    	 * @return string      Session Data
    	 */
-	public function userdata($key)
+	public function userdata($key = NULL)
 	{
-	  return isset($_SESSION[$key]) ? $_SESSION[$key] : null;
+		if(isset($key))
+		{
+			return isset($_SESSION[$key]) ? $_SESSION[$key] : NULL;
+		}
+		elseif (empty($_SESSION))
+		{
+			return array();
+		}
+		$userdata = array();
+		$_exclude = array_merge(
+			array('__lava_vars'),
+			$this->get_flash_keys(),
+		);
+
+		foreach (array_keys($_SESSION) as $key)
+		{
+			if ( ! in_array($key, $_exclude, TRUE))
+			{
+				$userdata[$key] = $_SESSION[$key];
+			}
+		}
+
+		return $userdata;
 	}
 	
 	/**
