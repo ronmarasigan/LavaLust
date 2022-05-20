@@ -185,14 +185,16 @@ $config['language'] 				= 'en-US';
 | Session                     
 |--------------------------------------------------------------------------
 |
-|Settings for sessions
+| Settings for sessions
+| $config['sess_save_path'] will get the session save path form php.ini
+| if empty.
 |
 |--------------------------------------------------------------------------
 */
 $config['sess_driver']             = 'file';
 $config['sess_cookie_name']        = 'LLSession';
 $config['sess_expiration']         = 7200;
-$config['sess_save_path']          = ''; //absolute path
+$config['sess_save_path']          = '';
 $config['sess_match_ip']           = TRUE;
 $config['sess_match_fingerprint']  = TRUE;
 $config['sess_time_to_update']     = 300;
@@ -221,7 +223,11 @@ $config['cookie_samesite']         = 'None';
 | Cache                      
 |--------------------------------------------------------------------------
 |
-|Settings for Cache
+| Settings for Cache
+| Set your cache directory and cache expiration time here
+| Default:
+|   $config['cache_dir'] = 'runtime/cache/';
+|   $config['cache_default_expires'] = 0;
 |
 |--------------------------------------------------------------------------
 */
