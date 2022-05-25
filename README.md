@@ -4,7 +4,7 @@
 
 ## Documentation
 
-    [LavaLust Documentation](https://lavalust.netlify.app)
+[LavaLust Documentation Link](https://lavalust.netlify.app)
 
 ## Changelog
 
