@@ -6,7 +6,7 @@
 
 ## LavaLust Version 3
 <p>
-    This version will hold the mass updates of the kernel files and built-in libraries of LavaLust Framework. It will also attempt to fix all issues from the its version 2 with PHP 8.1+
+    This version will hold the mass updates of the kernel files and built-in libraries of LavaLust Framework. It is now compatible with PHP 8.1+
 </p>
 
 ## Documentation
