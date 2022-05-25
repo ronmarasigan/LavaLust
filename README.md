@@ -2,6 +2,10 @@
 
     This version will hold the mass updates of the kernel files and built-in libraries of LavaLust Framework. It will also attempt to fix all issues from the its version 2 with PHP 8.1+
 
+## Documentation
+
+    [LavaLust Documentation](https://lavalust.netlify.app)
+
 ## Changelog
 
 1. Remove xss_clean() using Escaper class. If you want to use it, install htmlpurifier library then
