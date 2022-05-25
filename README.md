@@ -8,6 +8,7 @@
 <p>
     This version will hold the mass updates of the kernel files and built-in libraries of LavaLust Framework. It will also attempt to fix all issues from the its version 2 with PHP 8.1+
 </p>
+
 ## Documentation
 
 [LavaLust Documentation Link](https://lavalust.netlify.app)
@@ -84,6 +85,7 @@
     CodeIgniter
     Github Comunity / Youtube for all the resouces I read to make this work.
 </p>
+
 ### Licence
 <p>
     MIT License
