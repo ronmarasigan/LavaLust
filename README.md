@@ -1,14 +1,10 @@
 ## LavaLust Framework
 <p align="center">
-    <img width="250" height="280" src="https://raw.githubusercontent.com/ronmarasigan/LavaLust-Docs/master/assets/images/logo1.png">
+    <img width="200" height="280" src="https://raw.githubusercontent.com/ronmarasigan/LavaLust-Docs/master/assets/images/logo1.png">
 </p>
-    LavaLust is a lightweight Web Framework - (using MVC pattern) - for people who are developing web sites using PHP. It helps
-    you write code easily using Object-Oriented Approach. It also provides set of libraries for commonly needed tasks, as well as
-    a helper functions to minimize the amount of time coding.
-
-    LavaLust is somehow similar to CodeIgniter 3 structure and call to commonly used functions but way different when it comes to
-    class construction. This is very simple and ultimately light. The main purpose of this is to teach the basics of OOP and how
-    it will work with MVC. You will see in the documentation the similarities I am pertaining to.
+    LavaLust is a lightweight Web Framework - (using MVC pattern) - for people who are developing web sites using PHP. It helps you write code easily using Object-Oriented Approach. It also provides set of libraries for commonly needed tasks, as well as a helper functions to minimize the amount of time coding.
+    
+    LavaLust is somehow similar to CodeIgniter 3 structure and call to commonly used functions but way different when it comes to class construction. This is very simple and ultimately light. The main purpose of this is to teach the basics of OOP and how it will work with MVC. You will see in the documentation the similarities I am pertaining to.
 
 ## LavaLust Version 3
 
