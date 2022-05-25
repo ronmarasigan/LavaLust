@@ -5,9 +5,9 @@
     LavaLust is a lightweight Web Framework - (using MVC pattern) - for people who are developing web sites using PHP. It helps you write code easily using Object-Oriented Approach. It also provides set of libraries for commonly needed tasks, as well as a helper functions to minimize the amount of time coding.
 
 ## LavaLust Version 3
-
+<p>
     This version will hold the mass updates of the kernel files and built-in libraries of LavaLust Framework. It will also attempt to fix all issues from the its version 2 with PHP 8.1+
-
+</p>
 ## Documentation
 
 [LavaLust Documentation Link](https://lavalust.netlify.app)
@@ -80,12 +80,12 @@
 [Checkout LavaLust Tutorial's Youtube Channel](https://youtube.com/ronmarasigan)
 
 ### Special Thanks / Credits to the following
-
+<p>
     CodeIgniter
     Github Comunity / Youtube for all the resouces I read to make this work.
-
+</p>
 ### Licence
-
+<p>
     MIT License
 
     Copyright (c) 2020 Ronald M. Marasigan
@@ -107,3 +107,4 @@
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
+</p>
