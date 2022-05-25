@@ -81,10 +81,10 @@
 [Checkout LavaLust Tutorial's Youtube Channel](https://youtube.com/ronmarasigan)
 
 ### Special Thanks / Credits to the following
-<p>
+
     CodeIgniter
     Github Comunity / Youtube for all the resouces I read to make this work.
-</p>
+
 
 ### Licence
 <p>
