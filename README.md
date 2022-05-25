@@ -1,3 +1,15 @@
+## LavaLust Framework
+<p align="center">
+    ![alt text](https://github.com/ronmarasigan/LavaLust-Docs/tree/master/assets/images/logo.png?raw=true)
+</p>
+    LavaLust is a lightweight Web Framework - (using MVC pattern) - for people who are developing web sites using PHP. It helps
+    you write code easily using Object-Oriented Approach. It also provides set of libraries for commonly needed tasks, as well as
+    a helper functions to minimize the amount of time coding.
+
+    LavaLust is somehow similar to CodeIgniter 3 structure and call to commonly used functions but way different when it comes to
+    class construction. This is very simple and ultimately light. The main purpose of this is to teach the basics of OOP and how
+    it will work with MVC. You will see in the documentation the similarities I am pertaining to.
+
 ## LavaLust Version 3
 
     This version will hold the mass updates of the kernel files and built-in libraries of LavaLust Framework. It will also attempt to fix all issues from the its version 2 with PHP 8.1+
@@ -76,21 +88,9 @@
     See the repository brach "dev" to see the difference of version 2 to version 1
     *** Changelog of v3 against v2 will be posted if the official release of v3.0 was created.
 
-## What is LavaLust?
-
-    LavaLust is a lightweight Web Framework - (using MVC pattern) - for people who are developing web sites using PHP. It helps
-    you write code easily using Object-Oriented Approach. It also provides set of libraries for commonly needed tasks, as well as
-    a helper functions to minimize the amount of time coding.
-
-    LavaLust is somehow similar to CodeIgniter 3 structure and call to commonly used functions but way different when it comes to
-    class construction. This is very simple and ultimately light. The main purpose of this is to teach the basics of OOP and how
-    it will work with MVC. You will see in the documentation the similarities I am pertaining to.
-
 ## Installation and Tutorials
 
-[Github Page](https://ronmarasigan.github.io)
-
-[Youtube Channel](https://youtube.com/ronmarasigan)
+[Checkout LavaLust Tutorial's Youtube Channel](https://youtube.com/ronmarasigan)
 
 ## Special Thanks/Credits to the following
 
