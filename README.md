@@ -3,8 +3,6 @@
     <img width="200" height="280" src="https://raw.githubusercontent.com/ronmarasigan/LavaLust-Docs/master/assets/images/logo1.png">
 </p>
     LavaLust is a lightweight Web Framework - (using MVC pattern) - for people who are developing web sites using PHP. It helps you write code easily using Object-Oriented Approach. It also provides set of libraries for commonly needed tasks, as well as a helper functions to minimize the amount of time coding.
-    
-    LavaLust is somehow similar to CodeIgniter 3 structure and call to commonly used functions but way different when it comes to class construction. This is very simple and ultimately light. The main purpose of this is to teach the basics of OOP and how it will work with MVC. You will see in the documentation the similarities I am pertaining to.
 
 ## LavaLust Version 3
 
@@ -14,7 +12,7 @@
 
 [LavaLust Documentation Link](https://lavalust.netlify.app)
 
-## Changelog
+## Changelogs of Version 3
 
 1. Remove xss_clean() using Escaper class. If you want to use it, install htmlpurifier library then
    create a function "xss_clean" inside a helper.
@@ -77,18 +75,11 @@
 ```
     See docs for more info.
 
-### Overview of Changes in Version 3
-
-#### Note: you can still use the framework version 3 the way you use the version 2 and 1 before
-
-    See the repository brach "dev" to see the difference of version 2 to version 1
-    *** Changelog of v3 against v2 will be posted if the official release of v3.0 was created.
-
 ## Installation and Tutorials
 
 [Checkout LavaLust Tutorial's Youtube Channel](https://youtube.com/ronmarasigan)
 
-## Special Thanks/Credits to the following
+### Special Thanks / Credits to the following
 
     CodeIgniter
     Github Comunity / Youtube for all the resouces I read to make this work.
