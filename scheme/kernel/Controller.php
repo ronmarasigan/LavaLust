@@ -52,6 +52,15 @@ class Loader {
 	 * @var string
 	 */
 	private $sub_dir = '';
+    
+    /**
+     * Class constructor
+     * Load all autoloaders
+     */
+    public function __construct()
+    {
+        $this->_autoloader();
+    }
 	/**
 	 * Get Subdirectories
 	 *
@@ -223,12 +232,31 @@ class Loader {
 			$LAVA->{$dbname} = $database::instance($dbname);
 		}
 	}
+
+    public function _autoloader()
+    {
+        $autoload =& autoload_config();
+
+		if(count($autoload['libraries']) > 0)
+        {
+            $this->library($autoload['libraries']);
+        }	
+		if(count($autoload['models']) > 0)
+        {
+            $this->model($autoload['models']);
+        }		
+		if(count($autoload['helpers']) > 0)
+        {
+            $this->helper($autoload['helpers']);
+        }
+    }
+		
 }
 
 /**
  * Class Controller
  */
-class Controller extends Loader
+class Controller
 {
 	private static $instance;
 	public $call, $var;
@@ -238,24 +266,14 @@ class Controller extends Loader
 	 */
 	public function __construct()
 	{
-		$this->call = $this;
-
-		self::$instance = $this->call;
+		self::$instance =& $this;
 
 		foreach (loaded_class() as $var => $class)
 		{
 			$this->$var =& load_class($class);
 		}
 
-		//load autoload config
-		$autoload =& autoload_config();
-
-		if(count($autoload['libraries']) > 0)
-			$this->call->library($autoload['libraries']);
-		if(count($autoload['models']) > 0)
-			$this->call->model($autoload['models']);
-		if(count($autoload['helpers']) > 0 )
-			$this->call->helper($autoload['helpers']); 
+        $this->call = new Loader();
 	}
 	
 	/**

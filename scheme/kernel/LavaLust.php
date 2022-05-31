@@ -70,8 +70,8 @@ if ($composer_autoload = config_item('composer_autoload'))
 /**
  * Instantiate the Benchmark class
  */
-$pf =& load_class('performance', 'kernel');
-$pf->tag('lavalust');
+$performance =& load_class('performance', 'kernel');
+$performance->tag('lavalust');
 
 /**
  * Deployment Environment
@@ -142,7 +142,7 @@ function &lava_instance()
 {
   return Controller::instance();
 }
-$pf->tag('lavalust');
+$performance->tag('lavalust');
 
 /**
  * Initiate Router
