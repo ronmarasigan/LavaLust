@@ -40,8 +40,18 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  */
 class Model {
    
+    /**
+     * Class Constructor
+     * @return void
+     */
     public function __construct() {}
 
+    /**
+     * magic __get
+     *
+     * @param string $key
+     * @return void
+     */
     public function __get($key)
     {
         return lava_instance()->$key;
