@@ -53,14 +53,6 @@ class Loader {
 	 */
 	private $sub_dir = '';
     
-    /**
-     * Class constructor
-     * Load all autoloaders
-     */
-    public function __construct()
-    {
-        $this->_autoloader();
-    }
 	/**
 	 * Get Subdirectories
 	 *
@@ -232,25 +224,6 @@ class Loader {
 			$LAVA->{$dbname} = $database::instance($dbname);
 		}
 	}
-
-    public function _autoloader()
-    {
-        $autoload =& autoload_config();
-
-		if(count($autoload['libraries']) > 0)
-        {
-            $this->library($autoload['libraries']);
-        }	
-		if(count($autoload['models']) > 0)
-        {
-            $this->model($autoload['models']);
-        }		
-		if(count($autoload['helpers']) > 0)
-        {
-            $this->helper($autoload['helpers']);
-        }
-    }
-		
 }
 
 /**
@@ -273,7 +246,30 @@ class Controller
 			$this->$var =& load_class($class);
 		}
 
+        /**
+		 * Load all Loader Class
+		 */
         $this->call = new Loader();
+		
+		/**
+		 * Autoloaded
+		 *
+		 * @return void
+		 */
+		$autoload =& autoload_config();
+
+		if(count($autoload['libraries']) > 0)
+        {
+            $this->call->library($autoload['libraries']);
+        }	
+		if(count($autoload['models']) > 0)
+        {
+            $this->call->model($autoload['models']);
+        }		
+		if(count($autoload['helpers']) > 0)
+        {
+            $this->call->helper($autoload['helpers']);
+        }
 	}
 	
 	/**

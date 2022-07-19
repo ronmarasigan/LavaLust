@@ -130,7 +130,7 @@ if ( ! function_exists('active'))
 	function active($currect_page, $css_class = 'active')
 	{
 		// Explode REQUEST_URI
-		$uri_array =  explode('/', $_SERVER['REQUEST_URI']);
+		$uri_array =  explode('/', rtrim($_SERVER['REQUEST_URI'], '/'));
 		// Explode the BASE_URL
 		$url_array = explode('/', trim(preg_replace('(^https?://)', '', BASE_URL), '/'));
 		// Find the installation folder index base on $url_array
