@@ -35,7 +35,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
-if( ! function_exists('filter_var'))
+if( ! function_exists('filter_io'))
 {
 	/**
 	 * Filter variables
@@ -44,7 +44,7 @@ if( ! function_exists('filter_var'))
 	 * @param string $var the data to be filtered
 	 * @return void
 	 */
-	function filter_var($type, $var)
+	function filter_io($type, $var)
 	{
 		switch(strtolower($type))
 		{

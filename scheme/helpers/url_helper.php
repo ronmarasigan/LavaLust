@@ -146,7 +146,8 @@ if ( ! function_exists('active'))
 			// +1 to the installation folder index to get the index of controller and the rest of the segments if index_page is not empty
 			$url = implode('/', array_slice($uri_array, $folder_index + 1));
 		}
-		if($currect_page == $url)
+		
+		if($currect_page == explode('/', $url)[0] || $currect_page == $url)
 		{
 			echo $css_class;
 		}
