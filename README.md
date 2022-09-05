@@ -13,6 +13,11 @@
 
 [LavaLust Documentation Link](https://lavalust.netlify.app)
 
+<p>
+    Note: If you are using PLDT, you need to use google dns (8.8.8.8) to open the documentation website. There is
+    an issue with PLDT and Netlify websites.
+</p>
+
 ## Changelogs of Version 3
 
 1. Remove xss_clean() using Escaper class. If you want to use it, install htmlpurifier library then
