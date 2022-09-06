@@ -1,0 +1,15 @@
+{
+    "name": "ronmarasigan/lavalust",
+    "description": "LavaLust Framework",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "ronmarasigan",
+            "email": "ronald.marasigan@yahoo.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4"
+    }
+}

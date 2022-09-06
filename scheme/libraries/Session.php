@@ -161,31 +161,17 @@ class Session {
 			//Check for expiration time
 			$expiration = empty($this->config['cookie_expiration']) ? 0 : time() + $this->config['cookie_expiration'];
 
-			//check for PHP Version later than 7.3.0
-			if (PHP_VERSION_ID < 70300)
-			{
-				setcookie(
-					$this->config['cookie_name'],
-					$this->session_id(),
-					$expiration,
-					$this->config['cookie_path'],
-					$this->config['cookie_domain'],
-					$this->config['cookie_secure'],
-					TRUE
-				);
-			} else {
-				setcookie(
-					$this->config['cookie_name'],
-					$this->session_id(),
-					array('samesite' => $this->config['cookie_samesite'],
-					'secure'   => $this->config['cookie_secure'],
-					'expires'  => $expiration,
-					'path'     => $this->config['cookie_path'],
-					'domain'   => $this->config['cookie_domain'],
-					'httponly' => $this->config['cookie_httponly'],
-					)
-				);
-			}
+			setcookie(
+				$this->config['cookie_name'],
+				$this->session_id(),
+				array('samesite' => $this->config['cookie_samesite'],
+				'secure'   => $this->config['cookie_secure'],
+				'expires'  => $expiration,
+				'path'     => $this->config['cookie_path'],
+				'domain'   => $this->config['cookie_domain'],
+				'httponly' => $this->config['cookie_httponly'],
+				)
+			);
 	    }
 
 	    $this->_lava_init_vars();

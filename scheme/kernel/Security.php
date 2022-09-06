@@ -178,13 +178,7 @@ class Security
 	{
 		$expiration = time() + $this->_csrf_expire;
 
-		//check for PHP Version later than 7.3.0
-		if (PHP_VERSION_ID < 70300)
-		{
-			setcookie(
-				$this->_csrf_cookie_name, $this->_csrf_hash, $expiration, config_item('cookie_path'), config_item('cookie_domain'), config_item('cookie_secure'), config_item('cookie_httponly'));
-		} else {
-			setcookie($this->_csrf_cookie_name,
+		setcookie($this->_csrf_cookie_name,
 					$this->_csrf_hash,
 					array('samesite' => 'Strict',
 					'secure'   => FALSE,
@@ -193,7 +187,7 @@ class Security
 					'domain'   => config_item('cookie_domain'),
 					'httponly' => config_item('cookie_httponly'))
 			);
-		}
+			
 		return $this;
 	}
 

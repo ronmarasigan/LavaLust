@@ -1,3 +1,16 @@
+LavaLust Version 3.1.0 (Please update to this version)
+
+# Changelog
+
+1. Fixed known bugs.
+2. Fixed bugs of some kernel classes, libraries and helpers.
+
+LavaLust Version 3.0.1 and higher
+
+# Changelog
+
+1. Requires to use PHP version >= 7.4
+
 LavaLust Version 3
 
 # Changelog

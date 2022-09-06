@@ -57,7 +57,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 | LavaLust Version
 | -------------------------------------------------------------------
 */
-$config['VERSION']                 = '3.0.3';
+$config['VERSION']                 = '3.1.0';
 
 /*
 | -------------------------------------------------------------------
