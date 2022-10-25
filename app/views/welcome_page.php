@@ -68,7 +68,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
         <code>
             <b>System Requirements:</b>
             <ul>
-                <li>At least use PHP 7.4 (it will work with 7.2+ but I suggest to use newer version of PHP)</li>
+                <li>At least use PHP 7.4 or higher</li>
                 <li>MySQL 5 or higher</li>
                 <li>PDO is installed</li>
                 <li>Enaled mod_rewrite(optional but recommended for security purposes)</li>
