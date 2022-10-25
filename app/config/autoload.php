@@ -80,7 +80,7 @@ $autoload['libraries'] = array();
 | -------------------------------------------------------------------
 | Prototype:
 |
-|	$autoload['helper'] = array('url', 'form');
+|	$autoload['helper'] = array('url', 'file');
 */
 $autoload['helpers'] = array();
 
@@ -90,7 +90,7 @@ $autoload['helpers'] = array();
 | -------------------------------------------------------------------
 | Prototype:
 |
-|	$autoload['model'] = array('model1', 'model2')
+|	$autoload['model'] = array('model1_model', 'model2_model')
 */
 $autoload['models'] = array();
 ?>

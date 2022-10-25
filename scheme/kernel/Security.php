@@ -179,15 +179,15 @@ class Security
 		$expiration = time() + $this->_csrf_expire;
 
 		setcookie($this->_csrf_cookie_name,
-					$this->_csrf_hash,
-					array('samesite' => 'Strict',
-					'secure'   => FALSE,
-					'expires'  => $expiration,
-					'path'     => config_item('cookie_path'),
-					'domain'   => config_item('cookie_domain'),
-					'httponly' => config_item('cookie_httponly'))
-			);
-			
+			$this->_csrf_hash,
+			array('samesite' => 'Strict',
+			'secure'   => FALSE,
+			'expires'  => $expiration,
+			'path'     => config_item('cookie_path'),
+			'domain'   => config_item('cookie_domain'),
+			'httponly' => config_item('cookie_httponly'))
+		);
+		
 		return $this;
 	}
 
