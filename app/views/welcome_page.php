@@ -75,7 +75,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
             </ul>
         </code>
         <p>This view is located inside: </p>
-        <code>app/views/welcome_message.php</code>
+        <code>app/views/welcome_page.php</code>
 
         <p>The corresponding controller for this view file: </p>
         <code>app/controllers/Welcome.php</code>
