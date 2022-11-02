@@ -57,7 +57,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 | LavaLust Version
 | -------------------------------------------------------------------
 */
-$config['VERSION']                 = '3.1.0';
+$config['VERSION']                 = '3.1.1';
 
 /*
 | -------------------------------------------------------------------
@@ -213,10 +213,10 @@ $config['sess_expire_on_close']    = FALSE;
 $config['cookie_prefix']           = '';
 $config['cookie_domain']           = '';
 $config['cookie_path']             = '/';
-$config['cookie_secure']           = TRUE;
+$config['cookie_secure']           = FALSE;
 $config['cookie_expiration']       = 86400;
 $config['cookie_httponly']         = FALSE;
-$config['cookie_samesite']         = 'None';
+$config['cookie_samesite']         = 'Lax';
 
 /*
 |--------------------------------------------------------------------------

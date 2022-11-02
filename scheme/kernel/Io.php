@@ -160,11 +160,11 @@ Class Io {
 		{
 			if(count($options) > 0)
 			{
-				foreach($options as $key => $value)
+				foreach($options as $key => $val)
 				{
 					if(isset($options[$key]) && $options[$key] != 'expiration')
 					{
-						$arr[$key] = $value;
+						$arr[$key] = $val;
 					} else {
 						$arr[$key] = config_item('cookie_' . $key);
 					}
@@ -180,27 +180,21 @@ Class Io {
 		} else {
 			$arr['expiration'] =  ($expiration > 0) ? time() + $expiration : 0;
 		}
-		
+
 		foreach($lists as $key)
 		{
 			$arr[$key] = config_item('cookie_' . $key);
 		}
 
-		//check for PHP Version later than 7.3.0
-		if (PHP_VERSION_ID < 70300)
-		{
-			setcookie($arr['prefix'].$name, $value, $arr['expiration'], $arr['path'].'; samesite='.$arr['samesite'], $arr['domain'], $arr['secure'], $arr['httponly']);
-		} else {
-			setcookie($arr['prefix'].$name, $value,
-				array(
-					'expires' => $arr['expiration'],
-					'path' => $arr['path'],
-					'domain' => $arr['domain'],
-					'secure' => (bool) $arr['secure'],
-					'httponly' => (bool) $arr['httponly'],
-					'samesite' => $arr['samesite']
-				));
-		}
+		setcookie($arr['prefix'].$name, $value,
+			array(
+				'expires' => $arr['expiration'],
+				'path' => $arr['path'],
+				'domain' => $arr['domain'],
+				'secure' => (bool) $arr['secure'],
+				'httponly' => (bool) $arr['httponly'],
+				'samesite' => $arr['samesite']
+			));
 	}
 	
 	/**
