@@ -129,7 +129,7 @@ class Loader {
 			{
 				$page_vars[$data] = $data;
 			} else {
-				throw new Exception('View parameter only accepts array and string types');
+				throw new RuntimeException('View parameter only accepts array and string types');
 			}
 			extract($page_vars, EXTR_SKIP);
 		}
@@ -139,16 +139,16 @@ class Loader {
 		{
 			if(file_exists($view . '.php'))
 			{
-				require_once($view. '.php');
+				require_once($view . '.php');
 			} else {
-				throw new Exception(''.$view_file.' view file did not exist.');
+				throw new RuntimeException($view_file . ' view file did not exist.');
 			}		
 		} else {
 			if(file_exists($view))
 			{
 				require_once($view);
 			} else {
-				throw new Exception(''.$view_file.' view file did not exist.');
+				throw new RuntimeException($view_file . ' view file does not exist.');
 			}
 		}
 		echo ob_get_clean();
@@ -169,6 +169,8 @@ class Loader {
 				{
 					if ( file_exists($dir . DIRECTORY_SEPARATOR . $hlpr . '_helper.php') ) {
 						require_once $dir . DIRECTORY_SEPARATOR . $hlpr . '_helper.php';
+					} else {
+						throw new RuntimeException($hlpr . ' helper file does not exist.');
 					}
 				}
 			}
@@ -178,6 +180,8 @@ class Loader {
 				if ( file_exists($dir . DIRECTORY_SEPARATOR . $helper . '_helper.php') )
 				{
 					require_once $dir . DIRECTORY_SEPARATOR . $helper . '_helper.php';
+				} else {
+					throw new RuntimeException($dir . ' file does not exist.');
 				}
 			}
 		}

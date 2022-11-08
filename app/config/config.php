@@ -135,7 +135,6 @@ $config['composer_autoload']        = FALSE;
 | DO NOT CHANGE THIS UNLESS YOU FULLY UNDERSTAND THE REPERCUSSIONS!!
 |
 */
-$config['enable_query_strings']     = FALSE;
 $config['permitted_uri_chars']		= 'a-z 0-9~%.:_\-';
 
 /*
