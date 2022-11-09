@@ -169,8 +169,6 @@ class Loader {
 				{
 					if ( file_exists($dir . DIRECTORY_SEPARATOR . $hlpr . '_helper.php') ) {
 						require_once $dir . DIRECTORY_SEPARATOR . $hlpr . '_helper.php';
-					} else {
-						throw new RuntimeException($hlpr . ' helper file does not exist.');
 					}
 				}
 			}
@@ -180,8 +178,6 @@ class Loader {
 				if ( file_exists($dir . DIRECTORY_SEPARATOR . $helper . '_helper.php') )
 				{
 					require_once $dir . DIRECTORY_SEPARATOR . $helper . '_helper.php';
-				} else {
-					throw new RuntimeException($dir . ' file does not exist.');
 				}
 			}
 		}
