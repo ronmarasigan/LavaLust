@@ -4,7 +4,7 @@
 </p>
     LavaLust is a lightweight Web Framework - (using MVC pattern) - for people who are developing web sites using PHP. It helps you write code easily using Object-Oriented Approach. It also provides set of libraries for commonly needed tasks, as well as a helper functions to minimize the amount of time coding.
 
-## LavaLust Version 3.1.0
+## LavaLust Version 3.1.3
 <p>
     Update your project using this version. You are required to use PHP v7.4 or higher.
 </p>
