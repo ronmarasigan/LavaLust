@@ -282,7 +282,7 @@ class Email {
 		$headers[] = 'Return-Path: '.$this->sender_name.' <'.$this->sender.'>';
       	$headers[] = 'X-Priority: 3';
 
-        if(trim($this->reply_to) !== '') {
+        if($this->reply_to !== '') {
             $headers[] = 'Reply-To: '.$this->reply_to;
         } else {
             $headers[] = 'Reply-To: '.$this->sender;
@@ -291,7 +291,7 @@ class Email {
       	$contents = $out.'--'.$bm.$out;
         $contents .= 'Content-Type: multipart/alternative; boundary='.$bc.$out;
 
-        if(trim($this->emailContent) !== '') {
+        if($this->emailContent !== '') {
             $contents .= $out.'--'.$bc.$out;
             $contents .= $contype.$out;
             $contents .= $out.$this->emailContent.$out;
