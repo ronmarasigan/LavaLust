@@ -47,9 +47,9 @@ if($flag)
 	{
 		$_m = '_model';
 	}
-	if(! file_exists(APP_DIR . strtolower($option) . 's\\' . $class . ''.$_m.'.php'))
+	if(! file_exists(APP_DIR . strtolower($option) . 's/' . $class . ''.$_m.'.php'))
 	{
-		$file_handle = fopen(APP_DIR . strtolower($option) . 's\\' . $class . ''.$_m.'.php', 'w');
+		$file_handle = fopen(APP_DIR . strtolower($option) . 's/' . $class . ''.$_m.'.php', 'w');
 		$search = array('{class}', '{extends}');
 		$replace = array($class.$_m, $option);
 		$content = str_replace($search, $replace, $content);
