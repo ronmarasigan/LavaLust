@@ -2,8 +2,7 @@
 <?php
 (PHP_SAPI !== 'cli' || isset($_SERVER['HTTP_USER_AGENT'])) && die('cli only');
 //Constant 
-define('ROOT_DIR',  dirname(__DIR__) . DIRECTORY_SEPARATOR);
-define('APP_DIR', ROOT_DIR . 'app' . DIRECTORY_SEPARATOR);
+define('APP_DIR', dirname(__DIR__, 1) . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR);
 $flag = FALSE;
 do
 {
