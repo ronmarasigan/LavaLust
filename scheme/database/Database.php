@@ -115,7 +115,7 @@ class Database {
      * @param  array  $args  arguments
      * @return result
      */
-    public function raw($query, $args = [])
+    public function raw($query, $args = array(), $mode = PDO::FETCH_ASSOC)
     {
         $this->resetQuery();
         $query = trim($query);
@@ -126,7 +126,7 @@ class Database {
             $stmt = $this->db->prepare($query);
             $stmt->execute($this->bindValues);
             $this->rowCount = $stmt->rowCount();
-            return $stmt->fetchAll();
+            return $stmt->fetchAll($mode);
         }else{
             $stmt = $this->db->prepare($query);
             $stmt->execute($this->bindValues);
@@ -148,9 +148,9 @@ class Database {
         if (strpos( strtoupper($this->sql), "INSERT" ) === 0 ) {
             $this->lastIDInserted = (int) $this->db->lastInsertId();
             return $this->lastIDInserted;
-        }
-        else
+        } else {
             return $stmt->rowCount();
+        }
     }
 
     /**
@@ -979,7 +979,7 @@ class Database {
      * 
      * @return result
      */
-    public function get_all($mode = PDO::FETCH_DEFAULT)
+    public function get_all($mode = PDO::FETCH_ASSOC)
     {
         $this->buildQuery();
         $this->getSQL = $this->sql;
