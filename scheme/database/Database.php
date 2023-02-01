@@ -979,7 +979,7 @@ class Database {
      * 
      * @return result
      */
-    public function get_all()
+    public function get_all($mode = PDO::FETCH_DEFAULT)
     {
         $this->buildQuery();
         $this->getSQL = $this->sql;
@@ -987,7 +987,7 @@ class Database {
             $stmt = $this->db->prepare($this->sql);
             $stmt->execute($this->bindValues);
             $this->rowCount = $stmt->rowCount();
-            return $stmt->fetchAll();
+            return $stmt->fetchAll($mode);
         } catch(Exception $e) {
             throw new PDOException($e->getMessage().'<br>SQL STATEMENT: '.html_escape($this->getSQL));
         }
