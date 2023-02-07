@@ -601,9 +601,8 @@ class Form_validation {
                 $errors = '';
                 foreach($this->get_errors() as $error)
                 {
-                    $errors = $errors.'<br>'.html_escape($error);
+                    $errors = ! empty($errors) ? $errors.'<br>'.html_escape($error) : html_escape($error);
                 }
-                $errors = ltrim($errors, '<br>');  
                 return $errors;  
             }
         } 

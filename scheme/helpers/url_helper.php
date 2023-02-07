@@ -102,7 +102,8 @@ if ( ! function_exists('site_url'))
 	 */
 	function site_url($url = '') 
 	{
-		return ! empty(config_item('index_page')) ? BASE_URL . config_item('index_page').'/' . $url : BASE_URL . $url;
+		$base_url = filter_var(BASE_URL, FILTER_SANITIZE_URL);
+		return ! empty(config_item('index_page')) ? $base_url . config_item('index_page').'/' . $url : $base_url . $url;
 	}
 }
 
