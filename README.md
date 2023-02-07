@@ -7,6 +7,9 @@
 ## LavaLust Version 3.1.3
 <p>
     Update your project using this version. You are required to use PHP v7.4 or higher.
+    LavaLust v3.1.3 is not fully compatible to PHP8.2 but it will work normally with the use of
+    #[AllowDynamicProperties]. Dynamic property is now deprecated in PHP8.2 and will throw fatal
+    error in the future version of PHP.
 </p>
 
 ## LavaLust Version 3

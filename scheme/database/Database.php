@@ -91,7 +91,6 @@ class Database {
 
         try {
             $this->db = new PDO($dsn, $dbuser, $dbpass, $options);
-            $this->database_config = NULL;
         } catch (Exception $e) {
             throw new PDOException($e->getMessage());
         }

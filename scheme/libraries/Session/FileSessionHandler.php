@@ -39,7 +39,24 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
   * FileSessionHandler
   */
 class FileSessionHandler extends Session implements SessionHandlerInterface {
-    private $save_path, $file_path;
+    /**
+     * Path to save session
+     *
+     * @var string
+     */
+    private $save_path;
+    /**
+     * Path to save session file
+     *
+     * @var string
+     */
+    private $file_path;
+    /**
+     * Session Data
+     *
+     * @var boolean
+     */
+    private $data;
 
     public function __construct()
     {

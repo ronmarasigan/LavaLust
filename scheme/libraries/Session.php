@@ -47,6 +47,27 @@ class Session {
 	 */
 	private $config;
 
+	/**
+	 * Match IP
+	 *
+	 * @var string
+	 */
+	private $match_ip;
+
+	/**
+	 * Match Fingerprint
+	 *
+	 * @var string
+	 */
+	private $match_fingerprint;
+
+	/**
+	 * User Data
+	 *
+	 * @var array
+	 */
+	private $userdata;
+
 	public function __construct()
 	{
 		/**

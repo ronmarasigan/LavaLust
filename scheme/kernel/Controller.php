@@ -38,6 +38,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 /**
  * Class Loader
  */
+#[AllowDynamicProperties]
 class Loader {
 	/**
 	 * Hold class name
@@ -229,10 +230,21 @@ class Loader {
 /**
  * Class Controller
  */
+#[AllowDynamicProperties]
 class Controller
 {
+	/**
+	 * Controller Instance
+	 *
+	 * @var object
+	 */
 	private static $instance;
-	public $call, $var;
+	/**
+	 * Load class
+	 *
+	 * @var object
+	 */
+	public $call;
 	
 	/**
 	 * Constructor
