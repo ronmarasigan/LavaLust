@@ -1,3 +1,10 @@
+LavaLust 3.1.4 (Compatible with PHP 8.2 and higher)
+
+# Changelog
+
+1. Fixed dynamic property creation deprecation notice
+
+
 LavaLust Version 3.1.0 (Please update to this version)
 
 # Changelog
