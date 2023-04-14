@@ -145,12 +145,6 @@ class Pagination
         {
             $this->$key = lang($key);
         }
-
-        if(config_item('enable_query_strings') == FALSE)
-        {
-            $this->page_delimiter = '/';
-        }
-
     }
     /**
      * Initialize Variables for Paging

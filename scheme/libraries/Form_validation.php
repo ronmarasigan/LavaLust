@@ -44,7 +44,7 @@ class Form_validation {
      *
      * @var object
      */
-    protected $LAVA;
+    private $LAVA;
 
     //Default Error Messages
     private static $err_required = '%s is required';
@@ -270,14 +270,12 @@ class Form_validation {
      */
     public function is_unique($table, $field, $str,  $custom_error = '')
     {
-        if(isset($this->LAVA->db))
+        $this->LAVA->call->database();
+        $this->LAVA->db->table($table)->where($field, $str)->limit(1)->get();
+        if($this->LAVA->db->row_count() !== 0)
         {
-            $this->LAVA->db->table($table)->where($field, $str)->limit(1)->get();
-            if($this->LAVA->db->row_count() !== 0)
-            {
-                $this->set_error_message($custom_error, self::$err_is_unique, $this->name);
-            }       
-        }
+            $this->set_error_message($custom_error, self::$err_is_unique, $this->name);
+        } 
         return $this;
     }
 
