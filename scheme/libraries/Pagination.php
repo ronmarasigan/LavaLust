@@ -153,8 +153,9 @@ class Pagination
      * @param int $rows_per_page
      * @param int $page_num
      */
-    public function initialize($total_rows, $rows_per_page, $page_num, $url, $crumbs = 5)
+    public function initialize($table, $rows_per_page, $page_num, $url, $crumbs = 5)
     {
+        $total_rows = $this->LAVA->db->table($table)->select_count('*', 'count')->get()['count'];
         $this->crumbs = $crumbs;
         $this->rows_per_page = (int) $rows_per_page;
         $this->page_array['url'] = $url;

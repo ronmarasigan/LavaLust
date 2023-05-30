@@ -119,7 +119,7 @@ if( ! function_exists('csrf_field'))
                 $append,
                 "\n"
             );
-		return $form;
+		echo $form;
 	}
 }
 ?>

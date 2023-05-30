@@ -67,6 +67,7 @@ class Form_validation {
     private static $err_less_than_equal_to = 'Please enter a value greater than or equal to %f';
     private static $err_in_list = '%s is not in the list';
     private static $err_pattern = 'Please is not in %s format';
+    private static $err_valid_name = '%s is not a valid name';
 
     public $patterns = array(
         'url'           => '(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})+',
@@ -560,6 +561,19 @@ class Form_validation {
             $this->set_error_message($custom_error, self::$err_in_list, $this->value);
         }
         return $this; 
+    }
+
+    /**
+     * Check if format of Person name is valid
+     *
+     * @param string $custom_error
+     * @return void
+     */
+    public function valid_name($custom_error = '') {
+        if (!preg_match('/^[\p{L} ]+$/u', $this->value)) {
+            $this->set_error_message($custom_error, self::$err_valid_name, $this->value);
+        }
+        return $this;
     }
 
     /**
