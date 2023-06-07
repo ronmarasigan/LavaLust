@@ -44,7 +44,7 @@ class Form_validation {
      *
      * @var object
      */
-    protected $LAVA;
+    private $LAVA;
 
     //Default Error Messages
     private static $err_required = '%s is required';
@@ -67,6 +67,7 @@ class Form_validation {
     private static $err_less_than_equal_to = 'Please enter a value greater than or equal to %f';
     private static $err_in_list = '%s is not in the list';
     private static $err_pattern = 'Please is not in %s format';
+    private static $err_valid_name = '%s is not a valid name';
 
     public $patterns = array(
         'url'           => '(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})+',
@@ -270,14 +271,12 @@ class Form_validation {
      */
     public function is_unique($table, $field, $str,  $custom_error = '')
     {
-        if(isset($this->LAVA->db))
+        $this->LAVA->call->database();
+        $this->LAVA->db->table($table)->where($field, $str)->limit(1)->get();
+        if($this->LAVA->db->row_count() !== 0)
         {
-            $this->LAVA->db->table($table)->where($field, $str)->limit(1)->get();
-            if($this->LAVA->db->row_count() !== 0)
-            {
-                $this->set_error_message($custom_error, self::$err_is_unique, $this->name);
-            }       
-        }
+            $this->set_error_message($custom_error, self::$err_is_unique, $this->name);
+        } 
         return $this;
     }
 
@@ -562,6 +561,19 @@ class Form_validation {
             $this->set_error_message($custom_error, self::$err_in_list, $this->value);
         }
         return $this; 
+    }
+
+    /**
+     * Check if format of Person name is valid
+     *
+     * @param string $custom_error
+     * @return void
+     */
+    public function valid_name($custom_error = '') {
+        if (!preg_match('/^[\p{L} ]+$/u', $this->value)) {
+            $this->set_error_message($custom_error, self::$err_valid_name, $this->value);
+        }
+        return $this;
     }
 
     /**

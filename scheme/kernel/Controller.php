@@ -38,7 +38,6 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 /**
  * Class Loader
  */
-#[AllowDynamicProperties]
 class Loader {
 	/**
 	 * Hold class name
@@ -91,18 +90,18 @@ class Loader {
 				$this->get_sub_dir($value);
 				if(! is_int($key))
 				{
-					$LAVA->$key =& load_class($this->class, 'models' . $this->sub_dir, NULL, $key);
+					$LAVA->properties[$key] =& load_class($this->class, 'models' . $this->sub_dir, NULL, $key);
 				} else {
-					$LAVA->{$this->class} =& load_class($this->class, 'models' . $this->sub_dir, NULL, $this->class);
+					$LAVA->properties[$this->class] =& load_class($this->class, 'models' . $this->sub_dir, NULL, $this->class);
 				}	
 			}	
 		} else {	
 			$this->get_sub_dir($class);
 			if(! is_null($object_name))
 			{
-				$LAVA->$object_name =& load_class($this->class, 'models' . $this->sub_dir, NULL, $object_name);
+				$LAVA->properties[$object_name] =& load_class($this->class, 'models' . $this->sub_dir, NULL, $object_name);
 			} else {
-				$LAVA->{$this->class} =& load_class($this->class, 'models' . $this->sub_dir);
+				$LAVA->properties[$this->class] =& load_class($this->class, 'models' . $this->sub_dir);
 			}
 		}
 			
@@ -202,10 +201,10 @@ class Loader {
 					$database =& load_class('database', 'database');
 					$LAVA->db = $database::instance(NULL);
 				}
-				$LAVA->$class =& load_class($class, 'libraries');
+				$LAVA->properties[$class] =& load_class($class, 'libraries');
 			}
 		} else {
-			$LAVA->$classes =& load_class($classes, 'libraries', $params);
+			$LAVA->properties[$classes] =& load_class($classes, 'libraries', $params);
 		}
 	}
 
@@ -222,7 +221,7 @@ class Loader {
 		if(is_null($dbname)) {
 			$LAVA->db = $database::instance(NULL);
 		} else {			
-			$LAVA->{$dbname} = $database::instance($dbname);
+			$LAVA->properties[$dbname] = $database::instance($dbname);
 		}
 	}
 }
@@ -230,7 +229,6 @@ class Loader {
 /**
  * Class Controller
  */
-#[AllowDynamicProperties]
 class Controller
 {
 	/**
@@ -245,6 +243,37 @@ class Controller
 	 * @var object
 	 */
 	public $call;
+
+	/**
+	 * Dynamic Properties using __set and __get
+	 *
+	 * @var array
+	 */
+	public $properties = [];
+
+	/**
+	 * Set Dynamic Properties
+	 *
+	 * @param string $prop
+	 * @param string $val
+	 */
+	public function __set($prop, $val) {
+		$this->properties[$prop] = $val;
+	}
+
+	/**
+	 * Get Dynamic Properties
+	 *
+	 * @param string $prop
+	 * @return void
+	 */
+	public function __get($prop) {
+		if (array_key_exists($prop, $this->properties)) {
+			return $this->properties[$prop];
+		} else {
+			throw new Exception("Property $prop does not exist");
+		}
+	}
 	
 	/**
 	 * Constructor
@@ -255,7 +284,7 @@ class Controller
 
 		foreach (loaded_class() as $var => $class)
 		{
-			$this->$var =& load_class($class);
+			$this->properties[$var] =& load_class($class);
 		}
 
         /**

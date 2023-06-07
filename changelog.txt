@@ -1,3 +1,23 @@
+LavaLust 3.1.5
+
+# Changelog
+
+1. Database class was updated. It has offset and pagination method. Check documentation
+
+2. csrf_field() function in security helper was now echoed output. return $form to echo $form.
+
+3. Form_validation class was updated. It has valid_name() method to validate Person's name.
+
+4. Pagination class was updated. initiate() method has new set of parameters.
+    initiate($table, $rows_per_page, $page_num, $url, $crumbs = 5) //$table is the database table name to paginate
+
+LavaLust 3.1.4 (Compatible with PHP 8.2 and higher)
+
+# Changelog
+
+1. Fixed dynamic property creation deprecation notice
+
+
 LavaLust Version 3.1.0 (Please update to this version)
 
 # Changelog

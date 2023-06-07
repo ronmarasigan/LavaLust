@@ -59,6 +59,7 @@ class Database {
     private $having = NULL;
     private $lastIDInserted = 0;
     private $transactionCount = 0;
+    private $offset = null;
     private $operators = array('=', '!=', '<', '>', '<=', '>=', '<>');
 
     public function __construct($dbname = NULL)
@@ -164,6 +165,7 @@ class Database {
         $this->sql = NULL;
         $this->bindValues = array();
         $this->limit = NULL;
+        $this->offset = NULL;
         $this->orderBy = NULL;
         $this->groupBy = NULL;
         $this->having = NULL;
@@ -821,22 +823,38 @@ class Database {
     public function limit($limit, $end = NULL)
     {
         if ($end == NULL ) {
-            $this->limit = " LIMIT {$limit}";
+            $this->limit = $limit;
         }else{
-            $this->limit = " LIMIT {$limit}, {$end}";
+            $this->limit = $limit .', '. $end;
         }
 
         return $this;
     }
 
     /**
-     * offset
-     * 
-     * @param  int $offset
-     * @return $this
+     * Offset
+     *
+     * @param int $offset
+     * @return void
      */
-    public function offset($offset) {
-        $this->limit .= " OFFSET {$offset}";
+    public function offset($offset)
+    {
+        $this->offset = $offset;
+
+        return $this;
+    }
+
+    /**
+     * Pagination
+     *
+     * @param int $perPage
+     * @param int $page
+     * @return void
+     */
+    public function pagination($perPage, $page)
+    {
+        $this->limit = $perPage;
+        $this->offset = (($page > 0 ? $page : 1) - 1) * $perPage;
 
         return $this;
     }
@@ -949,7 +967,11 @@ class Database {
         }
 
         if ($this->limit !== NULL) {
-            $this->sql .= $this->limit;
+            $this->sql .= ' LIMIT ' . $this->limit;
+        }
+
+        if ($this->offset !== NULL) {
+            $this->sql .= ' OFFSET ' . $this->offset;
         }
     }
 
