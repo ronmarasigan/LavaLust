@@ -117,28 +117,6 @@ $config['composer_autoload']        = FALSE;
 
 /*
 |--------------------------------------------------------------------------
-| Allowed URL Characters
-|--------------------------------------------------------------------------
-|
-| This lets you specify which characters are permitted within your URLs.
-| When someone tries to submit a URL with disallowed characters they will
-| get a warning message.
-|
-| As a security measure you are STRONGLY encouraged to restrict URLs to
-| as few characters as possible.  By default only these are allowed: a-z 0-9~%.:_-
-|
-| Leave blank to allow all characters -- but only if you are insane.
-|
-| The configured value is actually a regular expression character group
-| and it will be executed as: ! preg_match('/^[<permitted_uri_chars>]+$/i
-|
-| DO NOT CHANGE THIS UNLESS YOU FULLY UNDERSTAND THE REPERCUSSIONS!!
-|
-*/
-$config['permitted_uri_chars']		= 'a-z 0-9~%.:_\-';
-
-/*
-|--------------------------------------------------------------------------
 | Default Character Set
 |--------------------------------------------------------------------------
 |
@@ -149,17 +127,6 @@ $config['charset']					= 'UTF-8';
 
 /*
 |--------------------------------------------------------------------------
-| Default Controllers and Methods
-|--------------------------------------------------------------------------
-|
-| This config will be used in the Router Class inside kernel.
-|
-*/
-$config['default_controller'] 		= 'Welcome';
-$config['default_method'] 			= 'index';
-
-/*
-|--------------------------------------------------------------------------
 | Error Views Directory Path
 |--------------------------------------------------------------------------
 |
@@ -167,6 +134,21 @@ $config['default_method'] 			= 'index';
 |
 */
 $config['error_view_path']         	= APP_DIR . 'views' . DIRECTORY_SEPARATOR . 'errors' . DIRECTORY_SEPARATOR;
+
+/*
+|--------------------------------------------------------------------------
+| 404 Error Overide
+|--------------------------------------------------------------------------
+|
+| $config['404_override'] is use if you want to add custom 404 error page.
+| 
+|	example: $confg['404_override'] = 'default/404'
+|
+|	if you have 'default folder' and '404.php file' inside error folder in view
+|
+*/
+$config['404_override']       	    = '';
+
 /*
 |--------------------------------------------------------------------------
 | Default Language

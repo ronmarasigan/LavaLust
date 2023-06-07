@@ -108,10 +108,7 @@ function _handlers()
 	register_shutdown_function('_shutdown_handler');
 }
 
-/**
- * Instantiate the routing class and set the routing
- */
-$router =& load_class('router', 'kernel');
+
 
 /**
  * Instantiate the security class for xss and csrf support
@@ -134,6 +131,12 @@ $lang =& load_class('lang', 'kernel');
 require_once SYSTEM_DIR . 'kernel/Controller.php';
 
 /**
+ * Instantiate the routing class and set the routing
+ */
+$router =& load_class('router', 'kernel', array(new Controller));
+require_once APP_DIR . 'config/routes.php';
+
+/**
  * Instantiate LavaLust Controller
  *
  * @return object
@@ -144,8 +147,8 @@ function &lava_instance()
 }
 $performance->tag('lavalust');
 
-/**
- * Initiate Router
- */
-$router->initiate();
+// Handle the request
+$url = $router->sanitize_url(str_replace($_SERVER['SCRIPT_NAME'], '', $_SERVER['PHP_SELF']), '/');
+$method = $router->sanitize_url($_SERVER['REQUEST_METHOD']);
+$router->initiate($url, $method);
 ?>

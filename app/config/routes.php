@@ -39,26 +39,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 | -------------------------------------------------------------------
 | URI ROUTING
 | -------------------------------------------------------------------
-| This file lets you re-map URI requests to specific controller functions.
+| Here is where you can register web routes for your application.
 |
-| Typically there is a one-to-one relationship between a URL string
-| and its corresponding controller class/method. The segments in a
-| URL normally follow this pattern:
 |
-|	example.com/class/method/id/
-|
-| In some instances, however, you may want to remap this relationship
-| so that a different class/function is called than the one
-| corresponding to the URL.
-|
-| $route['translate_uri_dashes'] = TRUE will enable to use dash(-) instead 
-| of underscore(_) in URI
-|
-| $route['404_override'] is use if you want to add custom 404 error page.
-| 
-|	example: $route['404_override'] = 'default/404'
-|
-|	if you have 'default folder' and '404.php file' inside error folder in view
 */
-$route['404_override']       	= '';
-$route['translate_uri_dashes'] 	= FALSE;
+
+$router->get('/', 'Welcome@index');

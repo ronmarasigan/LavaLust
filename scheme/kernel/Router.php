@@ -1,240 +1,252 @@
 <?php
-defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
-/**
- * ------------------------------------------------------------------
- * LavaLust - an opensource lightweight PHP MVC Framework
- * ------------------------------------------------------------------
- *
- * MIT License
- *
- * Copyright (c) 2020 Ronald M. Marasigan
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * @package LavaLust
- * @author Ronald M. Marasigan <ronald.marasigan@yahoo.com>
- * @copyright Copyright 2020 (https://ronmarasigan.github.io)
- * @since Version 1
- * @link https://lavalust.pinoywap.org
- * @license https://opensource.org/licenses/MIT MIT License
- */
 
-/**
- * Class Router
- */
 class Router
 {
-	/**
-	 * url from URI
-	 *
-	 * @var array
-	 */
-	protected $url = array();
+    /**
+     * List of routes
+     *
+     * @var array
+     */
+    private $routes = [];
 
-	/**
-	 * url string
-	 *
-	 * @var string
-	 */
-	protected $uri_string = '';
+    /**
+     * Group routes
+     *
+     * @var string
+     */
+    private $group_prefix = '';
 
-	/**
-	 * Controller
-	 *
-	 * @var string
-	 */
-	protected $controller;
-
-	/**
-	 * $Method
-	 *
-	 * @var string
-	 */
-	protected $method;
-
-	/**
-	 * Parameters
-	 *
-	 * @var array
-	 */
-	protected $params = array();
-
-	/**
-	 * Routes
-	 *
-	 * @var array
-	 */
-	private $route = array();
-
-	/**
-	 * Class Constructor
-	 */
-	public function __construct() {
-
-		//Routes
-		$this->route =& route_config();
-	}
-
-	/**
-	 * Re-Routing
-	 *
-	 * @param  string $url
-	 * @param  array $route
-	 * @return string
-	 */
-	public function remap_url($url, $route)
+    /**
+     * GET Method
+     *
+     * @param string $url
+     * @param mixed $callback
+     * @return void
+     */
+    public function get($url, $callback)
     {
-		$http_verb = isset($_SERVER['REQUEST_METHOD']) ? strtolower($_SERVER['REQUEST_METHOD']) : '';
-
-        foreach($route as $pattern => $replacement)
-        {
-			$replacement = $replacement;
-			if (is_array($replacement))
-			{
-				$replacement = array_change_key_case($replacement, CASE_LOWER);
-
-				if (isset($replacement[$http_verb]))
-				{
-					$replacement = $replacement[$http_verb];
-				} else {
-					continue;
-				}
-			}
-
-            $pattern = str_replace(':any', '(.+)', $pattern);
-            $pattern = str_replace(':num', '(\d+)', $pattern);
-            $pattern = '/' . str_replace('/', '\/', $pattern) . '/i';
-            $route_url = preg_replace($pattern, $replacement, $url);
-            if($route_url !== $url && $route_url !== NULL)
-				return $route_url;
-        }
-        return $this->uri_string;
+        $this->add_route($url, $callback, 'GET');
     }
 
     /**
-     * URL Parsing using $_SERVER['SCRIPT_NAME']
+     * POST Method
      *
-     * @return string
+     * @param string $url
+     * @param mixed $callback
+     * @return void
      */
-	public function parse_url()
-	{
-		//Get the URI String
-		$this->uri_string = trim(str_replace($_SERVER['SCRIPT_NAME'], '', $_SERVER['PHP_SELF']), '/');
+    public function post($url, $callback)
+    {
+        $this->add_route($url, $callback, 'POST');
+    }
 
-		//Get the segments
-		$this->url = explode('/', $this->remap_url(filter_var($this->uri_string, FILTER_SANITIZE_URL), $this->route));
-		
-		if($this->url[0]) {
-			foreach($this->url as $uri)
-			{
-				if (! preg_match('/^['.config_item('permitted_uri_chars').']+$/i', $uri))
-				{
-					show_error('400 Bad Request', 'The URI you submitted has disallowed characters.', 'error_general', 400);
-				}
-			}
-		}
+    /**
+     * PUT Method
+     *
+     * @param string $url
+     * @param mixed $callback
+     * @return void
+     */
+    public function put($url, $callback)
+    {
+        $this->add_route($url, $callback, 'PUT');
+    }
 
-		return $this->url;
-	}
+    /**
+     * PATCH Method
+     *
+     * @param string $url
+     * @param mixed $callback
+     * @return void
+     */
+    public function patch($url, $callback)
+    {
+        $this->add_route($url, $callback, 'PATCH');
+    }
 
-	/**
-	 * Initiate Routing
-	 *
-	 * @return $this
-	 */
-	public function initiate()
-	{
-		/**
-		 * Default Controller
-		 *
-		 * @var string
-		 */
-		$this->controller = config_item('default_controller');
+    /**
+     * DELETE Method
+     *
+     * @param string $url
+     * @param mixed $callback
+     * @return void
+     */
+    public function delete($url, $callback)
+    {
+        $this->add_route($url, $callback, 'DELETE');
+    }
 
-		/**
-		 * Default Method
-		 *
-		 * @var string
-		 */
-		$this->method = config_item('default_method');
+    /**
+     * Any Method
+     *
+     * @param string $url
+     * @param mixed $callback
+     * @param string $methods
+     * @return void
+     */
+    public function any($url, $callback, $methods)
+    {
+        $this->add_route($url, $callback, $methods);
+    }
 
-		/**
-		 * Segments
-		 *
-		 * @var array
-		 */
-		$segments = $this->parse_url();
+    /**
+     * Grouping Routes
+     *
+     * @param string $prefix
+     * @param mixed $callback
+     * @return void
+     */
+    public function group($prefix, $callback)
+    {
+        $previous_group_prefix = $this->group_prefix;
+        $this->group_prefix .= $prefix;
 
-		/**
-		 * Get the Controller Segment
-		 */
-		if(isset($segments[0]) && !empty($segments[0]))
-		{
-			if($this->route['translate_uri_dashes'] == TRUE)
-				$this->controller = str_replace('-', '_', ucfirst($segments[0]));
-			else
-				$this->controller = ucfirst($segments[0]);
-		}
+        call_user_func($callback);
 
-		/**
-		 * Get The Method Segment
-		 */
-		if(isset($segments[1]) && !empty($segments[1]))
-		{
-			if($this->route['translate_uri_dashes'] == TRUE)
-				$this->method = str_replace('-', '_', $segments[1]);
-			else
-				$this->method = $segments[1];
-		}
+        $this->group_prefix = $previous_group_prefix;
+    }
 
-		/**
-		 * Checking if controller exist
-		 */
-		if(file_exists(APP_DIR . 'controllers/' . $this->controller . '.php'))
-		{
-			require(APP_DIR . 'controllers/' . $this->controller . '.php');
-			unset($segments[0]);
+    /**
+     * Adding Routes
+     *
+     * @param string $url
+     * @param mixed $callback
+     * @param string $method
+     * @return void
+     */
+    private function add_route($url, $callback, $method = 'GET')
+    {
 
-			/**
-			 * Checking if method exist
-			 */
-			if(method_exists($this->controller, $this->method))
-				unset($segments[1]);
-			else
-				empty($this->route['404_override']) ? show_404() : show_404('', '', $this->route['404_override']);
+        $methods = explode('|', strtoupper($method));
+        foreach ($methods as $method) {
+            $this->routes[] = [
+                'url' => $this->group_prefix . $this->sanitize_url($url, '/'),
+                'callback' => $callback,
+                'method' => $method
+            ];
+        }
+    }
 
-			/**
-			 * Check if there are parameters in the URI
-			 *
-			 * @var array
-			 */
-			$this->params = $segments ? array_values($segments) : array();
+    /**
+     * Initiate Request
+     *
+     * @param string $url
+     * @param string $method
+     * @return void
+     */
+    public function initiate($url, $method)
+    {
+        foreach ($this->routes as $route) {
+            if (strtoupper($route['method']) === strtoupper($method)) {
+                $pattern = $this->convert_to_regex_pattern($route['url']);
 
-			/**
-			 * Load the controller, method and parameters
-			 */
-			call_user_func_array([new $this->controller, $this->method], $this->params);
+                if (preg_match($pattern, $url, $matches)) {
+                    array_shift($matches); // Remove the first element (full match)
 
-		} else {
-			empty($this->route['404_override']) ? show_404() : show_404('', '', $this->route['404_override']);
-		}
-	}
+                    $callback = $route['callback'];
+
+                    if (is_string($callback) && strpos($callback, '@') !== false) {
+                        [$controller, $method] = explode('@', $callback);
+
+                        if ($this->is_valid_controller_and_method($controller, $method)) {
+                            $this->call_controller_method($controller, $method, $matches);
+                        } else {
+                            show_error('Runtime Error', 'Invalid controller or method.');
+                        }
+                    } elseif (is_callable($callback)) {
+                        call_user_func_array($callback,  array_values($matches));
+                    } else {
+                        show_error('Runtime Error', 'Invalid callback for route: ' . $route);
+                    }
+                    return;
+                }
+            }
+        }
+        empty(config_item('404_override')) ? show_404() : show_404('Route Not Found', "Route not found: $url", config_item('404_override'));
+    }
+
+    /**
+     * Check if Controller and Method is Valid
+     *
+     * @param string $controller
+     * @param string $method
+     * @return boolean
+     */
+    private function is_valid_controller_and_method($controller, $method)
+    {
+        $valid_controller = preg_match('/^[a-zA-Z0-9_\\\\]+$/', $controller);
+        $valid_method = preg_match('/^[a-zA-Z0-9_]+$/', $method);
+        $app = APP_DIR .'controllers/'. ucfirst($controller) . '.php';
+        if(file_exists($app)){
+            require_once($app);
+            return $valid_controller && $valid_method && class_exists($controller) && method_exists($controller, $method);
+        }
+
+    }
+
+    /**
+     * Call the Controller and Method
+     *
+     * @param string $controller
+     * @param string $method
+     * @param mixed $params
+     * @return void
+     */
+    private function call_controller_method($controller, $method, $params)
+    {
+        $controller_instance = new $controller();
+
+        if ($this->is_method_accessible($controller_instance, $method)) {
+            call_user_func_array([$controller_instance, $method], $params);
+        } else {
+            show_error('Runtime Error', 'Invalid method.');
+        }
+    }
+
+    /**
+     * Check if Method is Accessible
+     *
+     * @param object $object
+     * @param string $method
+     * @return boolean
+     */
+    private function is_method_accessible($object, $method)
+    {
+        $reflectionMethod = new ReflectionMethod($object, $method);
+
+        return $reflectionMethod->isPublic()
+            && $reflectionMethod->getDeclaringClass()->getName() === get_class($object);
+    }
+
+    /**
+     * Regex Pattern
+     *
+     * @param string $url
+     * @return void
+     */
+    private function convert_to_regex_pattern($url)
+    {
+        $pattern = preg_replace('/\//', '\\/', $url);
+        $pattern = preg_replace('/\{([a-zA-Z0-9_]+)\}/', '(?P<$1>[a-zA-Z0-9_]+)', $pattern);
+        $pattern = '/^' . $pattern . '$/';
+        return $pattern;
+    }
+
+    /**
+     * Sanitize URL
+     *
+     * @param string $url
+     * @return void
+     */
+    public function sanitize_url($url)
+    {
+        // Remove trailing slashes
+        $url = rtrim($url, '/');
+        // Remove special characters
+        $url = filter_var($url, FILTER_SANITIZE_URL);
+
+        return $url;
+    }
+
 }
-
 ?>
