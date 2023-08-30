@@ -271,20 +271,20 @@ class Upload
 		{
 			if(! getimagesize($this->file['tmp_name']))
 			{
-				array_push($this->upload_errors, 'File is not an image.');
+				array_push($this->upload_errors, 'Uploaded file is not an image.');
 			}
 		}
 
 		// File too large?
 		if(isset($this->max_size) && $this->file['size'] > $this->max_size)
 		{
-			array_push($this->upload_errors, 'File size too large.');
+			array_push($this->upload_errors, 'Uploaded file size is too large.');
 		}
 
 		// File too small?
 		if(isset($this->min_size) && $this->file['size'] < $this->min_size)
 		{
-			array_push($this->upload_errors, 'File size too small.');
+			array_push($this->upload_errors, 'Uploaded file size is too small.');
 		}
 
 		// Create $basename, $filename, $dirname, & $extension variables
@@ -300,7 +300,7 @@ class Upload
 		// Don't allow just any file extension!
 		if( ! $this->allowed_extension($this->extension))
 		{
-			array_push($this->upload_errors, 'Invalid file extension.');
+			array_push($this->upload_errors, 'Invalid uploaded file extension.');
 		}
 
 		// Get mime type
@@ -309,7 +309,7 @@ class Upload
 		// Don't allow just any file mime!
 		if( ! $this->allowed_mime($this->mime))
 		{
-			array_push($this->upload_errors, 'Invalid file mime.');
+			array_push($this->upload_errors, 'Invalid uploaded file mime type.');
 		}
 
 		// Make sure we can use the destination directory
