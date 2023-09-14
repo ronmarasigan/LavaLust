@@ -131,7 +131,7 @@ if ( ! function_exists('active'))
 	function active($currect_page, $css_class = 'active')
 	{
 		// Explode REQUEST_URI
-		$uri_array =  explode('/', rtrim($_SERVER['REQUEST_URI'], '/'));
+		$uri_array =  explode('/', rtrim(strtok($_SERVER["REQUEST_URI"], '?'), '/'));
 		// Explode the BASE_URL
 		$url_array = explode('/', trim(preg_replace('(^https?://)', '', BASE_URL), '/'));
 		// Find the installation folder index base on $url_array
@@ -139,12 +139,12 @@ if ( ! function_exists('active'))
 		// Check if index_page is not empty in config file
 		if(! empty(config_item('index_page')))
 		{
-			// +2 to the installation folder index to get the index of controller and the rest of the segments if index_page is not empty
+			// +2 to the installation folder index to get the index of the route and the rest of the segments if index_page is not empty
 			$url = implode('/', array_slice($uri_array, $folder_index + 2));
 		}
 		else
 		{
-			// +1 to the installation folder index to get the index of controller and the rest of the segments if index_page is not empty
+			// +1 to the installation folder index to get the index of route and the rest of the segments if index_page is not empty
 			$url = implode('/', array_slice($uri_array, $folder_index + 1));
 		}
 		
