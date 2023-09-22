@@ -44,7 +44,7 @@
 ```php
         function index() {
             $this->call->model('user_model');
-            $data['users] = $this->user_model->get_all_users();
+            $data['users'] = $this->user_model->get_all_users();
             $this->call->view('user_view_file', $data);
         }
 ```
