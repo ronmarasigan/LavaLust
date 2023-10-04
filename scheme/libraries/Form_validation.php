@@ -52,8 +52,8 @@ class Form_validation {
     private static $err_differs = '%s matches with the other field';
     private static $err_is_unique = '%s is not unique';
     private static $err_exact_length = '%s not in exact length';
-    private static $err_min_length = 'Please enter less than %d character/s';
-    private static $err_max_length = 'Please enter more than %d character/s';
+    private static $err_min_length = 'Please enter more than %d character/s';
+    private static $err_max_length = 'Please enter less than %d character/s';
     private static $err_email = '%s contains invalid email address';
     private static $err_alpha = '%s accepts letters only';
     private static $err_alphanum = '%s accepts letters and numbers only';
@@ -294,7 +294,7 @@ class Form_validation {
             return FALSE;
         }
 
-        if(mb_strlen($this->value) === (int) $length)
+        if(strlen($this->value) === (int) $length)
         {
             $this->set_error_message($custom_error, self::$err_exact_length, $length);
         }
@@ -315,7 +315,7 @@ class Form_validation {
             return FALSE;
         }
 
-        if(mb_strlen($this->value) < $length)
+        if(strlen($this->value) < (int) $length)
         {
             $this->set_error_message($custom_error, self::$err_min_length, $length);
         }
@@ -336,7 +336,7 @@ class Form_validation {
             return FALSE;
         }
 
-        if(mb_strlen($this->value) > $length)
+        if(strlen($this->value) > (int) $length)
         {
             $this->set_error_message($custom_error, self::$err_max_length, $length);
         }
