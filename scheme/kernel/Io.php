@@ -122,6 +122,30 @@ Class Io {
 	}
 
 	/**
+	 * POST and GET
+	 *
+	 * @param string $index
+	 * @return void
+	 */
+	public function post_get($index = NULL)
+	{
+		$output = $this->post($index);
+		return isset($output) ? $output : $this->get($index);
+	}
+
+		/**
+	 * GET and POST
+	 *
+	 * @param string $index
+	 * @return void
+	 */
+	public function get_post($index = NULL)
+	{
+		$output = $this->get($index);
+		return isset($output) ? $output : $this->post($index);
+	}
+
+	/**
 	 * Cookie Variable
 	 *
 	 * @param string $index
@@ -195,6 +219,81 @@ Class Io {
 				'httponly' => (bool) $arr['httponly'],
 				'samesite' => $arr['samesite']
 			));
+	}
+	
+	/**
+	 * Undocumented function
+	 *
+	 * @param string $index
+	 * @return void
+	 */
+	public function server($index = NULL)
+	{
+		if($index === NULL && !empty($_SERVER)) {
+			$server = array();
+			foreach($_SERVER as $key => $value) {
+				$server[$key] = $value;
+			}
+			return $server;
+		}
+		return $_SERVER[$index];
+	}
+
+	/**
+	 * Undocumented function
+	 *
+	 * @param boolean $upper	Whether to return in upper or lower case
+	 *				(default: FALSE)
+	 * @return void
+	 */
+	public function method($upper = FALSE)
+	{
+		return ($upper)
+			? strtoupper($this->server('REQUEST_METHOD'))
+			: strtolower($this->server('REQUEST_METHOD'));
+	}
+	
+	/**
+	 * Get IP Address
+	 *
+	 * @return void
+	 */
+	public function ip_address() {
+		$trustedHeaders = ['HTTP_X_FORWARDED_FOR', 'HTTP_CLIENT_IP', 'HTTP_X_REAL_IP'];
+
+		foreach ($trustedHeaders as $header) {
+			if (isset($_SERVER[$header]) && filter_var($_SERVER[$header], FILTER_VALIDATE_IP)) {
+				return $_SERVER[$header];
+			}
+		}
+
+		// Fallback to REMOTE_ADDR if no trusted headers found
+		return $_SERVER['REMOTE_ADDR'];
+	}
+
+	/**
+	 * Validate IP Address
+	 *
+	 * @param	string	$ip	IP address
+	 * @param	string	$which	IP protocol: 'ipv4' or 'ipv6'
+	 * @return	bool
+	 */
+	public function valid_ip($ip, $which = '')
+	{
+		switch (strtolower($which))
+		{
+			case 'ipv4':
+				$which = FILTER_FLAG_IPV4;
+				break;
+			case 'ipv6':
+				$which = FILTER_FLAG_IPV6;
+				break;
+			default:
+				$which = 0;
+				break;
+		}
+
+		return (bool) filter_var($ip, FILTER_VALIDATE_IP, $which);
 	}
 	
 	/**
