@@ -35,6 +35,34 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
+if ( ! function_exists('base_url'))
+{
+	/**
+	 * Base URL
+	 *
+	 * @return void
+	 */
+	function base_url() 
+	{
+		return  filter_var(BASE_URL, FILTER_SANITIZE_URL);
+	}
+}
+
+if ( ! function_exists('site_url'))
+{
+	/**
+	 * Get the site url
+	 *
+	 * @param string $url
+	 * @return void
+	 */
+	function site_url($url = '') 
+	{
+		$base_url = filter_var(BASE_URL, FILTER_SANITIZE_URL);
+		return ! empty(config_item('index_page')) ? $base_url . config_item('index_page').'/' . $url : $base_url . $url;
+	}
+}
+
 if ( ! function_exists('redirect'))
 {
 	/**
@@ -92,34 +120,6 @@ if ( ! function_exists('load_css'))
 	}
 }
 
-if ( ! function_exists('site_url'))
-{
-	/**
-	 * Get the site url
-	 *
-	 * @param string $url
-	 * @return void
-	 */
-	function site_url($url = '') 
-	{
-		$base_url = filter_var(BASE_URL, FILTER_SANITIZE_URL);
-		return ! empty(config_item('index_page')) ? $base_url . config_item('index_page').'/' . $url : $base_url . $url;
-	}
-}
-
-if ( ! function_exists('base_url'))
-{
-	/**
-	 * Base URL
-	 *
-	 * @return void
-	 */
-	function base_url() 
-	{
-		return  filter_var(BASE_URL, FILTER_SANITIZE_URL);
-	}
-}
-
 if ( ! function_exists('active'))
 {
 	/**
@@ -131,7 +131,7 @@ if ( ! function_exists('active'))
 	function active($currect_page, $css_class = 'active')
 	{
 		// Explode REQUEST_URI
-		$uri_array =  explode('/', rtrim($_SERVER['REQUEST_URI'], '/'));
+		$uri_array =  explode('/', rtrim(strtok($_SERVER["REQUEST_URI"], '?'), '/'));
 		// Explode the BASE_URL
 		$url_array = explode('/', trim(preg_replace('(^https?://)', '', BASE_URL), '/'));
 		// Find the installation folder index base on $url_array
@@ -139,12 +139,12 @@ if ( ! function_exists('active'))
 		// Check if index_page is not empty in config file
 		if(! empty(config_item('index_page')))
 		{
-			// +2 to the installation folder index to get the index of controller and the rest of the segments if index_page is not empty
+			// +2 to the installation folder index to get the index of the route and the rest of the segments if index_page is not empty
 			$url = implode('/', array_slice($uri_array, $folder_index + 2));
 		}
 		else
 		{
-			// +1 to the installation folder index to get the index of controller and the rest of the segments if index_page is not empty
+			// +1 to the installation folder index to get the index of the route and the rest of the segments if index_page is not empty
 			$url = implode('/', array_slice($uri_array, $folder_index + 1));
 		}
 		
@@ -169,5 +169,6 @@ if ( ! function_exists('segment'))
 	    return isset($parts[$seg]) ? $parts[$seg] : false;
 	}
 }
+
 
 ?>

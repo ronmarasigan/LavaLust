@@ -111,13 +111,14 @@ class Session {
 		} else {
 	    	$this->config['cookie_expiration'] = ( ! isset($this->config['sess_expiration']) AND $this->config['sess_expire_on_close']) ? 0 : (int) $this->config['sess_expiration'];
 		}
-	    session_set_cookie_params(
-	    	$this->config['cookie_expiration'],
-	    	$this->config['cookie_path'],
-	    	$this->config['cookie_domain'],
-	    	$this->config['cookie_secure'],
-	    	TRUE
-	    );
+	    session_set_cookie_params(array(
+			'lifetime' => $this->config['cookie_expiration'],
+			'path'     => $this->config['cookie_path'],
+			'domain'   => $this->config['cookie_domain'],
+			'secure'   => $this->config['cookie_secure'],
+			'httponly' => TRUE,
+			'samesite' => $this->config['cookie_samesite']
+		));
 		
 	    ini_set('session.use_trans_sid', 0);
 	    ini_set('session.use_strict_mode', 1);

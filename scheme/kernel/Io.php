@@ -56,6 +56,27 @@ Class Io {
 	private $security;
 
 	/**
+	 * Status Code
+	 *
+	 * @var int
+	 */
+	private $status_code;
+
+	/**
+	 * Request Headers
+	 *
+	 * @var array
+	 */
+    private $headers = [];
+
+	/**
+	 * Content
+	 *
+	 * @var mixed
+	 */
+    private $content;
+
+	/**
 	 * Class constructor
 	 */
 	public function __construct()
@@ -222,7 +243,7 @@ Class Io {
 	}
 	
 	/**
-	 * Undocumented function
+	 * Server
 	 *
 	 * @param string $index
 	 * @return void
@@ -240,7 +261,7 @@ Class Io {
 	}
 
 	/**
-	 * Undocumented function
+	 * Method
 	 *
 	 * @param boolean $upper	Whether to return in upper or lower case
 	 *				(default: FALSE)
@@ -304,6 +325,86 @@ Class Io {
 	public function is_ajax() {
         return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest';
 	}
+
+	/**
+	 * Set Status Code
+	 *
+	 * @param int $status_code
+	 * @return void
+	 */
+	public function set_status_code($status_code) {
+        $this->status_code = $status_code;
+    }
+
+	/**
+	 * Set Header
+	 *
+	 * @param string $name
+	 * @param string $value
+	 * @return void
+	 */
+    public function set_header($name, $value) {
+        $this->headers[$name] = $value;
+    }
+
+	/**
+	 * Add header
+	 *
+	 * @param string $name
+	 * @param string $value
+	 * @return void
+	 */
+	public function add_header($name, $value) {
+        $this->headers[$name] = $value;
+    }
+
+	/**
+	 * Set Content
+	 *
+	 * @param mixed $content
+	 * @return void
+	 */
+    public function set_content($content) {
+        $this->content = $content;
+    }
+
+	/**
+	 * HTML Content
+	 *
+	 * @param mixed $content
+	 * @return void
+	 */
+	public function set_html_content($content) {
+        $this->add_header('Content-Type', 'text/html');
+        return $this->set_content($content);
+    }
+
+	/**
+	 * Send Response
+	 *
+	 * @return void
+	 */
+    public function send() {
+        http_response_code($this->status_code);
+
+        foreach ($this->headers as $name => $value) {
+            header("$name: $value");
+        }
+
+        echo $this->content;
+    }
+
+	/**
+	 * Json Encode
+	 *
+	 * @param [type] $data
+	 * @return void
+	 */
+    public function send_json($data) {
+        $this->set_header('Content-Type', 'application/json');
+        $this->set_content(json_encode($data));
+        $this->send();
+    }
 }
 	
 ?>
