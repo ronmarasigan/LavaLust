@@ -175,13 +175,13 @@ class Router
 		if (strpos($url, '/') !== 0) {
 			$url = '/' . $url;
 		}
-        
+
         if(is_string($method)) {
             $methods = explode('|', strtoupper($method));
         } else {
             $methods = $method;
         }
-        
+
         foreach ($methods as $method) {
             $route = [
                 'url' => $this->group_prefix . $this->sanitize_url($url),
@@ -192,7 +192,7 @@ class Router
             ];
             $this->routes[] = $route;
         }
-        
+
     }
 
     /**
@@ -208,10 +208,21 @@ class Router
 
         if ($lastRoute) {
             $lastRoute['constraints'][$param] = $pattern;
-            $this->routes[key($this->routes)] = $lastRoute; // Update the last route in the array
+            $this->routes[key($this->routes)] = $lastRoute;
         }
 
         return $this;
+    }
+
+    /**
+     * Numeric
+     *
+     * @param mixed $param
+     * @return void
+     */
+    public function where_numeric($param)
+    {
+        return $this->where($param, '[0-9]+');
     }
 
     /**
@@ -223,6 +234,7 @@ class Router
     public function where_alpha($param)
     {
         return $this->where($param, '[a-zA-Z]+');
+
     }
 
     /**
@@ -296,7 +308,7 @@ class Router
         $matches = [];
         if(preg_match($this->convert_to_regex_pattern($route['url'], $route['constraints']), $url, $matches))
         {
-            array_shift($matches); // Remove the first element (full match)
+            array_shift($matches);
 
             $callback = $route['callback'];
 
@@ -304,7 +316,7 @@ class Router
                 if(strpos($callback, '::') !== false) {
                     [$controller, $method] = explode('::', $callback);
                 } else {
-                    [$controller, $method] = [$callback, 'index'];                           
+                    [$controller, $method] = [$callback, 'index'];
                 }
                 $app = APP_DIR .'controllers/'. ucfirst($controller) . '.php';
                 if(file_exists($app)){
