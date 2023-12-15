@@ -149,7 +149,6 @@ class Router
      */
     public function group($prefix, $callback)
     {
-        // Check if the URL starts with a slash and add one if needed
         if (strpos($prefix, '/') !== 0) {
 			$prefix = '/' . $prefix;
 		}
@@ -171,7 +170,6 @@ class Router
      */
     private function add_route($url, $callback, $method = 'GET', $name = NULL)
     {
-        // Check if the URL starts with a slash and add one if needed
 		if (strpos($url, '/') !== 0) {
 			$url = '/' . $url;
 		}
@@ -321,17 +319,70 @@ class Router
                 $app = APP_DIR .'controllers/'. ucfirst($controller) . '.php';
                 if(file_exists($app)){
                     require_once($app);
-                    $this->call_controller_method($controller, $method, $matches);
+                    $this->call_controller_method($controller, $method, $this->map_parameters($controller, $method, $route['url'], $matches));
                 } else {
                     show_error('Runtime Error', 'Controller file did not exist.');
                 }
             } elseif (is_callable($callback)) {
-                call_user_func_array($callback,  array_values($matches));
+                call_user_func_array($callback, $this->map_parameters(null, null, $route['url'], $matches));
             } else {
                 throw new RuntimeException('Invalid callback.');
             }
             return;
         }
+    }
+
+    /**
+     * Map parameters to named parameters
+     *
+     * @param string|null $method
+     * @param string $route_url
+     * @param array $matches
+     * @return array
+     */
+    private function map_parameters($controller, $method, $route_url, $matches)
+    {
+        $parameters = [];
+
+        if ($method) {
+            $reflection_method = new reflectionMethod($controller, $method);
+            $params = $reflection_method->getParameters();
+
+            $route_parameters = $this->get_route_parameters($route_url);
+
+            foreach ($params as $param) {
+                $name = $param->getName();
+                $position = array_search($name, $route_parameters);
+                if ($position === false) {
+                    throw new RuntimeException("Unknown named parameter \$$name");
+                }
+                $parameters[$name] = $matches[$position] ?? null;
+            }
+        } else {
+            $route_parameters = $this->get_route_parameters($route_url);
+            foreach ($route_parameters as $index => $name) {
+                if (!isset($matches[$index])) {
+                    throw new RuntimeException("Unknown named parameter \$$name");
+                }
+                $parameters[$name] = $matches[$index];
+            }
+        }
+
+        return $parameters;
+    }
+
+    /**
+     * Get named parameters from the route URL
+     *
+     * @param string $url
+     * @return array
+     */
+    private function get_route_parameters($url)
+    {
+        $matches = [];
+        preg_match_all('/\{([^\/]+)\}/', $url, $matches);
+
+        return $matches[1];
     }
 
     /**
@@ -343,7 +394,6 @@ class Router
      */
     public function initiate($url, $method)
     {
-        //check for invalid chars
         $url_segments = explode('/', $url);
         array_shift($url_segments);
         foreach($url_segments as $uri)
@@ -419,9 +469,7 @@ class Router
      */
     public function sanitize_url($url)
     {
-        // Remove trailing slashes
         $url = rtrim($url, '/');
-        // Remove special characters
         $url = filter_var($url, FILTER_SANITIZE_URL);
 
         return $url;
