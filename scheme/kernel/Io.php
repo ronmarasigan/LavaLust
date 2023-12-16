@@ -337,17 +337,6 @@ Class Io {
     }
 
 	/**
-	 * Set Header
-	 *
-	 * @param string $name
-	 * @param string $value
-	 * @return void
-	 */
-    public function set_header($name, $value) {
-        $this->headers[$name] = $value;
-    }
-
-	/**
 	 * Add header
 	 *
 	 * @param string $name
