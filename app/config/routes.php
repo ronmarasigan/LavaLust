@@ -6,9 +6,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * ------------------------------------------------------------------
  *
  * MIT License
- * 
+ *
  * Copyright (c) 2020 Ronald M. Marasigan
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -45,7 +45,3 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 */
 
 $router->get('/', 'Welcome::index');
-$router->get('user/{name}/{id}', function($name, $id) {
-    echo $id .' --- '.$name;
-});
-$router->get('profile/{name}/{id}', 'Welcome::index');
