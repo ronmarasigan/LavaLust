@@ -285,6 +285,11 @@ class Router
 
             $callback = $route['callback'];
 
+            // Filter out empty matches for optional parameters
+        $matches = array_filter($matches, function ($value, $key) {
+            return !is_numeric($key) || !empty($value);
+        }, ARRAY_FILTER_USE_BOTH);
+
             if (is_string($callback)) {
                 if(strpos($callback, '::') !== false) {
                     [$controller, $method] = explode('::', $callback);
