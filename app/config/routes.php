@@ -45,3 +45,6 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 */
 
 $router->get('/', 'Welcome::index');
+$router->get('user/{id?}', function($id = null) {
+    echo $id;
+});

@@ -164,7 +164,6 @@ class Router
      */
     private function add_route($url, $callback, $method = 'GET', $name = NULL)
     {
-        // Check if the URL starts with a slash and add one if needed
 		if (strpos($url, '/') !== 0) {
 			$url = '/' . $url;
 		}
@@ -197,7 +196,6 @@ class Router
      */
     public function group($prefix, $callback)
     {
-        // Check if the URL starts with a slash and add one if needed
         if (strpos($prefix, '/') !== 0) {
 			$prefix = '/' . $prefix;
 		}
