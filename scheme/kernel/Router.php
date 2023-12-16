@@ -344,19 +344,18 @@ class Router
      */
     public function where($param, $pattern = null)
     {
-        $lastRoute = end($this->routes);
+        $last_route = end($this->routes);
 
-        if ($lastRoute) {
+        if ($last_route) {
             if(is_array($param)) {
                 foreach($param as $key => $val) {
-                    $lastRoute['constraints'][$key] = $val;
-                    $this->routes[key($this->routes)] = $lastRoute;
+                    $last_route['constraints'][$key] = $val;
                 }
             } else {
-                $lastRoute['constraints'][$param] = $pattern;
-                $this->routes[key($this->routes)] = $lastRoute;
+                $last_route['constraints'][$param] = $pattern;
+                
             }
-            
+            $this->routes[key($this->routes)] = $last_route;
         }
 
         return $this;
@@ -368,7 +367,7 @@ class Router
      * @param mixed $param
      * @return void
      */
-    public function where_numeric($param)
+    public function where_number($param)
     {
         return $this->where($param, '[0-9]+');
     }
