@@ -62,6 +62,20 @@ class Router
     private $route_constraints = [];
 
     /**
+     * Sanitize URL
+     *
+     * @param string $url
+     * @return void
+     */
+    public function sanitize_url($url)
+    {
+        $url = rtrim($url, '/');
+        $url = filter_var($url, FILTER_SANITIZE_URL);
+
+        return $url;
+    }
+
+    /**
      * GET Method
      *
      * @param string $url
@@ -141,27 +155,6 @@ class Router
     }
 
     /**
-     * Grouping Routes
-     *
-     * @param string $prefix
-     * @param mixed $callback
-     * @return void
-     */
-    public function group($prefix, $callback)
-    {
-        // Check if the URL starts with a slash and add one if needed
-        if (strpos($prefix, '/') !== 0) {
-			$prefix = '/' . $prefix;
-		}
-        $previous_group_prefix = $this->group_prefix;
-        $this->group_prefix .= $prefix;
-
-        call_user_func($callback);
-
-        $this->group_prefix = $previous_group_prefix;
-    }
-
-    /**
      * Adding Routes
      *
      * @param string $url
@@ -193,6 +186,155 @@ class Router
             $this->routes[] = $route;
         }
 
+    }
+
+    /**
+     * Grouping Routes
+     *
+     * @param string $prefix
+     * @param mixed $callback
+     * @return void
+     */
+    public function group($prefix, $callback)
+    {
+        // Check if the URL starts with a slash and add one if needed
+        if (strpos($prefix, '/') !== 0) {
+			$prefix = '/' . $prefix;
+		}
+        $previous_group_prefix = $this->group_prefix;
+        $this->group_prefix .= $prefix;
+
+        call_user_func($callback);
+
+        $this->group_prefix = $previous_group_prefix;
+    }
+
+    /**
+     * Call the Controller and Method
+     *
+     * @param string $controller
+     * @param string $method
+     * @param mixed $params
+     * @return void
+     */
+    private function call_controller_method($controller, $method, $params)
+    {
+        $controller_instance = new $controller();
+
+        if ($this->is_method_accessible($controller_instance, $method)) {
+            call_user_func_array([$controller_instance, $method], array_values($params));
+        } else {
+            throw new RuntimeException('Method is inaccessible.');
+        }
+    }
+
+    /**
+     * Check if Method is Accessible
+     *
+     * @param object $object
+     * @param string $method
+     * @return boolean
+     */
+    private function is_method_accessible($controller, $method)
+    {
+        return is_object($controller) && method_exists($controller, $method) && is_callable([$controller, $method]);
+    }
+
+    /**
+     * Regex Pattern
+     *
+     * @param string $url
+     * @return void
+     */
+    private function convert_to_regex_pattern($url, $constraints)
+    {
+        $pattern = preg_replace_callback('/\{([^\/]+)\}/', function ($matches) use ($constraints) {
+            $param = $matches[1];
+            if (isset($constraints[$param])) {
+                return '(' . $constraints[$param] . ')';
+            }
+            return '([^\/]+)';
+        }, $url);
+        return '#^' . $pattern . '$#';
+    }
+
+    /**
+     * URL Matches
+     *
+     * @param string $url
+     * @param string $route
+     * @return void
+     */
+    private function url_matches_route($url, $route)
+    {
+        $pattern = $this->convert_to_regex_pattern($route['url'], $route['constraints']);
+        return preg_match($pattern, $url);
+    }
+
+    /**
+     * Execute Callback
+     *
+     * @param string $url
+     * @param string $route
+     * @return void
+     */
+    private function execute_callback($url, $route)
+    {
+        $matches = [];
+        if(preg_match($this->convert_to_regex_pattern($route['url'], $route['constraints']), $url, $matches))
+        {
+            array_shift($matches);
+
+            $callback = $route['callback'];
+
+            if (is_string($callback)) {
+                if(strpos($callback, '::') !== false) {
+                    [$controller, $method] = explode('::', $callback);
+                } else {
+                    [$controller, $method] = [$callback, 'index'];
+                }
+                $app = APP_DIR .'controllers/'. ucfirst($controller) . '.php';
+                if(file_exists($app)){
+                    require_once($app);
+                    $this->call_controller_method($controller, $method, $matches);
+                } else {
+                    throw new RuntimeException('Controller does not exist.');
+                }
+            } elseif (is_callable($callback)) {
+                call_user_func_array($callback,  array_values($matches));
+            } else {
+                throw new RuntimeException('Invalid callback.');
+            }
+            return;
+        }
+    }
+
+    /**
+     * Initiate Request
+     *
+     * @param string $url
+     * @param string $method
+     * @return void
+     */
+    public function initiate($url, $method)
+    {
+        //check for invalid chars
+        $url_segments = explode('/', $url);
+        array_shift($url_segments);
+        foreach($url_segments as $uri)
+        {
+            if (! preg_match('/^['.config_item('permitted_uri_chars').']+$/i', $uri))
+            {
+                show_error('400 Bad Request', 'The URI you submitted has disallowed characters.', 'error_general', 400);
+            }
+        }
+        foreach ($this->routes as $route) {
+            if (strtoupper($route['method']) === strtoupper($method) && $this->url_matches_route($url, $route)) {
+                $this->execute_callback($url, $route);
+                return;
+            }
+        }
+        empty(config_item('404_override')) ? show_404() : show_404('', '', config_item('404_override'));
     }
 
     /**
@@ -289,148 +431,6 @@ class Router
     {
         $pattern = '(' . implode('|', array_map('preg_quote', $values)) . ')';
         return $this->where($param, $pattern);
-    }
-
-    /**
-     * URL Matches
-     *
-     * @param string $url
-     * @param string $route
-     * @return void
-     */
-    private function url_matches_route($url, $route)
-    {
-        $pattern = $this->convert_to_regex_pattern($route['url'], $route['constraints']);
-        return preg_match($pattern, $url);
-    }
-
-    /**
-     * Execute Callback
-     *
-     * @param string $url
-     * @param string $route
-     * @return void
-     */
-    private function execute_callback($url, $route)
-    {
-        $matches = [];
-        if(preg_match($this->convert_to_regex_pattern($route['url'], $route['constraints']), $url, $matches))
-        {
-            array_shift($matches);
-
-            $callback = $route['callback'];
-
-            if (is_string($callback)) {
-                if(strpos($callback, '::') !== false) {
-                    [$controller, $method] = explode('::', $callback);
-                } else {
-                    [$controller, $method] = [$callback, 'index'];
-                }
-                $app = APP_DIR .'controllers/'. ucfirst($controller) . '.php';
-                if(file_exists($app)){
-                    require_once($app);
-                    $this->call_controller_method($controller, $method, $matches);
-                } else {
-                    throw new RuntimeException('Controller does not exist.');
-                }
-            } elseif (is_callable($callback)) {
-                call_user_func_array($callback,  array_values($matches));
-            } else {
-                throw new RuntimeException('Invalid callback.');
-            }
-            return;
-        }
-    }
-
-    /**
-     * Initiate Request
-     *
-     * @param string $url
-     * @param string $method
-     * @return void
-     */
-    public function initiate($url, $method)
-    {
-        //check for invalid chars
-        $url_segments = explode('/', $url);
-        array_shift($url_segments);
-        foreach($url_segments as $uri)
-        {
-            if (! preg_match('/^['.config_item('permitted_uri_chars').']+$/i', $uri))
-            {
-                show_error('400 Bad Request', 'The URI you submitted has disallowed characters.', 'error_general', 400);
-            }
-        }
-        foreach ($this->routes as $route) {
-            if (strtoupper($route['method']) === strtoupper($method) && $this->url_matches_route($url, $route)) {
-                $this->execute_callback($url, $route);
-                return;
-            }
-        }
-        empty(config_item('404_override')) ? show_404() : show_404('', '', config_item('404_override'));
-    }
-
-    /**
-     * Call the Controller and Method
-     *
-     * @param string $controller
-     * @param string $method
-     * @param mixed $params
-     * @return void
-     */
-    private function call_controller_method($controller, $method, $params)
-    {
-        $controller_instance = new $controller();
-
-        if ($this->is_method_accessible($controller_instance, $method)) {
-            call_user_func_array([$controller_instance, $method], array_values($params));
-        } else {
-            throw new RuntimeException('Method is inaccessible.');
-        }
-    }
-
-    /**
-     * Check if Method is Accessible
-     *
-     * @param object $object
-     * @param string $method
-     * @return boolean
-     */
-    private function is_method_accessible($controller, $method)
-    {
-        return is_object($controller) && method_exists($controller, $method) && is_callable([$controller, $method]);
-    }
-
-    /**
-     * Regex Pattern
-     *
-     * @param string $url
-     * @return void
-     */
-    private function convert_to_regex_pattern($url, $constraints)
-    {
-        $pattern = preg_replace_callback('/\{([^\/]+)\}/', function ($matches) use ($constraints) {
-            $param = $matches[1];
-            if (isset($constraints[$param])) {
-                return '(' . $constraints[$param] . ')';
-            }
-            return '([^\/]+)';
-        }, $url);
-        return '#^' . $pattern . '$#';
-    }
-
-    /**
-     * Sanitize URL
-     *
-     * @param string $url
-     * @return void
-     */
-    public function sanitize_url($url)
-    {
-        $url = rtrim($url, '/');
-        $url = filter_var($url, FILTER_SANITIZE_URL);
-
-        return $url;
     }
 
     /**
