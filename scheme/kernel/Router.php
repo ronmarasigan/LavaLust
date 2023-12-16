@@ -202,13 +202,21 @@ class Router
      * @param regex $pattern
      * @return void
      */
-    public function where($param, $pattern)
+    public function where($param, $pattern = null)
     {
         $lastRoute = end($this->routes);
 
         if ($lastRoute) {
-            $lastRoute['constraints'][$param] = $pattern;
-            $this->routes[key($this->routes)] = $lastRoute;
+            if(is_array($param)) {
+                foreach($param as $key => $val) {
+                    $lastRoute['constraints'][$key] = $val;
+                    $this->routes[key($this->routes)] = $lastRoute;
+                }
+            } else {
+                $lastRoute['constraints'][$param] = $pattern;
+                $this->routes[key($this->routes)] = $lastRoute;
+            }
+            
         }
 
         return $this;
