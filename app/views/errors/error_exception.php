@@ -95,7 +95,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 		<div class="stack_trace">
 			<p style="font-weight: bold">Stack trace:</p>
 			<?php foreach ($exception->getTrace() as $error): ?>
-				<?php if (isset($error['file'])): ?>
+				<?php if (isset($error['file']) && strpos($error['file'], realpath(SYSTEM_DIR)) !== 0): ?>
 					<p style="margin-left:10px">
 					File: <?php echo $error['file']; ?><br />
 					Line: <?php echo $error['line']; ?><br />

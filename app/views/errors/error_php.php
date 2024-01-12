@@ -78,7 +78,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 	</style>
 </head>
 <body>
-	<div class="header"><h4>Uncaught Exception Encountered</h4></div>
+	<div class="header"><h4>A PHP Error was encountered</h4></div>
 		<div class="err_body">
 			<p>Severity: <?php echo $severity; ?></p>
 			<p>Message:  <?php echo $message; ?></p>
@@ -88,7 +88,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 		<div class="stack_trace">
 			<p style="font-weight: bold">Stack trace:</p>
 			<?php foreach (debug_backtrace() as $error): ?>
-				<?php if (isset($error['file'])): ?>
+				<?php if (isset($error['file']) && strpos($error['file'], realpath(SYSTEM_DIR)) !== 0): ?>
 					<p style="margin-left:10px">
 					File: <?php echo $error['file']; ?><br />
 					Line: <?php echo $error['line']; ?><br />
