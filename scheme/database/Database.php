@@ -822,10 +822,11 @@ class Database {
      */
     public function limit($limit, $end = NULL)
     {
+        $this->limit = ' LIMIT ';
         if ($end == NULL ) {
-            $this->limit = $limit;
+            $this->limit .= $limit;
         }else{
-            $this->limit = $limit .', '. $end;
+            $this->limit .= $limit .', '. $end;
         }
 
         return $this;
@@ -839,7 +840,8 @@ class Database {
      */
     public function offset($offset)
     {
-        $this->offset = $offset;
+        $this->offset = ' OFFSET ';
+        $this->offset .= $offset;
 
         return $this;
     }
@@ -866,19 +868,17 @@ class Database {
      * @param  string $order
      * @return $this
      */
-    public function order_by($field_name, $order = 'ASC')
+    public function order_by($field_name, $order = null)
     {
         $field_name = trim($field_name);
 
-        $order =  trim(strtoupper($order));
-
-        if ($field_name !== NULL && ($order == 'ASC' || $order == 'DESC')) {
-            if ($this->orderBy ==NULL ) {
-                $this->orderBy = " ORDER BY {$field_name} {$order}";
-            }else{
-                $this->orderBy .= ", {$field_name} {$order}";
-            }
-            
+        $this->orderBy = ' ORDER BY ';
+        if (! is_null($order)) {
+            $this->orderBy .= $field_name . ' ' . strtoupper($order);
+        } else {
+            $this->orderBy .= stristr($field_name, ' ') || strtolower($field_name) === 'rand()'
+                ? $field_name
+                : $field_name . ' ASC';
         }
 
         return $this;
@@ -967,11 +967,11 @@ class Database {
         }
 
         if ($this->limit !== NULL) {
-            $this->sql .= ' LIMIT ' . $this->limit;
+            $this->sql .= $this->limit;
         }
 
         if ($this->offset !== NULL) {
-            $this->sql .= ' OFFSET ' . $this->offset;
+            $this->sql .= $this->offset;
         }
     }
 
