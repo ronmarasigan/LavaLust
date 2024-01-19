@@ -143,13 +143,17 @@ class Database {
     {
         $this->sql .= $this->where;
         $this->getSQL = $this->sql;
-        $stmt = $this->db->prepare($this->sql);
-        $stmt->execute($this->bindValues);
-        if (strpos( strtoupper($this->sql), "INSERT" ) === 0 ) {
-            $this->lastIDInserted = (int) $this->db->lastInsertId();
-            return $this->lastIDInserted;
-        } else {
-            return $stmt->rowCount();
+        try {
+            $stmt = $this->db->prepare($this->sql);
+            $stmt->execute($this->bindValues);
+            if (strpos( strtoupper($this->sql), "INSERT" ) === 0 ) {
+                $this->lastIDInserted = (int) $this->db->lastInsertId();
+                return $this->lastIDInserted;
+            } else {
+                return $stmt->rowCount();
+            }
+        } catch(Exception $e) {
+            throw new PDOException($e->getMessage().'<div style="background-color:#000;color:#fff;padding:15px">Query: '.html_escape($this->getSQL).'</div>');
         }
     }
 
@@ -991,7 +995,7 @@ class Database {
             $this->rowCount = $stmt->rowCount();
             return $stmt->fetch($mode);
         } catch(Exception $e) {
-            throw new PDOException($e->getMessage().'<br>SQL STATEMENT: '.html_escape($this->getSQL));
+            throw new PDOException($e->getMessage().'<div style="background-color:#000;color:#fff;padding:15px">Query: '.html_escape($this->getSQL).'</div>');
         }
     }
 
@@ -1010,7 +1014,7 @@ class Database {
             $this->rowCount = $stmt->rowCount();
             return $stmt->fetchAll($mode);
         } catch(Exception $e) {
-            throw new PDOException($e->getMessage().'<br>SQL STATEMENT: '.html_escape($this->getSQL));
+            throw new PDOException($e->getMessage().'<div style="background-color:#000;color:#fff;padding:15px">Query: '.html_escape($this->getSQL).'</div>');
         }
     }
 
