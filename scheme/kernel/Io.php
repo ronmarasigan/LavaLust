@@ -386,7 +386,7 @@ Class Io {
 	/**
 	 * Json Encode
 	 *
-	 * @param [type] $data
+	 * @param string $data
 	 * @return void
 	 */
     public function send_json($data) {
