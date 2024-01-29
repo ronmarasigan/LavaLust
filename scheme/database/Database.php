@@ -153,7 +153,7 @@ class Database {
                 return $stmt->rowCount();
             }
         } catch(Exception $e) {
-            throw new PDOException($e->getMessage().'<div style="background-color:#000;color:#fff;padding:15px">Query: '.html_escape($this->getSQL).'</div>');
+            throw new PDOException($e->getMessage().'<div style="background-color:#000;color:#fff;padding:15px">Query: '.$this->getSQL.'</div>');
         }
     }
 
@@ -290,7 +290,7 @@ class Database {
     public function _sql_function($column, $alias = null, $type = 'MAX')
     {
         if( ! in_array($type, array('MAX', 'MIN', 'SUM', 'COUNT', 'AVG', 'DISTINCT'))) {
-            throw new RuntimeException('Invalid function type: ' . html_escape($type));
+            throw new RuntimeException('Invalid function type: ' . $type);
         }
 
         $function = $type . '(' . $column . ')' . (! is_null($alias) ? ' AS ' . $alias : '');
@@ -995,7 +995,7 @@ class Database {
             $this->rowCount = $stmt->rowCount();
             return $stmt->fetch($mode);
         } catch(Exception $e) {
-            throw new PDOException($e->getMessage().'<div style="background-color:#000;color:#fff;padding:15px">Query: '.html_escape($this->getSQL).'</div>');
+            throw new PDOException($e->getMessage().'<div style="background-color:#000;color:#fff;padding:15px">Query: '.$this->getSQL.'</div>');
         }
     }
 
@@ -1014,7 +1014,7 @@ class Database {
             $this->rowCount = $stmt->rowCount();
             return $stmt->fetchAll($mode);
         } catch(Exception $e) {
-            throw new PDOException($e->getMessage().'<div style="background-color:#000;color:#fff;padding:15px">Query: '.html_escape($this->getSQL).'</div>');
+            throw new PDOException($e->getMessage().'<div style="background-color:#000;color:#fff;padding:15px">Query: '.$this->getSQL.'</div>');
         }
     }
 

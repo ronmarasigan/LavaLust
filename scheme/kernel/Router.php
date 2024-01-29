@@ -222,7 +222,7 @@ class Router
         if ($this->is_method_accessible($controller_instance, $method)) {
             call_user_func_array([$controller_instance, $method], array_values($params));
         } else {
-            throw new RuntimeException('Method is inaccessible.');
+            throw new RuntimeException('Method '. $controller.'::'.$method .' is inaccessible or nonexistent.');
         }
     }
 
@@ -296,12 +296,12 @@ class Router
                     require_once($app);
                     $this->call_controller_method($controller, $method, $matches);
                 } else {
-                    throw new RuntimeException('Controller does not exist.');
+                    throw new RuntimeException('Controller '. $controller .' does not exist.');
                 }
             } elseif (is_callable($callback)) {
                 call_user_func_array($callback,  array_values($matches));
             } else {
-                throw new RuntimeException('Invalid callback.');
+                throw new RuntimeException('Invalid callback '. $matches);
             }
             return;
         }
