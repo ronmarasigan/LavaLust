@@ -6,9 +6,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * ------------------------------------------------------------------
  *
  * MIT License
- * 
+ *
  * Copyright (c) 2020 Ronald M. Marasigan
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -29,31 +29,32 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  *
  * @package LavaLust
  * @author Ronald M. Marasigan <ronald.marasigan@yahoo.com>
- * @copyright Copyright 2020 (https://ronmarasigan.github.io)
  * @since Version 1
- * @link https://lavalust.pinoywap.org
+ * @link https://github.com/ronmarasigan/LavaLust
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
- /**
-  * Class Performance
-  */
+/**
+* ------------------------------------------------------
+*  Class Performance
+* ------------------------------------------------------
+ */
 class Performance {
 	public function __construct() {
-        
+
     }
 	/**
 	 * Holds the mark points
-	 * 
+	 *
 	 * @var array
 	 */
 	public $tags = array();
 
 	/**
 	 * Start marking Points
-	 * 
+	 *
 	 * @param  string $point marker
-	 * @return array
+	 * @return void
 	 */
 	public function tag($point)
 	{
@@ -63,7 +64,7 @@ class Performance {
 
 	/**
 	 * Elapsed Time
-	 * 
+	 *
 	 * @param  string  $point    marker
 	 * @param  integer $decimals
 	 * @return float
@@ -76,7 +77,7 @@ class Performance {
 
 	/**
 	 * Memory Usage
-	 * 
+	 *
 	 * @return float
 	 */
 	public function memory_usage()

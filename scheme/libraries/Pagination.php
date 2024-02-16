@@ -6,9 +6,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * ------------------------------------------------------------------
  *
  * MIT License
- * 
+ *
  * Copyright (c) 2020 Ronald M. Marasigan
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -29,34 +29,35 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  *
  * @package LavaLust
  * @author Ronald M. Marasigan <ronald.marasigan@yahoo.com>
- * @copyright Copyright 2020 (https://ronmarasigan.github.io)
  * @since Version 1
- * @link https://lavalust.pinoywap.org
+ * @link https://github.com/ronmarasigan/LavaLust
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
- /**
-  * Class Pagination
-  */
+/**
+* ------------------------------------------------------
+*  Class Pagination
+* ------------------------------------------------------
+ */
 class Pagination
 {
     /**
      * Array to hold different page info
-     * 
+     *
      * @var array
      */
     protected $page_array = array();
 
     /**
      * Page number
-     * 
+     *
      * @var array
      */
     protected $page_num;
 
     /**
      * Rows Per Page
-     * 
+     *
      * @var int
      */
     protected $rows_per_page;
@@ -70,7 +71,7 @@ class Pagination
 
     /**
      * Links
-     * 
+     *
      * @var string
      */
     protected $pagination;
@@ -105,20 +106,20 @@ class Pagination
 
     /**
      * Classes for CSS
-     * 
+     *
      * @var array
      */
     protected $classes = array();
 
     /**
      * Page delimiter
-     * 
+     *
      * @var string
      */
     protected $page_delimiter = '/';
     /**
      * LavaLust Instance
-     * 
+     *
      * @var
      */
     protected $LAVA;
@@ -144,12 +145,12 @@ class Pagination
         foreach (array('first_link', 'next_link', 'prev_link', 'last_link', 'classes', 'page_delimiter') as $key)
         {
             $this->$key = lang($key);
-        }       
+        }
 
     }
     /**
      * Initialize Variables for Paging
-     * 
+     *
      * @param int $total_rows
      * @param int $rows_per_page
      * @param int $page_num
@@ -196,7 +197,7 @@ class Pagination
 
     /**
      * Calculate then Render Pages
-     * 
+     *
      * @param  int $page_num
      * @param  int $last_page
      * @param  int $next
@@ -242,7 +243,7 @@ class Pagination
 
     /**
      * Render the Output
-     * 
+     *
      * @return string
      */
     public function paginate()
@@ -251,8 +252,8 @@ class Pagination
             $this->pagination = '
                 <nav class="'.$this->classes['nav'].'">
                     <ul class="'.$this->classes['ul'].'">
-            '; 
-            
+            ';
+
             $this->pagination .= '
                 <li class="'.$this->classes['li'].'"><a class="'.$this->classes['a'].'" href="'.site_url($this->page_array['url']).''.$this->page_delimiter.'1">'.$this->first_link.'</a></li>
             ';
@@ -272,7 +273,7 @@ class Pagination
                     <li class="'.$this->classes['li'].' '.$active.'"><a class="'.$this->classes['a'].'" href="'.site_url($this->page_array['url']).''.$this->page_delimiter.''.(int)$pages.'">'.(int)$pages.'</a></li>
                 ';
             }
-            
+
             $this->pagination .= '
                 <li class="'.$this->classes['li'].'"><a class="'.$this->classes['a'].'" href="'.site_url($this->page_array['url']).''.$this->page_delimiter.''.$this->page_array['next'].'">'.$this->next_link.'</a></li>
                 <li class="'.$this->classes['li'].'"><a class="'.$this->classes['a'].'" href="'.site_url($this->page_array['url']).''.$this->page_delimiter.''.$this->page_array['last'].'">'.$this->last_link.'</a></li>

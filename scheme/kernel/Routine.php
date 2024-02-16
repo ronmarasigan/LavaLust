@@ -6,9 +6,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * ------------------------------------------------------------------
  *
  * MIT License
- * 
+ *
  * Copyright (c) 2020 Ronald M. Marasigan
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -61,7 +61,7 @@ if ( ! function_exists('load_class'))
 		foreach (array(APP_DIR, SYSTEM_DIR) as $path)
     	{
 			$path = $path . $directory  . DIRECTORY_SEPARATOR . $class_name . '.php';
-					
+
 			if (file_exists($path))
 			{
 				if( ! class_exists($class_name, FALSE))
@@ -70,7 +70,7 @@ if ( ! function_exists('load_class'))
 				}
 			}
 		}
-		
+
 		loaded_class($class, $object_name);
 		$LAVA->store_object($object_name, isset($params) ? new $class($params) : new $class());
 		$object = $LAVA->get_object($object_name);
@@ -193,13 +193,13 @@ if ( ! function_exists('get_config'))
 	{
 		static $config;
 
-		if ( file_exists(APP_DIR . 'config/config.php') ) 
+		if ( file_exists(APP_DIR . 'config/config.php') )
 		{
 			require_once APP_DIR . 'config/config.php';
 
-			if ( isset($config) OR is_array($config) ) 
+			if ( isset($config) OR is_array($config) )
 			{
-				foreach( $config as $key => $val ) 
+				foreach( $config as $key => $val )
 				{
 					$config[$key] = $val;
 				}
@@ -244,13 +244,13 @@ if ( ! function_exists('autoload_config'))
 	{
 		static $autoload;
 
-		if ( file_exists(APP_DIR . 'config/autoload.php') ) 
+		if ( file_exists(APP_DIR . 'config/autoload.php') )
 		{
 			require_once APP_DIR . 'config/autoload.php';
 
-			if ( isset($autoload)  OR is_array($autoload) ) 
+			if ( isset($autoload)  OR is_array($autoload) )
 			{
-				foreach( $autoload as $key => $val ) 
+				foreach( $autoload as $key => $val )
 				{
 					$autoload[$key] = $val;
 				}
@@ -273,13 +273,13 @@ if ( ! function_exists('database_config'))
 	{
 		static $database;
 
-		if ( file_exists(APP_DIR . 'config/database.php') ) 
+		if ( file_exists(APP_DIR . 'config/database.php') )
 		{
 			require_once APP_DIR . 'config/database.php';
 
 			if ( isset($database)  OR is_array($database) )
 			{
-				foreach( $database as $key => $val ) 
+				foreach( $database as $key => $val )
 				{
 					$database[$key] = $val;
 				}
@@ -302,13 +302,13 @@ if ( ! function_exists('route_config'))
 	{
 		static $route;
 
-		if ( file_exists(APP_DIR . 'config/routes.php') ) 
+		if ( file_exists(APP_DIR . 'config/routes.php') )
 		{
 			require_once APP_DIR . 'config/routes.php';
 
 			if ( isset($route)  OR is_array($route) )
 			{
-				foreach( $route as $key => $val ) 
+				foreach( $route as $key => $val )
 				{
 					$route[$key] = $val;
 				}
@@ -317,7 +317,7 @@ if ( ! function_exists('route_config'))
 			}
 		} else {
 			show_404('404 Not Found', 'The configuration file does not exist');
-		}			
+		}
 	}
 }
 

@@ -29,18 +29,30 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  *
  * @package LavaLust
  * @author Ronald M. Marasigan <ronald.marasigan@yahoo.com>
- * @copyright Copyright 2020 (https://ronmarasigan.github.io)
  * @since Version 1
- * @link https://lavalust.pinoywap.org
+ * @link https://github.com/ronmarasigan/LavaLust
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
 /**
- * Class Registry
+* ------------------------------------------------------
+*  Class Performance
+* ------------------------------------------------------
  */
 class Registry
-{ 
+{
+    /**
+     * Class name arrays
+     *
+     * @var array
+     */
 	private $_classes = array();
+
+    /**
+     * Instance
+     *
+     * @var object
+     */
 	private static $_instance;
 	
     /**
@@ -56,7 +68,9 @@ class Registry
     }
 
     /**
+     * Get
      * @param string $key
+     * @return mixed
      */
     protected function get($key)
     {
@@ -71,6 +85,7 @@ class Registry
     /**
      * @param string $key
      * @param object $object
+     * @return void
      */
     protected function set($key, $object)
     {
@@ -79,6 +94,7 @@ class Registry
 
     /**
      * @param string $key
+     * @return object
      */
     static function get_object($key)
     {
@@ -88,6 +104,7 @@ class Registry
     /**
      * @param string $key
      * @param object $object
+     * @return object
      */
 	static function store_object($key, $object)
 	{

@@ -6,9 +6,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * ------------------------------------------------------------------
  *
  * MIT License
- * 
+ *
  * Copyright (c) 2020 Ronald M. Marasigan
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -29,9 +29,8 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  *
  * @package LavaLust
  * @author Ronald M. Marasigan <ronald.marasigan@yahoo.com>
- * @copyright Copyright 2020 (https://ronmarasigan.github.io)
  * @since Version 1
- * @link https://lavalust.pinoywap.org
+ * @link https://github.com/ronmarasigan/LavaLust
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
@@ -46,27 +45,151 @@ class Form_validation {
      */
     private $LAVA;
 
-    //Default Error Messages
+    /**
+     * Check if required
+     *
+     * @var string
+     */
     private static $err_required = '%s is required';
+
+    /**
+     * Matches
+     *
+     * @var string
+     */
     private static $err_matches = '%s does not match with the other field';
+
+    /**
+     * Differs
+     *
+     * @var string
+     */
     private static $err_differs = '%s matches with the other field';
+
+    /**
+     * Is unique
+     *
+     * @var string
+     */
     private static $err_is_unique = '%s is not unique';
+
+    /**
+     * Exact length
+     *
+     * @var string
+     */
     private static $err_exact_length = '%s not in exact length';
+
+    /**
+     * Min length
+     *
+     * @var string
+     */
     private static $err_min_length = 'Please enter more than %d character/s';
+
+    /**
+     * Max length
+     *
+     * @var string
+     */
     private static $err_max_length = 'Please enter less than %d character/s';
+
+    /**
+     * Valid email
+     *
+     * @var string
+     */
     private static $err_email = '%s contains invalid email address';
+
+    /**
+     * Alpha
+     *
+     * @var string
+     */
     private static $err_alpha = '%s accepts letters only';
+
+    /**
+     * Alpha and num
+     *
+     * @var string
+     */
     private static $err_alphanum = '%s accepts letters and numbers only';
+
+    /**
+     * Alpha, num and space
+     *
+     * @var string
+     */
     private static $err_alphanumspace = '%s accepts letters, numbers and spaces only';
+
+    /**
+     * alpha and space
+     *
+     * @var string
+     */
     private static $err_alphaspace = '%s accepts letters and spaces only';
+
+    /**
+     * Alphanumdash
+     *
+     * @var string
+     */
     private static $err_alphanumdash = '%s accepts letters, numbers and dashes only';
+
+    /**
+     * numeric
+     *
+     * @var string
+     */
     private static $err_numeric = '%s accepts numbers only';
+
+    /**
+     * greater than
+     *
+     * @var string
+     */
     private static $err_greater_than = 'Please enter a value less than %f';
+
+    /**
+     * less than
+     *
+     * @var string
+     */
     private static $err_less_than = 'Please enter a value greater than %f';
+
+    /**
+     * grater than or equal
+     *
+     * @var string
+     */
     private static $err_greater_than_equal_to = 'Please enter a value less than or equal to %f';
+
+    /**
+     * Less than or equal
+     *
+     * @var string
+     */
     private static $err_less_than_equal_to = 'Please enter a value greater than or equal to %f';
+
+    /**
+     * In List
+     *
+     * @var string
+     */
     private static $err_in_list = '%s is not in the list';
+
+    /**
+     * Valid pattern
+     *
+     * @var string
+     */
     private static $err_pattern = 'Please is not in %s format';
+
+    /**
+     * Valid name
+     *
+     * @var string
+     */
     private static $err_valid_name = '%s is not a valid name';
 
     public $patterns = array(
@@ -128,7 +251,7 @@ class Form_validation {
 
     /**
      * Check if from is submitted and not empty
-     * 
+     *
      * @return Bool
      */
     public function submitted()
@@ -173,7 +296,7 @@ class Form_validation {
 
     /**
      * Check if pattern matched
-     * 
+     *
      * @param  string $name Pattern
      * @return void
      */
@@ -190,7 +313,7 @@ class Form_validation {
             if($this->value != '' && !preg_match($regex, $this->value))
             {
                 $this->set_error_message($custom_error, self::$err_pattern, $this->name);
-            }           
+            }
         }
         return $this;
     }
@@ -203,7 +326,7 @@ class Form_validation {
      * @return void
      */
     public function custom_pattern($pattern, $custom_error)
-    {   
+    {
         $regex = '/^('.$pattern.')$/u';
         if($this->value != '' && !preg_match($regex, $this->value))
         {
@@ -219,17 +342,17 @@ class Form_validation {
      * @return void
      */
     public function required($custom_error = '')
-    {     
+    {
         if(($this->value == '' || $this->value == null))
         {
             $this->set_error_message($custom_error, self::$err_required, $this->name);
-        }            
-        return $this;  
+        }
+        return $this;
     }
 
     /**
      * Check if current field match the other field
-     * 
+     *
      * @param  string $field
      * @param  string $err   Custom Error
      * @return void
@@ -245,7 +368,7 @@ class Form_validation {
 
     /**
      * Check if current field differs from other field
-     * 
+     *
      * @param  string $field
      * @param  string $err   Custom Error
      * @return void
@@ -276,7 +399,7 @@ class Form_validation {
         if($this->LAVA->db->row_count() !== 0)
         {
             $this->set_error_message($custom_error, self::$err_is_unique, $this->name);
-        } 
+        }
         return $this;
     }
 
@@ -289,7 +412,7 @@ class Form_validation {
      */
     public function exact_length($length, $custom_error = '')
     {
-        if (! is_numeric($length)) 
+        if (! is_numeric($length))
         {
             return FALSE;
         }
@@ -310,7 +433,7 @@ class Form_validation {
      */
     public function min_length($length, $custom_error = '')
     {
-        if (! is_numeric($length)) 
+        if (! is_numeric($length))
         {
             return FALSE;
         }
@@ -340,7 +463,7 @@ class Form_validation {
         {
             $this->set_error_message($custom_error, self::$err_max_length, $length);
         }
-        return $this;       
+        return $this;
     }
 
     /**
@@ -354,7 +477,7 @@ class Form_validation {
         if(!filter_var($this->value, FILTER_VALIDATE_EMAIL))
         {
             $this->set_error_message($custom_error, self::$err_email, $this->name);
-        } 
+        }
         return $this;
     }
 
@@ -372,12 +495,12 @@ class Form_validation {
             {
                 $this->set_error_message($custom_error, self::$err_alpha, $this->name);
             }
-        }   
-        return $this; 
+        }
+        return $this;
     }
 
     /**
-     * Alpha-numeric 
+     * Alpha-numeric
      *
      * @param string $custom_error
      * @return void
@@ -389,9 +512,9 @@ class Form_validation {
             if(! ctype_alnum((string) $this->value))
             {
                 $this->set_error_message($custom_error, self::$err_alphanum, $this->name);
-            } 
-        }   
-        return $this; 
+            }
+        }
+        return $this;
     }
 
     /**
@@ -408,8 +531,8 @@ class Form_validation {
             {
                 $this->set_error_message($custom_error, self::$err_alphanumspace, $this->name);
             }
-        }  
-        return $this; 
+        }
+        return $this;
     }
 
     /**
@@ -425,9 +548,9 @@ class Form_validation {
             if(! preg_match('/^[A-Z ]+$/i', $this->value))
             {
                 $this->set_error_message($custom_error, self::$err_alphaspace, $this->name);
-            }   
+            }
         }
-        return $this; 
+        return $this;
     }
 
     /**
@@ -445,7 +568,7 @@ class Form_validation {
                 $this->set_error_message($custom_error, self::$err_alphanumdash, $this->name);
             }
         }
-        return $this; 
+        return $this;
     }
 
    /**
@@ -462,8 +585,8 @@ class Form_validation {
             {
                 $this->set_error_message($custom_error, self::$err_numeric, $this->name);
             }
-        }  
-        return $this; 
+        }
+        return $this;
 
     }
 
@@ -484,7 +607,7 @@ class Form_validation {
         {
             $$this->set_error_message($custom_error, self::$err_greater_than, $min);
         }
-        return $this; 
+        return $this;
     }
 
     /**
@@ -504,7 +627,7 @@ class Form_validation {
         {
             $$this->set_error_message($custom_error, self::$err_greater_than_equal_to, $min);
         }
-        return $this; 
+        return $this;
     }
 
     /**
@@ -524,7 +647,7 @@ class Form_validation {
         {
             $this->set_error_message($custom_error, self::$err_less_than, $max);
         }
-        return $this; 
+        return $this;
     }
 
     /**
@@ -544,7 +667,7 @@ class Form_validation {
         {
             $this->set_error_message($custom_error, self::$err_less_than_equal_to, $max);
         }
-        return $this; 
+        return $this;
     }
 
     /**
@@ -560,7 +683,7 @@ class Form_validation {
         {
             $this->set_error_message($custom_error, self::$err_in_list, $this->value);
         }
-        return $this; 
+        return $this;
     }
 
     /**
@@ -578,7 +701,7 @@ class Form_validation {
 
     /**
      * Is validated
-     * 
+     *
      * @return bool
      */
     public function run() {
@@ -590,7 +713,7 @@ class Form_validation {
 
     /**
      * Get Errors
-     * 
+     *
      * @return array
      */
     public function get_errors() {
@@ -615,8 +738,8 @@ class Form_validation {
                 {
                     $errors = ! empty($errors) ? $errors.'<br>'.html_escape($error) : html_escape($error);
                 }
-                return $errors;  
+                return $errors;
             }
-        } 
+        }
     }
 }

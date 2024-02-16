@@ -6,9 +6,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * ------------------------------------------------------------------
  *
  * MIT License
- * 
+ *
  * Copyright (c) 2020 Ronald M. Marasigan
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -29,9 +29,8 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  *
  * @package LavaLust
  * @author Ronald M. Marasigan <ronald.marasigan@yahoo.com>
- * @copyright Copyright 2020 (https://ronmarasigan.github.io)
  * @since Version 1
- * @link https://lavalust.pinoywap.org
+ * @link https://github.com/ronmarasigan/LavaLust
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
@@ -40,9 +39,9 @@ if ( ! function_exists('base_url'))
 	/**
 	 * Base URL
 	 *
-	 * @return void
+	 * @return string
 	 */
-	function base_url() 
+	function base_url()
 	{
 		return  filter_var(BASE_URL, FILTER_SANITIZE_URL);
 	}
@@ -54,9 +53,9 @@ if ( ! function_exists('site_url'))
 	 * Get the site url
 	 *
 	 * @param string $url
-	 * @return void
+	 * @return string
 	 */
-	function site_url($url = '') 
+	function site_url($url = '')
 	{
 		$base_url = filter_var(BASE_URL, FILTER_SANITIZE_URL);
 		return ! empty(config_item('index_page')) ? $base_url . config_item('index_page').'/' . $url : $base_url . $url;
@@ -70,9 +69,9 @@ if ( ! function_exists('redirect'))
 	 *
 	 * @param string $uri
 	 * @param boolean $permanent
-	 * @return void
+	 * @return string
 	 */
-	function redirect($uri = '', $permanent = false)
+	function redirect($uri = '', $permanent = false, $exit = true)
 	{
 		if ( ! preg_match('#^(\w+:)?//#i', $uri))
 		{
@@ -82,7 +81,7 @@ if ( ! function_exists('redirect'))
 		{
 			header('Location: ' . $uri, true, ($permanent === true) ? 301 : 302);
 		}
-		exit();
+		($exit === true) ?? exit();
 	}
 }
 
@@ -147,7 +146,7 @@ if ( ! function_exists('active'))
 			// +1 to the installation folder index to get the index of the route and the rest of the segments if index_page is not empty
 			$url = implode('/', array_slice($uri_array, $folder_index + 1));
 		}
-		
+
 		if($currect_page == explode('/', $url)[0] || $currect_page == $url)
 		{
 			echo $css_class;
@@ -159,7 +158,7 @@ if ( ! function_exists('segment'))
 {
 	/**
 	 * URI Segment
-	 * 
+	 *
 	 * @param  int $seg	URI Segment
 	 * @return int
 	 */

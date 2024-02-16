@@ -6,9 +6,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * ------------------------------------------------------------------
  *
  * MIT License
- * 
+ *
  * Copyright (c) 2020 Ronald M. Marasigan
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -29,9 +29,8 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  *
  * @package LavaLust
  * @author Ronald M. Marasigan <ronald.marasigan@yahoo.com>
- * @copyright Copyright 2020 (https://ronmarasigan.github.io)
  * @since Version 1
- * @link https://lavalust.pinoywap.org
+ * @link https://github.com/ronmarasigan/LavaLust
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
@@ -39,7 +38,7 @@ if ( ! function_exists('str_insert'))
 {
     /**
      * Insert String
-     * 
+     *
      * @param  array An associative array with key => value pairs.
      * @param  string The text with the strings to be replaced.
      * @return string
@@ -64,7 +63,7 @@ if ( ! function_exists('str_between'))
 {
     /**
      * String Between
-     * 
+     *
      * @param  string $left   The left element of the string to search.
      * @param  string $right  The right element of the string to search.
      * @param  string $string The string to search in.
@@ -80,8 +79,8 @@ if ( ! function_exists('str_between'))
 if ( ! function_exists('str_after'))
 {
     /**
-     * 
-     * 
+     *
+     *
      * @param  string $search The string to search for.
      * @param  string $string The string to search in.
      * @return string The found string after the search string. Whitespaces at beginning will be removed.
@@ -95,8 +94,8 @@ if ( ! function_exists('str_after'))
 if ( ! function_exists('str_before'))
 {
     /**
-     * 
-     * 
+     *
+     *
      * @param  string $search The string to search for.
      * @param  string $string The string to search in.
      * @return string The found string before the search string. Whitespaces at end will be removed.
@@ -111,7 +110,7 @@ if ( ! function_exists('str_limitwords'))
 {
     /**
      * String Limit Words
-     * 
+     *
      * @param  string  $string The string to limit the words.
      * @param  integer $limit  The number of words to limit. Defaults to 10.
      * @param  string  $end    The string to end the cut string. Defaults to '...'
@@ -133,7 +132,7 @@ if ( ! function_exists('str_limitchars'))
 {
     /**
      * String limit Characters
-     * 
+     *
      * @param  string  $string The string to limit the words.
      * @param  integer $limit  The number of words to limit. Defaults to 10.
      * @param  string  $end    The string to end the cut string. Defaults to '...'

@@ -6,9 +6,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * ------------------------------------------------------------------
  *
  * MIT License
- * 
+ *
  * Copyright (c) 2020 Ronald M. Marasigan
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -29,14 +29,15 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  *
  * @package LavaLust
  * @author Ronald M. Marasigan <ronald.marasigan@yahoo.com>
- * @copyright Copyright 2020 (https://ronmarasigan.github.io)
  * @since Version 1
- * @link https://lavalust.pinoywap.org
+ * @link https://github.com/ronmarasigan/LavaLust
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
 /**
- * Class Session
+* ------------------------------------------------------
+*  Class Session
+* ------------------------------------------------------
  */
 class Session {
 
@@ -74,7 +75,7 @@ class Session {
 		 * Session Configs
 		 */
 		$this->config =& get_config();
-		
+
 		//IP Matching
 		$this->match_ip = $this->config['sess_match_ip'];
 
@@ -87,7 +88,7 @@ class Session {
 	    } else {
 	    	$this->config['cookie_name'] = $this->config['sess_cookie_name'] ? $this->config['sess_cookie_name'] : NULL;
 	    }
-		
+
 		//Set up cookie name
 	    if (empty($this->config['cookie_name']))
 		{
@@ -119,7 +120,7 @@ class Session {
 			'httponly' => TRUE,
 			'samesite' => $this->config['cookie_samesite']
 		));
-		
+
 	    ini_set('session.use_trans_sid', 0);
 	    ini_set('session.use_strict_mode', 1);
 	    ini_set('session.use_cookies', 1);
@@ -131,7 +132,7 @@ class Session {
 			$handler = new FileSessionHandler();
 			session_set_save_handler($handler, TRUE);
 		} elseif ( ! empty($this->config['sess_driver']) AND $this->config['sess_driver'] == 'database' ) {
-			
+
 		}
 
 	    //On creation store the useragent fingerprint
@@ -245,7 +246,7 @@ class Session {
 
 	/**
 	 * SID length
-	 * 
+	 *
 	 * @return int SID length
 	 */
 	private function _get_sid_length()
@@ -256,10 +257,10 @@ class Session {
 			$sid_length += (int) ceil((160 % $bits) / $bits_per_character);
 		return $sid_length;
 	}
-	
+
 	/**
 	 * Regenerate Session ID
-	 * 
+	 *
 	 * @param  bool FALSE by Default
 	 * @return string    Session ID
 	 */
@@ -271,7 +272,7 @@ class Session {
 
 	/**
 	 * Mark as Flash
-	 * 
+	 *
 	 * @param  string $key Session
 	 * @return bool
 	 */
@@ -315,7 +316,7 @@ class Session {
 	{
 		$this->mark_as_flash($key);
 	}
-   	
+
    	/**
    	 * Return Session ID
    	 * @return string Session ID
@@ -329,12 +330,12 @@ class Session {
 		{
             $rand_id .= $seed[$k];
         }
-        return $rand_id; 
+        return $rand_id;
 	}
 
 	/**
 	 * Check if session variable has data
-	 * 
+	 *
 	 * @param  string $key Session
 	 * @return boolean
 	 */
@@ -345,14 +346,14 @@ class Session {
 			if(isset($_SESSION[$key]))
 			{
 				return TRUE;
-			}	
+			}
 		}
 		return FALSE;
 	}
-	
+
 	/**
 	 * Set Data to Session Key
-	 * 
+	 *
 	 * @param array $keys array of Sessions
 	 */
 	public function set_userdata($keys, $value = NULL)
@@ -367,10 +368,10 @@ class Session {
 			$_SESSION[$keys] = $value;
 		}
 	}
-	
+
 	/**
 	 * Unset Session Data
-	 * 
+	 *
 	 * @param  array  $keys Array of Sessions
 	 * @return function
 	 */
@@ -413,7 +414,7 @@ class Session {
 
 		return $keys;
 	}
-	
+
 	/**
 	 * Unmark Flash keys
 	 *
@@ -442,7 +443,7 @@ class Session {
 			unset($_SESSION['__ci_vars']);
 		}
 	}
-	
+
    	/**
    	 * Get specific session key value
 
@@ -475,10 +476,10 @@ class Session {
 
 		return $userdata;
 	}
-	
+
 	/**
 	 * Session Destroy
-	 * 
+	 *
 	 * @return function
 	 */
 	public function sess_destroy()
@@ -488,7 +489,7 @@ class Session {
 
 	/**
 	 * Get flash data to Session
-	 * 
+	 *
 	 * @param  array $key Session Keys
 	 * @return string      Session Data
 	 */
@@ -516,7 +517,7 @@ class Session {
 
 	/**
 	 * Set flash data to Session
-	 * 
+	 *
 	 * @param  array $key Session Keys
 	 * @return function
 	 */

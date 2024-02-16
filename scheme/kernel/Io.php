@@ -6,9 +6,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * ------------------------------------------------------------------
  *
  * MIT License
- * 
+ *
  * Copyright (c) 2020 Ronald M. Marasigan
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -29,28 +29,29 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  *
  * @package LavaLust
  * @author Ronald M. Marasigan <ronald.marasigan@yahoo.com>
- * @copyright Copyright 2020 (https://ronmarasigan.github.io)
  * @since Version 1
- * @link https://lavalust.pinoywap.org
+ * @link https://github.com/ronmarasigan/LavaLust
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
 /**
- * Class Input and Ouput
+* ------------------------------------------------------
+*  Class IO
+* ------------------------------------------------------
  */
 Class Io {
 
 	/**
 	 * If CSRF Protection is enables, csrf_verify() will
 	 * run
-	 * 
+	 *
 	 * @var boolean
 	 */
 	private $_enable_csrf = FALSE;
 
 	/**
 	 * Securty instance
-	 * 
+	 *
 	 * @var class
 	 */
 	private $security;
@@ -83,21 +84,21 @@ Class Io {
 	{
 		/**
 		 * Load Security Instance
-		 * 
+		 *
 		 * @var class
 		 */
 		$this->security =& load_class('Security', 'kernel');
 
 		/**
 		 * Check CSRF Protection if enabled
-		 * 
+		 *
 		 * @var boolean
 		 */
 		$this->_enable_csrf	= (config_item('csrf_protection') === TRUE);
 
 		/**
 		 * Check CSRF Protection
-		 * 
+		 *
 		 * @var
 		 */
 		if ($this->_enable_csrf === TRUE)
@@ -105,10 +106,10 @@ Class Io {
 			$this->security->csrf_validate();
 		}
 	}
-	
+
   	/**
   	 * POST Variable
-  	 * 
+  	 *
   	 * @param  string
   	 * @return string
   	 */
@@ -126,7 +127,7 @@ Class Io {
 
 	/**
   	 * GET Variable
-  	 * 
+  	 *
   	 * @param  string
   	 * @return string
   	 */
@@ -146,7 +147,7 @@ Class Io {
 	 * POST and GET
 	 *
 	 * @param string $index
-	 * @return void
+	 * @return string
 	 */
 	public function post_get($index = NULL)
 	{
@@ -158,7 +159,7 @@ Class Io {
 	 * GET and POST
 	 *
 	 * @param string $index
-	 * @return void
+	 * @return string
 	 */
 	public function get_post($index = NULL)
 	{
@@ -170,7 +171,7 @@ Class Io {
 	 * Cookie Variable
 	 *
 	 * @param string $index
-	 * @return void
+	 * @return string
 	 */
 	public function cookie($index = NULL)
 	{
@@ -191,7 +192,7 @@ Class Io {
 	 * @param string $value
 	 * @param string $expiration
 	 * @param array $options
-	 * @return 
+	 * @return void
 	 */
 	public function set_cookie($name, $value = '', $expiration = 0, $options = array())
 	{
@@ -200,7 +201,7 @@ Class Io {
 
 		//hold options elements
 		$arr = array();
-		
+
 		if(is_array($options))
 		{
 			if(count($options) > 0)
@@ -241,12 +242,12 @@ Class Io {
 				'samesite' => $arr['samesite']
 			));
 	}
-	
+
 	/**
 	 * Server
 	 *
 	 * @param string $index
-	 * @return void
+	 * @return string
 	 */
 	public function server($index = NULL)
 	{
@@ -265,7 +266,7 @@ Class Io {
 	 *
 	 * @param boolean $upper	Whether to return in upper or lower case
 	 *				(default: FALSE)
-	 * @return void
+	 * @return string
 	 */
 	public function method($upper = FALSE)
 	{
@@ -273,11 +274,11 @@ Class Io {
 			? strtoupper($this->server('REQUEST_METHOD'))
 			: strtolower($this->server('REQUEST_METHOD'));
 	}
-	
+
 	/**
 	 * Get IP Address
 	 *
-	 * @return void
+	 * @return string
 	 */
 	public function ip_address() {
 		$trustedHeaders = ['HTTP_X_FORWARDED_FOR', 'HTTP_CLIENT_IP', 'HTTP_X_REAL_IP'];
@@ -297,7 +298,7 @@ Class Io {
 	 *
 	 * @param	string	$ip	IP address
 	 * @param	string	$which	IP protocol: 'ipv4' or 'ipv6'
-	 * @return	bool
+	 * @return	boolean
 	 */
 	public function valid_ip($ip, $which = '')
 	{
@@ -316,11 +317,11 @@ Class Io {
 
 		return (bool) filter_var($ip, FILTER_VALIDATE_IP, $which);
 	}
-	
+
 	/**
 	 * Is Ajax
-	 * 
-	 * @return boolean Check if Request is AJAX
+	 *
+	 * @return boolean
 	 */
 	public function is_ajax() {
         return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest';
@@ -361,7 +362,7 @@ Class Io {
 	 * HTML Content
 	 *
 	 * @param mixed $content
-	 * @return void
+	 * @return mixed
 	 */
 	public function set_html_content($content) {
         $this->add_header('Content-Type', 'text/html');
@@ -395,5 +396,5 @@ Class Io {
         $this->send();
     }
 }
-	
+
 ?>

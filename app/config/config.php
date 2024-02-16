@@ -6,9 +6,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * ------------------------------------------------------------------
  *
  * MIT License
- * 
+ *
  * Copyright (c) 2020 Ronald M. Marasigan
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -29,9 +29,8 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  *
  * @package LavaLust
  * @author Ronald M. Marasigan <ronald.marasigan@yahoo.com>
- * @copyright Copyright 2020 (https://ronmarasigan.github.io)
  * @since Version 1
- * @link https://lavalust.pinoywap.org
+ * @link https://github.com/ronmarasigan/LavaLust
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
@@ -163,7 +162,7 @@ $config['error_view_path']         	= APP_DIR . 'views' . DIRECTORY_SEPARATOR . 
 |--------------------------------------------------------------------------
 |
 | $config['404_override'] is use if you want to add custom 404 error page.
-| 
+|
 |	example: $confg['404_override'] = 'default/404'
 |
 |	if you have 'default folder' and '404.php file' inside error folder in view
@@ -185,7 +184,7 @@ $config['language'] 				= 'en-US';
 
 /*
 |--------------------------------------------------------------------------
-| Session                     
+| Session
 |--------------------------------------------------------------------------
 |
 | Settings for sessions
@@ -206,7 +205,7 @@ $config['sess_expire_on_close']    = FALSE;
 
 /*
 |--------------------------------------------------------------------------
-| Cookies                      
+| Cookies
 |--------------------------------------------------------------------------
 |
 |Settings for cookies.
@@ -223,7 +222,7 @@ $config['cookie_samesite']         = 'Lax';
 
 /*
 |--------------------------------------------------------------------------
-| Cache                      
+| Cache
 |--------------------------------------------------------------------------
 |
 | Settings for Cache

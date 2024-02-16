@@ -6,9 +6,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * ------------------------------------------------------------------
  *
  * MIT License
- * 
+ *
  * Copyright (c) 2020 Ronald M. Marasigan
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -29,9 +29,8 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  *
  * @package LavaLust
  * @author Ronald M. Marasigan <ronald.marasigan@yahoo.com>
- * @copyright Copyright 2020 (https://ronmarasigan.github.io)
  * @since Version 1
- * @link https://lavalust.pinoywap.org
+ * @link https://github.com/ronmarasigan/LavaLust
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
@@ -86,10 +85,13 @@ if ( ! function_exists('sanitize_filename'))
 
 if( ! function_exists('csrf_field'))
 {
+	/**
+	 * CSRF token
+	 *
+	 * @return void
+	 */
 	function csrf_field() {
-		/**
-		 * LavaLust Super Object
-		 */
+
 		$LAVA =& lava_instance();
 
 		if (FALSE !== ($noise = random_bytes(1)))
@@ -110,7 +112,7 @@ if( ! function_exists('csrf_field'))
             {
                 $append  = str_repeat(" ", $noise);
             }
-            
+
             $form = sprintf(
                 '%s<input type="hidden" name="%s" value="%s" />%s%s',
                 $prepend,

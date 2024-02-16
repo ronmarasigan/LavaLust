@@ -6,9 +6,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * ------------------------------------------------------------------
  *
  * MIT License
- * 
+ *
  * Copyright (c) 2020 Ronald M. Marasigan
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -29,14 +29,15 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  *
  * @package LavaLust
  * @author Ronald M. Marasigan <ronald.marasigan@yahoo.com>
- * @copyright Copyright 2020 (https://ronmarasigan.github.io)
  * @since Version 1
- * @link https://lavalust.pinoywap.org
+ * @link https://github.com/ronmarasigan/LavaLust
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
 /**
- * Class Loader
+* ------------------------------------------------------
+*  Class Loader
+* ------------------------------------------------------
  */
 class Loader {
 	/**
@@ -52,7 +53,7 @@ class Loader {
 	 * @var string
 	 */
 	private $sub_dir = '';
-    
+
 	/**
 	 * Get Subdirectories
 	 *
@@ -72,7 +73,7 @@ class Loader {
 	/**
 	 * @param mixed $class
 	 * @param null $object_name
-	 * 
+	 *
 	 * @return object
 	 */
 	public function model($class, $object_name = NULL)
@@ -80,7 +81,7 @@ class Loader {
 		if( ! class_exists('Model')) {
 			require_once(SYSTEM_DIR.'kernel/Model.php');
 		}
-			
+
 		$LAVA = Controller::instance();
 
 		if(is_array($class))
@@ -93,9 +94,9 @@ class Loader {
 					$LAVA->properties[$key] =& load_class($this->class, 'models' . $this->sub_dir, NULL, $key);
 				} else {
 					$LAVA->properties[$this->class] =& load_class($this->class, 'models' . $this->sub_dir, NULL, $this->class);
-				}	
-			}	
-		} else {	
+				}
+			}
+		} else {
 			$this->get_sub_dir($class);
 			if(! is_null($object_name))
 			{
@@ -104,9 +105,9 @@ class Loader {
 				$LAVA->properties[$this->class] =& load_class($this->class, 'models' . $this->sub_dir);
 			}
 		}
-			
+
 	}
-	
+
 	/**
 	 * Load View File
 	 *
@@ -142,7 +143,7 @@ class Loader {
 				require_once($view . '.php');
 			} else {
 				throw new RuntimeException($view_file . ' view file did not exist.');
-			}		
+			}
 		} else {
 			if(file_exists($view))
 			{
@@ -182,7 +183,7 @@ class Loader {
 			}
 		}
 	}
-	
+
 	/**
 	 * Load Library
 	 *
@@ -220,14 +221,16 @@ class Loader {
 		$database =& load_class('database','database', $dbname);
 		if(is_null($dbname)) {
 			$LAVA->db = $database::instance(NULL);
-		} else {			
+		} else {
 			$LAVA->properties[$dbname] = $database::instance($dbname);
 		}
 	}
 }
 
 /**
- * Class Controller
+* ------------------------------------------------------
+*  Class Controller
+* ------------------------------------------------------
  */
 class Controller
 {
@@ -274,7 +277,7 @@ class Controller
 			throw new Exception("Property $prop does not exist");
 		}
 	}
-	
+
 	/**
 	 * Constructor
 	 */
@@ -291,7 +294,7 @@ class Controller
 		 * Load all Loader Class
 		 */
         $this->call = new Loader();
-		
+
 		/**
 		 * Autoloaded
 		 *
@@ -302,17 +305,17 @@ class Controller
 		if(count($autoload['libraries']) > 0)
         {
             $this->call->library($autoload['libraries']);
-        }	
+        }
 		if(count($autoload['models']) > 0)
         {
             $this->call->model($autoload['models']);
-        }		
+        }
 		if(count($autoload['helpers']) > 0)
         {
             $this->call->helper($autoload['helpers']);
         }
 	}
-	
+
 	/**
 	 * Instance of controller
 	 *
@@ -322,7 +325,7 @@ class Controller
 	{
 		return self::$instance;
 	}
-	
+
 }
 
 ?>

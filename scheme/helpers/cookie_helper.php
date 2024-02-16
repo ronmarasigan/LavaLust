@@ -6,9 +6,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * ------------------------------------------------------------------
  *
  * MIT License
- * 
+ *
  * Copyright (c) 2020 Ronald M. Marasigan
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -29,9 +29,8 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  *
  * @package LavaLust
  * @author Ronald M. Marasigan <ronald.marasigan@yahoo.com>
- * @copyright Copyright 2020 (https://ronmarasigan.github.io)
  * @since Version 1
- * @link https://lavalust.pinoywap.org
+ * @link https://github.com/ronmarasigan/LavaLust
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
@@ -55,7 +54,7 @@ if ( ! function_exists('get_cookie'))
 {
 	/**
 	 * Fetch an item from the COOKIE array
-	 * 
+	 *
 	 * @param  string  $name name of the cookie
 	 * @return mixed
 	 */
@@ -70,8 +69,8 @@ if ( ! function_exists('delete_cookie'))
 {
 	/**
 	 * Delete a cookie
-	 * 
-	 * @param  string $name 
+	 *
+	 * @param  string $name
 	 * @param  string $domain the cookie domain
 	 * @param  string $path   the cookie path
 	 * @param  string $prefix the cookie prefix
