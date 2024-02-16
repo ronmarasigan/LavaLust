@@ -142,7 +142,7 @@ require_once APP_DIR . 'config/routes.php';
  */
 function &lava_instance()
 {
-  return Controller::instance();
+  	return Controller::instance();
 }
 $performance->tag('lavalust');
 

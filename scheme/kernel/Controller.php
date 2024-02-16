@@ -232,7 +232,7 @@ class Loader {
 *  Class Controller
 * ------------------------------------------------------
  */
-class Controller
+class Controller extends Loader
 {
 	/**
 	 * Controller Instance
@@ -283,17 +283,14 @@ class Controller
 	 */
 	public function __construct()
 	{
-		self::$instance =& $this;
+        $this->call = $this;
+
+		self::$instance = $this;
 
 		foreach (loaded_class() as $var => $class)
 		{
 			$this->properties[$var] =& load_class($class);
 		}
-
-        /**
-		 * Load all Loader Class
-		 */
-        $this->call = new Loader();
 
 		/**
 		 * Autoloaded
