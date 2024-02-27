@@ -41,6 +41,12 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  */
 class Database {
     /**
+     * Database instance
+     *
+     * @var object
+     */
+    private static $instance = NULL;
+    /**
      * Database Instance
      *
      * @var string
