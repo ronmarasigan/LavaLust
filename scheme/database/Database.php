@@ -46,6 +46,7 @@ class Database {
      * @var object
      */
     private static $instance = NULL;
+    
     /**
      * Database Instance
      *
