@@ -340,12 +340,18 @@ Class Io {
 	/**
 	 * Add header
 	 *
-	 * @param string $name
+	 * @param mixed $name
 	 * @param string $value
 	 * @return void
 	 */
 	public function add_header($name, $value) {
-        $this->headers[$name] = $value;
+		if(is_array($name)) {
+			foreach($name as $key => $value) {
+				$this->headers[$key] = $value;
+			}
+		} else {
+			$this->headers[$name] = $value;
+		}
     }
 
 	/**
