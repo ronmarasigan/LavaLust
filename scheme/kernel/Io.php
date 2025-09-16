@@ -87,7 +87,7 @@ Class Io {
 		 *
 		 * @var class
 		 */
-		$this->security =& load_class('Security', 'kernel');
+		$this->security = load_class('Security', 'kernel');
 
 		/**
 		 * Check CSRF Protection if enabled

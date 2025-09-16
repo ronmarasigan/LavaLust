@@ -1,0 +1,17 @@
+AddDefaultCharset UTF-8
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # If request is empty (root /), serve public/index.php
+    RewriteRule ^$ public/index.php [L]
+
+    # If request is a file or directory, serve it directly
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # Otherwise, forward everything into /public
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>

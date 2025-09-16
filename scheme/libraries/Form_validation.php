@@ -242,7 +242,7 @@ class Form_validation {
      */
     public function __construct()
     {
-        $this->LAVA =& lava_instance();
+        $this->LAVA = lava_instance();
         foreach($_POST as $key => $value)
         {
             $this->post_arrays[$key] = $value;

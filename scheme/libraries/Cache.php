@@ -109,9 +109,9 @@ class Cache
 	 */
 	function __construct()
 	{
-		$this->_lava =& lava_instance();
+		$this->_lava = lava_instance();
 		$this->_reset();
-		$this->_config =& get_config();
+		$this->_config = get_config();
 		$this->_path = $this->_config['cache_dir'];
 		$this->_default_expires = $this->_config['cache_default_expires'];
 		if ( ! is_dir($this->_path))

@@ -1,3 +1,10 @@
+LavaLust 5
+
+#Changelog
+
+1. LavaLust now now follows HMVC Architecture
+2. Front controller index.php is not inside public directory.
+
 LavaLust 4.2.5
 
 #Changelog

@@ -65,7 +65,7 @@ class Migration {
      */
     public function __construct()
     {   
-        $this->_lava =& lava_instance();
+        $this->_lava = lava_instance();
 
         $this->_lava->config->load('migration');
 
@@ -111,7 +111,7 @@ class Migration {
 
         public function __construct()
         {
-            \$this->_lava =& lava_instance();
+            \$this->_lava = lava_instance();
             \$this->_lava->call->dbforge();
         }
 

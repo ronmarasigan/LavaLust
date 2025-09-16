@@ -69,7 +69,7 @@ if ($composer_autoload = config_item('composer_autoload'))
 /**
  * Instantiate the Benchmark class
  */
-$performance =& load_class('performance', 'kernel');
+$performance = load_class('performance', 'kernel');
 $performance->start('lavalust');
 
 /**
@@ -111,27 +111,27 @@ function _handlers()
 /**
  * Instantiate the config class
  */
-$config =& load_class('config', 'kernel');
+$config = load_class('config', 'kernel');
 
 /**
  * Instantiate the logger class
  */
-$logger =& load_class('logger', 'kernel');
+$logger = load_class('logger', 'kernel');
 
 /**
  * Instantiate the security class for xss and csrf support
  */
-$security =& load_class('security', 'kernel');
+$security = load_class('security', 'kernel');
 
 /**
  * Instantiate the Input/Ouput class
  */
-$io =& load_class('io', 'kernel');
+$io = load_class('io', 'kernel');
 
 /**
  * Instantiate the Language class
  */
-$lang =& load_class('lang', 'kernel');
+$lang = load_class('lang', 'kernel');
 
 /**
  * Load BaseController
@@ -141,7 +141,7 @@ require_once SYSTEM_DIR . 'kernel/Controller.php';
 /**
  * Instantiate the routing class and set the routing
  */
-$router =& load_class('router', 'kernel', array(new Controller));
+$router = load_class('router', 'kernel', array(new Controller));
 require_once APP_DIR . 'config/routes.php';
 
 /**

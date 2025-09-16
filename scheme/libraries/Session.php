@@ -74,7 +74,7 @@ class Session {
 		/**
 		 * Session Configs
 		 */
-		$this->config =& get_config();
+		$this->config = get_config();
 
 		//IP Matching
 		$this->match_ip = $this->config['sess_match_ip'];
@@ -241,7 +241,7 @@ class Session {
 			}
 		}
 
-		$this->userdata =& $_SESSION;
+		$this->userdata = $_SESSION;
 	}
 
 	/**

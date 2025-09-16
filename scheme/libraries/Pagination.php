@@ -118,7 +118,7 @@ class Pagination
      */
     public function __construct()
     {
-        $this->LAVA =& lava_instance();
+        $this->LAVA = lava_instance();
         $this->LAVA->call->helper('language');
         $this->LAVA->call->library('session');
 

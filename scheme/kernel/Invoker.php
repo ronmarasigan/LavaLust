@@ -77,28 +77,57 @@ class Invoker {
 	 * @var mixed
 	 */
 	private $class;
-
 	/**
-	 * Hold the sub directory of the class
+	 * Load Controller
 	 *
-	 * @var string
+	 * @param mixed $class
+	 * @param string $method
+	 * @param array $params
+	 * @return mixed
 	 */
-	private $sub_dir = '';
+	public function controller($class, $method = 'index', $params = [])
+	{
+		$parts = explode('/', $class);
+		$ctrl = ucfirst(array_pop($parts));
+		$module = array_shift($parts);
+		$nested = implode('/', $parts);
 
-	/**
-	 * Get Subdirectories
-	 *
-	 * @return void
-	 */
-	private function get_sub_dir($url) {
-		if(strpos($url, '/')) {
-			$model = explode('/', $url);
-			$this->class = end($model);
-			array_pop($model);
-			$this->sub_dir = '/' . implode('/', $model);
-		} else {
-			$this->class = $url;
+		$path = APP_DIR . "modules/{$module}/controllers/" . ($nested ? "{$nested}/" : '') . "{$ctrl}.php";
+
+		if (file_exists($path)) {
+			require_once $path;
+
+			if (!class_exists($ctrl)) {
+				throw new Exception("Controller class {$ctrl} not found in module {$module}");
+			}
+
+			$instance = new $ctrl();
+
+			if (!method_exists($instance, $method)) {
+				throw new Exception("Method {$method} not found in controller {$ctrl}");
+			}
+
+			return call_user_func_array([$instance, $method], $params);
 		}
+
+		$path = APP_DIR . "controllers/" . ($nested ? "{$nested}/" : '') . "{$ctrl}.php";
+		if (file_exists($path)) {
+			require_once $path;
+
+			if (!class_exists($ctrl)) {
+				throw new Exception("Controller class {$ctrl} not found");
+			}
+
+			$instance = new $ctrl();
+
+			if (!method_exists($instance, $method)) {
+				throw new Exception("Method {$method} not found in controller {$ctrl}");
+			}
+
+			return call_user_func_array([$instance, $method], $params);
+		}
+
+		throw new Exception("Controller {$ctrl} not found in module {$module}" . ($nested ? "/{$nested}" : ''));
 	}
 
 	/**
@@ -107,37 +136,57 @@ class Invoker {
 	 *
 	 * @return object
 	 */
-	public function model($class, $object_name = NULL)
+	public function model($class, $object_name = null)
 	{
-		if( ! class_exists('Model')) {
-			require_once(SYSTEM_DIR.'kernel/Model.php');
+		if (!class_exists('Model')) {
+			require_once SYSTEM_DIR . 'kernel/Model.php';
 		}
 
-		$LAVA =& lava_instance();
+		$LAVA = lava_instance();
 
-		if(is_array($class))
-		{
-			foreach($class as $key => $value)
-			{
-				$this->get_sub_dir($value);
-				if(! is_int($key))
-				{
-					$LAVA->properties[$key] =& load_class($this->class, 'models' . $this->sub_dir, NULL, $key);
+		if (is_array($class)) {
+			foreach ($class as $key => $value) {
+				if (is_int($key)) {
+					$this->model($value);
 				} else {
-					$LAVA->properties[$this->class] =& load_class($this->class, 'models' . $this->sub_dir, NULL, $this->class);
+					$this->model($key, $value);
 				}
 			}
-		} else {
-			$this->get_sub_dir($class);
-			if(! is_null($object_name))
-			{
-				$LAVA->properties[$object_name] =& load_class($this->class, 'models' . $this->sub_dir, NULL, $object_name);
-			} else {
-				$LAVA->properties[$this->class] =& load_class($this->class, 'models' . $this->sub_dir);
+			return;
+		}
+
+		$parts = explode('/', $class);
+		$this->class = array_pop($parts);
+		$module = null;
+		$nested = '';
+
+		if (count($parts) > 0) {
+			$module = array_shift($parts);
+			$nested = implode('/', $parts);
+		}
+
+		if ($module) {
+			$path = APP_DIR . "modules/{$module}/models/" . ($nested ? "{$nested}/" : '') . "{$this->class}.php";
+			if (file_exists($path)) {
+				require_once $path;
+				$obj_name = $object_name ?? $this->class;
+				$LAVA->properties[$obj_name] = new $this->class();
+				return;
 			}
 		}
 
+		$path = APP_DIR . "models/" . ($nested ? "{$nested}/" : '') . "{$this->class}.php";
+		if (file_exists($path)) {
+			require_once $path;
+			$obj_name = $object_name ?? $this->class;
+			$LAVA->properties[$obj_name] = new $this->class();
+			return;
+		}
+
+		$location = $module ? "module {$module}" : "app/models";
+		throw new Exception("Model {$this->class} not found in {$location}" . ($nested ? "/{$nested}" : ''));
 	}
+
 
 	/**
 	 * Load View File
@@ -148,51 +197,46 @@ class Invoker {
 	 */
 	public function view($view_file, $data = NULL)
 	{
-        $LAVA =& lava_instance();
-		foreach (get_object_vars($LAVA) as $key => $val)
-		{
-			if ( ! isset($this->properties[$key]))
-			{
-				$this->properties[$key] =& $LAVA->$key;
+		$LAVA = lava_instance();
+		foreach (get_object_vars($LAVA) as $key => $val) {
+			if (!isset($this->properties[$key])) {
+				$this->properties[$key] = $LAVA->$key;
 			}
 		}
 
-		if(! is_null($data)) {
-			//it will hold the data after looping
-			$page_vars = array();
-			if(is_array($data))
-			{
-				foreach($data as $key => $value)
-				{
-					$page_vars[$key] = $value;
-				}
-			} elseif(is_string($data))
-			{
-				$page_vars[$data] = $data;
+		if (!is_null($data)) {
+			if (is_array($data)) {
+				extract($data, EXTR_SKIP);
+			} elseif (is_string($data)) {
+				$$data = $data;
 			} else {
-				throw new RuntimeException('View parameter only accepts array and string types');
+				throw new RuntimeException('View parameter only accepts array or string types');
 			}
-			extract($page_vars, EXTR_SKIP);
 		}
+
 		ob_start();
-		$view = APP_DIR .'views' . DIRECTORY_SEPARATOR . $view_file;
-		if(strpos($view_file, '.') === false)
-		{
-			if(file_exists($view . '.php'))
-			{
-				require_once($view . '.php');
-			} else {
-				throw new RuntimeException($view_file . ' view file did not exist.');
-			}
-		} else {
-			if(file_exists($view))
-			{
-				require_once($view);
-			} else {
-				throw new RuntimeException($view_file . ' view file does not exist.');
-			}
+
+		$view_file = str_replace('\\', '/', $view_file);
+		$parts = explode('/', $view_file);
+		$file = array_pop($parts);
+		$module_or_nested = array_shift($parts);
+		$nested = implode('/', $parts);
+
+		if ($module_or_nested && file_exists(APP_DIR . "modules/{$module_or_nested}/views/" . ($nested ? "{$nested}/" : '') . "{$file}.php")) {
+			$path = APP_DIR . "modules/{$module_or_nested}/views/" . ($nested ? "{$nested}/" : '') . "{$file}.php";
+			require $path;
+			echo ob_get_clean();
+			return;
 		}
-		echo ob_get_clean();
+
+		$path = APP_DIR . "views/" . ($nested ? "{$module_or_nested}/{$nested}/" : '') . "{$file}.php";
+		if (file_exists($path)) {
+			require $path;
+			echo ob_get_clean();
+			return;
+		}
+
+		throw new RuntimeException("View {$view_file} not found in module or app/views");
 	}
 
 	/**
@@ -233,19 +277,19 @@ class Invoker {
 	 */
 	public function library($classes, $params = NULL)
 	{
-		$LAVA =& lava_instance();
+		$LAVA = lava_instance();
 		if(is_array($classes))
 		{
 			foreach($classes as $class)
 			{
 				if($class == 'database') {
-					$database =& load_class('database', 'database');
+					$database = load_class('database', 'database');
 					$LAVA->db = $database::instance(NULL);
 				}
-				$LAVA->properties[$class] =& load_class($class, 'libraries');
+				$LAVA->properties[$class] = load_class($class, 'libraries');
 			}
 		} else {
-			$LAVA->properties[$classes] =& load_class($classes, 'libraries', $params);
+			$LAVA->properties[$classes] = load_class($classes, 'libraries', $params);
 		}
 	}
 
@@ -257,8 +301,8 @@ class Invoker {
 	 */
 	public function database($dbname = NULL)
 	{
-		$LAVA =& lava_instance();
-		$database =& load_class('database','database', $dbname);
+		$LAVA = lava_instance();
+		$database = load_class('database','database', $dbname);
 		if(is_null($dbname)) {
 			$LAVA->db = $database::instance(NULL);
 		} else {
@@ -273,13 +317,13 @@ class Invoker {
 	 */
 	public function dbforge()
 	{
-		$LAVA =& lava_instance();
-		$LAVA->properties['dbforge'] =& load_class('dbforge','database');
+		$LAVA = lava_instance();
+		$LAVA->properties['dbforge'] = load_class('dbforge','database');
 	}
 
     public function initialize()
     {
-        $autoload =& autoload_config();
+        $autoload = autoload_config();
 
 		if(count($autoload['libraries']) > 0)
         {

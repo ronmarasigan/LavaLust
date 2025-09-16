@@ -161,7 +161,7 @@ class Upload
 	public function __construct($file = array())
 	{
 		// Instance
-		$this->LAVA =& lava_instance();
+		$this->LAVA = lava_instance();
 		//Uploaded file
 		$this->file = $file;
 		// Allowed extensions

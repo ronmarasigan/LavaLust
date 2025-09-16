@@ -58,7 +58,7 @@ class Config {
 
     public function __construct()
 	{
-		$this->config =& get_config();
+		$this->config = get_config();
 
 		// Set the base_url automatically if none was provided
 		if (empty($this->config['base_url']))
