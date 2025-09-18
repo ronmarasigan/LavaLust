@@ -1010,19 +1010,20 @@ class Database {
      */
     public function in($field, array $keys, $type = '', $andOr = 'AND')
     {
-        if (is_array($keys)) {
-            $_keys = [];
-            foreach ($keys as $k => $v) {
-                $_keys[] = (is_numeric($v) ? $v : '?');
+        if (!empty($keys)) {
+            $placeholders = implode(', ', array_fill(0, count($keys), '?'));
+            foreach ($keys as $v) {
+                $this->bindValues[] = $v;
             }
-            $where = $field . ' ' . $type . 'IN (' . implode(', ', $_keys) . ')';
+
+            $where = "$field {$type}IN ($placeholders)";
 
             if ($this->grouped) {
                 $where = '(' . $where;
                 $this->grouped = false;
             }
 
-            $this->where = (is_null($this->where))
+            $this->where = is_null($this->where)
                 ? ' WHERE ' . $where
                 : $this->where . ' ' . $andOr . ' ' . $where;
         }
