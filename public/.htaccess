@@ -22,6 +22,5 @@
 
 # Optional: Deny access to sensitive files
 <FilesMatch "^\.env|composer\.json|composer\.lock">
-    Order allow,deny
-    Deny from all
+    Require all denied
 </FilesMatch>
