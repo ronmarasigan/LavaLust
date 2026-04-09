@@ -116,8 +116,8 @@ class Ember
         $this->templates_path = rtrim(config_item('templates_path'), '/\\') . DIRECTORY_SEPARATOR;
         $this->cache_path     = rtrim(config_item('cache_path'), '/\\') . DIRECTORY_SEPARATOR;
 
-        $this->auto_escape      = config_item('auto_escape');
-        $this->enable_php_blocks = config_item('enable_php_blocks');
+        $this->auto_escape      = (bool) config_item('auto_escape');
+        $this->enable_php_blocks = (bool) config_item('enable_php_blocks');
         $this->escape_context   = config_item('escape_context');
         
         if (!is_dir($this->cache_path)) {

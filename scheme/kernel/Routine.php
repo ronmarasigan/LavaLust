@@ -223,7 +223,7 @@ if ( ! function_exists('_error_handler'))
 			E_USER_DEPRECATED   => 'E_USER_DEPRECATED',
 		];
 
-		if (defined('E_STRICT')) {
+		if (PHP_VERSION_ID < 80400 && defined('E_STRICT')) {
 			$error_levels[E_STRICT] = 'E_STRICT';
 		}
 

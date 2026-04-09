@@ -75,7 +75,7 @@ $config['refresh_token_expiration'] = 604800;
 | Used for Securing endpoint
 |
 */
-$config['jwt_secret'] = 'l99H8TM4Q4JXFM3Hr8LN';
+$config['jwt_secret'] = 'cbTsnJDxCodakDxh4M3qd5Sn3Kd2cYCDp4MEu0DAPxx';
 
 /*
 |--------------------------------------------------------------------------
@@ -85,7 +85,7 @@ $config['jwt_secret'] = 'l99H8TM4Q4JXFM3Hr8LN';
 | Used for Securing endpoint
 |
 */
-$config['refresh_token_key'] = 'BDswlrEaYWAgeJ4VurGe';
+$config['refresh_token_key'] = '0bNvxjPFJ6dhi1Ttf7AStp95zUcd1iy94mjblklwfPs';
 
 /*
 |--------------------------------------------------------------------------
@@ -107,3 +107,50 @@ $config['allow_origin'] = '*';
 |
 */
 $config['refresh_token_table'] = 'refresh_tokens';
+
+/*
+|--------------------------------------------------------------------------
+| JWT Issuer and Audience
+|--------------------------------------------------------------------------
+| These are used for JWT Issuer and Audience claims.
+|
+*/
+$config['jwt_issuer'] = 'your-app';
+
+/*
+|--------------------------------------------------------------------------
+| JWT Issuer and Audience
+|--------------------------------------------------------------------------
+| These are used for JWT Issuer and Audience claims.
+|
+*/
+
+$config['jwt_audience'] = 'your-app-clients';
+
+/*
+|--------------------------------------------------------------------------
+| Rate Limiting
+|--------------------------------------------------------------------------
+| These settings are used for API rate limiting.
+|
+*/
+$config['rate_limit_enabled'] = true;
+
+/*
+|--------------------------------------------------------------------------
+| Rate Limiting Requests and Seconds
+|--------------------------------------------------------------------------
+| These settings define the number of requests allowed and the time 
+| window in seconds.
+|
+*/
+$config['rate_limit_requests'] = 60;
+
+/*
+|--------------------------------------------------------------------------
+| Rate Limiting Seconds
+|--------------------------------------------------------------------------
+| This setting defines the time window in seconds for rate limiting.
+|
+*/
+$config['rate_limit_seconds'] = 60;

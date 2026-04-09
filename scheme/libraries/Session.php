@@ -206,30 +206,34 @@ class Session {
         $fingerprint = $this->generate_fingerprint();
 
         $this->_security_init();
-        $lockMsg = $this->security_check_lock($ip, $fingerprint);
+
+		//check lock
+        $this->security_check_lock($ip, $fingerprint);
 
         // Start session
         $existing_session = !empty($_COOKIE[$this->config['cookie_name']]);
         session_start();
 
-        // Track new session creations (anti-flood)
         if (!$existing_session && empty($_SESSION)) {
-            $msg = $this->security_track_session_creation($ip, $fingerprint);
-            if ($msg) {
+            $creation_msg = $this->security_track_session_creation($ip, $fingerprint);
+            if ($creation_msg) {
+                // Soft block for creation flood - do not throw, just destroy and continue
                 session_destroy();
-                throw new RuntimeException($msg);
+                $_SESSION = [];
+                // We will detect this via get_security_status() later
             }
         }
 
         // Fingerprint & IP validation
         if (empty($_SESSION['fingerprint'])) {
             $_SESSION['fingerprint'] = $fingerprint;
-            $_SESSION['created_at'] = time();
+            $_SESSION['created_at']   = time();
             $_SESSION['last_activity'] = time();
-        } elseif ($this->match_fingerprint && $_SESSION['fingerprint'] !== $fingerprint) {
+        } 
+        elseif ($this->match_fingerprint && $_SESSION['fingerprint'] !== $fingerprint) {
             $this->security_log_attempt($ip, $fingerprint, 'Fingerprint mismatch');
             session_destroy();
-            throw new RuntimeException('Session terminated: Fingerprint mismatch detected.');
+            throw new RuntimeException('Session terminated: Fingerprint mismatch detected.'); // Real attack
         }
 
         if (isset($_SESSION['ip_address']) && $this->match_ip && $_SESSION['ip_address'] !== $ip) {
@@ -241,12 +245,15 @@ class Session {
         $_SESSION['ip_address'] = $ip;
 
         // Inactivity check
+        $inactivity_expired = false;
         if (isset($_SESSION['last_activity']) && 
             (time() - $_SESSION['last_activity']) > $this->inactivity_timeout) {
+            
             $this->sess_destroy();
-            throw new RuntimeException('Session expired due to inactivity.');
+            $inactivity_expired = true;
+        } else {
+            $_SESSION['last_activity'] = time();
         }
-        $_SESSION['last_activity'] = time();
 
         // Periodic regeneration (skip AJAX)
         $regenerate_time = (int)($this->config['sess_time_to_update'] ?? 300);
@@ -281,7 +288,53 @@ class Session {
 
         $this->_lava_init_vars();
     }
+	
+	/**
+	 * Get current security status for the session (for demo/debug purposes)
+	 *
+	 * @return array
+	 */
+	public function get_security_status(): array
+    {
+        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $fingerprint = $this->generate_fingerprint();
+        $key = $ip . '_' . $fingerprint;
 
+        $data = $this->_security_load();
+
+        // Invalid attempts lock
+        $locked_until = $data[$key]['locked_until'] ?? 0;
+        $remaining    = max($locked_until - time(), 0);
+
+        // Session creation flood lock
+        $creation_key = 'creation_' . $ip . '_' . $fingerprint;
+        $creation_locked_until = $data[$creation_key]['locked_until'] ?? 0;
+        $creation_remaining = max($creation_locked_until - time(), 0);
+
+        // Inactivity check (safe even if session was destroyed)
+        $inactivity_expired = false;
+        if (isset($_SESSION) && isset($_SESSION['last_activity'])) {
+            $inactivity_expired = (time() - $_SESSION['last_activity']) > $this->inactivity_timeout;
+        }
+
+        return [
+            'locked'                    => $remaining > 0,
+            'locked_until'              => $locked_until,
+            'remaining'                 => $remaining,
+            'remaining_minutes'         => $remaining > 0 ? (int)ceil($remaining / 60) : 0,
+            'attempts'                  => $data[$key]['attempts'] ?? 0,
+            'max_attempts'              => $this->max_invalid_attempts,
+
+            'creation_locked'           => $creation_remaining > 0,
+            'creation_remaining'        => $creation_remaining,
+            'creation_remaining_minutes'=> $creation_remaining > 0 ? (int)ceil($creation_remaining / 60) : 0,
+
+            'inactivity_expired'        => $inactivity_expired,
+
+            'ip'                        => $ip,
+            'fingerprint'               => $fingerprint
+        ];
+    }
 
 	/**
 	 * Validate session id (to mitigate session fixation attacks)
@@ -371,10 +424,15 @@ class Session {
 	 *
 	 * @param bool $destroy
 	 */
-	public function sess_regenerate($destroy = false)
+	public function sess_regenerate(bool $destroy = false)
     {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            return false;
+        }
+
         $_SESSION['last_regenerate'] = time();
-        session_regenerate_id($destroy);
+        
+        return @session_regenerate_id((bool)$destroy);
     }
 
 	/**
@@ -537,22 +595,24 @@ class Session {
 	 * Destroy the current session
 	 */	
 	public function sess_destroy()
-	{
-		$_SESSION = array();
+    {
+        $_SESSION = [];
 
-		$params = session_get_cookie_params();
-		setcookie(
-			session_name(),
-			'',
-			(time() - 42000),
-			$params['path'] ?? '/',
-			$params['domain'] ?? '',
-			$params['secure'] ?? false,
-			$params['httponly'] ?? true
-		);
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            $params = session_get_cookie_params();
+            setcookie(
+                session_name(),
+                '',
+                time() - 42000,
+                $params['path'] ?? '/',
+                $params['domain'] ?? '',
+                $params['secure'] ?? false,
+                $params['httponly'] ?? true
+            );
 
-		session_destroy();
-	}
+            session_destroy();
+        }
+    }
 
 	/**
 	 * Fetch flashdata
