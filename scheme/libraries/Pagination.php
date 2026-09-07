@@ -547,12 +547,12 @@ class Pagination
     {
         $href = $this->build_url($page);
 
-        $classes = trim($this->classes['a'] . ' ' . $active_class);
+        $li_classes = trim($this->classes['li'] . ' ' . $active_class);
 
-        return '<li class="' . $this->classes['li'] . '">'
-             . '<a class="' . $classes . '" href="' . $href . '" aria-label="Page ' . (int) $page . '">'
-             . $label
-             . '</a></li>';
+        return '<li class="' . $li_classes . '">'
+            . '<a class="' . $this->classes['a'] . '" href="' . $href . '" aria-label="Page ' . (int) $page . '">'
+            . $label
+            . '</a></li>';
     }
 
     /**
