@@ -204,6 +204,25 @@ lava_instance()->router = $router;
 require_once APP_DIR . 'config/routes.php';
 
 /**
+ * Attribute-based routing (PHP >= 8.0 only)
+ *
+ * Auto-discovers controllers under app/controllers/ that carry
+ * #[Route]/#[Get]/#[Post]/etc attributes and registers them onto
+ * the same $router instance used above. Controllers with no
+ * attributes (e.g. Welcome.php) are left completely untouched, and
+ * routes.php remains the manual registration path — nothing here
+ * is required to keep using string-callback routes.
+ *
+ * On PHP 7.4 (LavaLust's stated minimum) this block is skipped
+ * silently since #[Attribute] syntax doesn't parse pre-8.0.
+ */
+if (PHP_VERSION_ID >= 80000) {
+    require_once SYSTEM_DIR . 'kernel/Attributes.php';
+    require_once SYSTEM_DIR . 'kernel/AttributeRouteLoader.php';
+    (new AttributeRouteLoader($router))->load();
+}
+
+/**
  * Load app-level kernel extensions (MY_* overrides)
  * Allows extending any kernel class without touching core files.
  */
