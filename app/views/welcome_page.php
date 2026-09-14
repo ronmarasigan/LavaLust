@@ -125,8 +125,13 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
             box-shadow: 0 0 20px var(--lava-glow-strong);
+            flex-shrink: 0;
+        }
+
+        .nav-logo .flame svg {
+            width: 15px;
+            height: 15px;
         }
 
         .nav-links {
@@ -377,8 +382,17 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
             margin-bottom: 1rem;
+        }
+
+        .feature-icon svg {
+            width: 18px;
+            height: 18px;
+            stroke: var(--lava);
+            fill: none;
+            stroke-width: 1.6;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
 
         .feature h3 {
@@ -465,7 +479,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
             transition: all 0.2s;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.625rem;
         }
 
         .dir-item:hover {
@@ -474,7 +488,27 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
             background: rgba(221,72,20,0.05);
         }
 
-        .dir-item .dir-icon { color: var(--lava); font-size: 0.9rem; }
+        .dir-item .dir-icon {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dir-item .dir-icon svg {
+            width: 14px;
+            height: 14px;
+            stroke: var(--lava);
+            fill: none;
+            stroke-width: 1.6;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            opacity: 0.8;
+        }
+
+        .dir-item:hover .dir-icon svg { opacity: 1; }
 
         /* ── FOOTER ── */
         footer {
@@ -560,13 +594,18 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 <!-- NAV -->
 <nav>
     <a class="nav-logo" href="#">
-        <div class="flame">🔥</div>
+        <div class="flame">
+            <!-- Flame SVG -->
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 21C12 21 5 17 5 11C5 8 7.5 5.5 10 5.5C10 5.5 9 8 11 9C11 9 10 6.5 13.5 5C13.5 5 12.5 9 15.5 9C17.5 9 18.5 7 18.5 7C18.5 7 21 9.5 19 14C17.5 17.5 12 21 12 21Z" fill="white" opacity="0.95"/>
+            </svg>
+        </div>
         LavaLust
     </a>
     <div class="nav-links">
         <a href="https://lavalust.netlify.app/docs/" target="_blank">Docs</a>
         <a href="https://github.com/ronmarasigan/LavaLust" target="_blank">GitHub</a>
-        <a href="https://lavalust.netlify.app/docs/" target="_blank" class="btn-nav">Get Started →</a>
+        <a href="https://lavalust.netlify.app/docs/" target="_blank" class="btn-nav">Get Started</a>
     </div>
 </nav>
 
@@ -619,36 +658,61 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
         <p class="section-desc">LavaLust gives you a clean, consistent structure so you can focus on building — not configuring.</p>
 
         <div class="features-layout">
+
+            <!-- MVC -->
             <div class="feature">
-                <div class="feature-icon">🧠</div>
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="5" rx="1"/><rect x="2" y="10" width="9" height="5" rx="1"/><rect x="2" y="17" width="9" height="4" rx="1"/><path d="M15 12h7M15 17h7M19 10v10"/></svg>
+                </div>
                 <h3>MVC Architecture</h3>
                 <p>Clean separation between Models, Views, and Controllers keeps your codebase maintainable as it grows.</p>
             </div>
+
+            <!-- Routing -->
             <div class="feature">
-                <div class="feature-icon">⚙️</div>
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7 6h10M14 8l4 8M10 8L6 16"/></svg>
+                </div>
                 <h3>Flexible Routing</h3>
                 <p>Define routes with GET, POST, PUT, DELETE and more. Supports named routes, closures, and grouped prefixes.</p>
             </div>
+
+            <!-- ORM -->
             <div class="feature">
-                <div class="feature-icon">🗄️</div>
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v4c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 9v5c0 1.66 4 3 9 3s9-1.34 9-3V9"/><path d="M3 14v5c0 1.66 4 3 9 3s9-1.34 9-3v-5"/></svg>
+                </div>
                 <h3>ORM-style Models</h3>
                 <p>Fluent query builder with relationships, soft deletes, timestamps, mass assignment protection, and eager loading.</p>
             </div>
+
+            <!-- HMVC -->
             <div class="feature">
-                <div class="feature-icon">📦</div>
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><rect x="2" y="2" width="8" height="8" rx="1.5"/><rect x="14" y="2" width="8" height="8" rx="1.5"/><rect x="2" y="14" width="8" height="8" rx="1.5"/><rect x="14" y="14" width="8" height="8" rx="1.5"/></svg>
+                </div>
                 <h3>HMVC Modules</h3>
                 <p>Scale your app with self-contained modules. Each module owns its controllers, models, and views.</p>
             </div>
+
+            <!-- REST -->
             <div class="feature">
-                <div class="feature-icon">🔗</div>
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M4 12h16M12 4l8 8-8 8"/></svg>
+                </div>
                 <h3>REST API Support</h3>
                 <p>Build JSON APIs out of the box using built-in conventions, response helpers, and content negotiation.</p>
             </div>
+
+            <!-- Libraries -->
             <div class="feature">
-                <div class="feature-icon">🛡️</div>
-                <h3>Libraries & Helpers</h3>
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M4 19V6a2 2 0 0 1 2-2h13a1 1 0 0 1 1 1v13"/><path d="M4 19a2 2 0 0 0 2 2h13a1 1 0 0 0 1-1v-1"/><path d="M8 7h6M8 11h8"/></svg>
+                </div>
+                <h3>Libraries &amp; Helpers</h3>
                 <p>Sessions, form validation, file uploads, pagination, encryption — batteries included where it counts.</p>
             </div>
+
         </div>
     </div>
 </section>
@@ -713,25 +777,28 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 
         <div class="structure-grid">
             <?php
+            // Each entry: [path, SVG path data (viewBox 0 0 24 24, stroke only)]
             $dirs = [
-                ['app/config',      '⚙'],
-                ['app/controllers', '🎮'],
-                ['app/helpers',     '🔧'],
-                ['app/libraries',   '📚'],
-                ['app/language',    '🌐'],
-                ['app/middlewares', '🛡️'],
-                ['app/migrations',  '🔄'],
-                ['app/models',      '🗄'],
-                ['app/modules',     '📦'],
-                ['app/views',       '🖼'],
-                ['public/',         '🌍'],
-                ['runtime/',        '⚡'],
-                ['console/',        '💻'],
-                ['scheme/',         '📐'],
+                ['app/config',      '<path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>'],
+                ['app/controllers', '<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>'],
+                ['app/helpers',     '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>'],
+                ['app/libraries',   '<path d="M4 19V6a2 2 0 0 1 2-2h13a1 1 0 0 1 1 1v13"/><path d="M4 19a2 2 0 0 0 2 2h13a1 1 0 0 0 1-1v-1"/><path d="M8 7h6M8 11h8"/>'],
+                ['app/language',    '<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>'],
+                ['app/middlewares', '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>'],
+                ['app/migrations',  '<polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>'],
+                ['app/models',      '<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v4c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 9v5c0 1.66 4 3 9 3s9-1.34 9-3V9"/><path d="M3 14v5c0 1.66 4 3 9 3s9-1.34 9-3v-5"/>'],
+                ['app/modules',     '<rect x="2" y="2" width="8" height="8" rx="1.5"/><rect x="14" y="2" width="8" height="8" rx="1.5"/><rect x="2" y="14" width="8" height="8" rx="1.5"/><rect x="14" y="14" width="8" height="8" rx="1.5"/>'],
+                ['app/views',       '<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>'],
+                ['public/',         '<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>'],
+                ['runtime/',        '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>'],
+                ['console/',        '<polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>'],
+                ['scheme/',         '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>'],
             ];
-            foreach ($dirs as [$name, $icon]): ?>
+            foreach ($dirs as [$name, $svgPaths]): ?>
             <div class="dir-item">
-                <span class="dir-icon"><?php echo $icon; ?></span>
+                <span class="dir-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><?php echo $svgPaths; ?></svg>
+                </span>
                 <?php echo $name; ?>
             </div>
             <?php endforeach; ?>
