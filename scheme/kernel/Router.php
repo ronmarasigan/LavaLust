@@ -437,6 +437,12 @@ class Router
             $url = '/' . $url;
         }
 
+        if ($method === 'OPTIONS') {
+            handle_cors();
+            http_response_code(204);
+            exit;
+        }
+
         // Security check for permitted characters
         $url_segments = explode('/', $url);
         array_shift($url_segments);
