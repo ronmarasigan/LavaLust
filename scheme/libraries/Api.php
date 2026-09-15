@@ -535,7 +535,7 @@ class Api
 
         $stmt = $this->_lava->db->raw(
             "SELECT * FROM {$this->refresh_token_table} 
-             WHERE token = ? AND expires_at > NOW() LIMIT 1",
+            WHERE token = ? AND expires_at > NOW() LIMIT 1",
             [$hashed]
         );
         $found = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -544,10 +544,27 @@ class Api
             $this->respond_error('Refresh token expired or revoked', 403);
         }
 
-        // Revoke old + rotate (best practice)
-        $this->revoke_refresh_token($refresh_token);
+        $user_stmt = $this->_lava->db->raw(
+            "SELECT id, role FROM users WHERE id = ? LIMIT 1",
+            [$payload['sub']]
+        );
+        $user = $user_stmt->fetch(PDO::FETCH_ASSOC);
 
-        $new_tokens = $this->issue_tokens(['id' => $payload['sub']]);
+        if (!$user) {
+            $this->respond_error('User not found', 403);
+        }
+
+        $this->revoke_refresh_token($refresh_token);
+        $role_scopes = [
+            'admin'  => ['read', 'write', 'delete'],
+            'editor' => ['read', 'write'],
+            'user'   => ['read'],
+        ];
+        $new_tokens = $this->issue_tokens([
+            'id'     => $user['id'],
+            'role'   => $user['role'],
+            'scopes' => $role_scopes[$user['role']] ?? ['read'],
+        ]);
 
         $this->respond([
             'message' => 'Tokens refreshed successfully',
