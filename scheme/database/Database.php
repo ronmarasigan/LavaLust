@@ -375,7 +375,9 @@ class Database {
             $t_start = microtime(true);
             $stmt->execute($this->bind_values);
             $t_elapsed = microtime(true) - $t_start;
-
+            
+            $this->last_id_inserted = $this->db->lastInsertId();
+            
             if ($this->query_logging) {
                 $this->query_log[] = [
                     'query'    => $query,

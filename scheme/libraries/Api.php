@@ -593,7 +593,7 @@ class Api
      * @param integer|null $user_id
      * @return void
      */
-    public function cleanup_expired_refresh_tokens($user_id = null): void
+    public function cleanup_expired_refresh_tokens($user_id = null)
     {
         $sql = "DELETE FROM {$this->refresh_token_table} WHERE expires_at < NOW()";
         $params = [];
