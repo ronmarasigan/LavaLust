@@ -68,6 +68,7 @@ class Migration {
 
         if (!config_item('migration_enabled')) {
             $this->error('Migrations are disabled in the configuration.');
+            exit;
         }
 
         $this->migrations_folder = config_item('migration_path');
