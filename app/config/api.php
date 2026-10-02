@@ -36,12 +36,12 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 
 /*
 |--------------------------------------------------------------------------
-| Enable/Disable Migrations
+| Enable/Disable API Helper
 |--------------------------------------------------------------------------
 |
-| Migrations are disabled by default for security reasons.
-| You should enable migrations whenever you intend to do a schema migration
-| and disable it back when you're done.
+| The API Helper is disabled by default for security reasons.
+| Before enabling it you MUST set the jwt_secret and refresh_token_key
+| below (see their notes). The API library refuses to start otherwise.
 |
 */
 $config['api_helper_enabled'] = FALSE;
@@ -74,8 +74,20 @@ $config['refresh_token_expiration'] = 604800;
 |
 | Used for Securing endpoint
 |
+| REQUIRED when api_helper_enabled is TRUE. There is intentionally no
+| default value: a secret that ships with the framework is public and
+| lets anyone forge valid tokens.
+|
+| Provide it through the environment variable LAVALUST_JWT_SECRET.
+| It must be at least 32 random characters. Generate one with:
+|
+|   php -r "echo bin2hex(random_bytes(32));"
+|
+| Never commit the real value to version control. If a secret was ever
+| committed or exposed, rotate it. All existing tokens become invalid.
+|
 */
-$config['jwt_secret'] = 'cbTsnJDxCodakDxh4M3qd5Sn3Kd2cYCDp4MEu0DAPxx';
+$config['jwt_secret'] = getenv('JWT_SECRET') ?: '';
 
 /*
 |--------------------------------------------------------------------------
@@ -84,8 +96,44 @@ $config['jwt_secret'] = 'cbTsnJDxCodakDxh4M3qd5Sn3Kd2cYCDp4MEu0DAPxx';
 |
 | Used for Securing endpoint
 |
+| REQUIRED when api_helper_enabled is TRUE. There is intentionally no
+| default value. It is used to hash refresh tokens before they are stored
+| in the database and must be different from jwt_secret.
+|
+| Provide it through the environment variable LAVALUST_REFRESH_TOKEN_KEY.
+| It must be at least 32 random characters. Generate one with:
+|
+|   php -r "echo bin2hex(random_bytes(32));"
+|
 */
-$config['refresh_token_key'] = '0bNvxjPFJ6dhi1Ttf7AStp95zUcd1iy94mjblklwfPs';
+$config['refresh_token_key'] = getenv('REFRESH_TOKEN_KEY') ?: '';
+
+/*
+|--------------------------------------------------------------------------
+| Verify User On Each Request
+|--------------------------------------------------------------------------
+|
+| When TRUE, require_jwt() checks that the token's subject exists in the
+| users table and takes role and scopes from the database instead of
+| trusting the token claims. This costs one indexed query per request.
+|
+| Set to FALSE only if your users are not stored in the table below and
+| you perform your own server-side authorization checks.
+|
+*/
+$config['jwt_verify_user'] = TRUE;
+
+/*
+|--------------------------------------------------------------------------
+| Users Table
+|--------------------------------------------------------------------------
+|
+| Name of the table holding your users. It needs at least the columns
+| "id" and "role". Used when refreshing tokens and when jwt_verify_user
+| is TRUE.
+|
+*/
+$config['users_table'] = 'users';
 
 /*
 |--------------------------------------------------------------------------
@@ -93,7 +141,8 @@ $config['refresh_token_key'] = '0bNvxjPFJ6dhi1Ttf7AStp95zUcd1iy94mjblklwfPs';
 |--------------------------------------------------------------------------
 |
 | Access-Control-Allow-Origin - change this to your domain if
-| already deployed.
+| already deployed. '*' allows any website to call your API from
+| a browser, so set your real domain in production.
 |
 */
 $config['allow_origin'] = '*';
@@ -110,18 +159,20 @@ $config['refresh_token_table'] = 'refresh_tokens';
 
 /*
 |--------------------------------------------------------------------------
-| JWT Issuer and Audience
+| JWT Issuer
 |--------------------------------------------------------------------------
-| These are used for JWT Issuer and Audience claims.
+| This is used for the JWT Issuer claim (iss). Change it to your
+| application's name or URL.
 |
 */
 $config['jwt_issuer'] = 'your-app';
 
 /*
 |--------------------------------------------------------------------------
-| JWT Issuer and Audience
+| JWT Audience
 |--------------------------------------------------------------------------
-| These are used for JWT Issuer and Audience claims.
+| This is used for the JWT Audience claim (aud). Change it to identify
+| the clients allowed to use the tokens.
 |
 */
 

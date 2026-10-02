@@ -200,7 +200,7 @@ EOT;
                 $migration->up();
 
                 $this->record_migration($version);
-                $this->success("✓ Migrated: " . basename($file));
+                $this->success("Migrated: " . basename($file));
                 $migrated++;
             }
         }

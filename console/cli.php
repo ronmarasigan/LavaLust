@@ -63,6 +63,11 @@ register_command('route:list', 'handle_route_list', 'Display all registered rout
 
 register_command('key:generate', 'handle_key_generate', 'Generate a new application key', []);
 
+register_command('jwt:generate', 'handle_jwt_generate', 'Generate JWT_SECRET and REFRESH_TOKEN_KEY and save them to .env', [
+    '[--force]' => 'Overwrite values that are already set in .env',
+    '[--show]'  => 'Print the generated values to the terminal'
+]);
+
 register_command('env:check', 'handle_env_check', 'Display current environment configuration summary', []);
 
 autoload_commands();
@@ -422,6 +427,97 @@ function handle_key_generate() {
 }
 
 /**
+ * Handle JWT Generate Command
+ *
+ * Generates JWT_SECRET and REFRESH_TOKEN_KEY and saves them to .env.
+ * Values that are already set are kept unless --force is given.
+ *
+ * php lava jwt:generate            Generate missing keys
+ * php lava jwt:generate --force    Overwrite keys already set in .env
+ * php lava jwt:generate --show     Also print the generated values
+ *
+ * @param string|null $input
+ * @param array       $flags
+ * @return void
+ */
+function handle_jwt_generate($input = null, array $flags = []) {
+    $env_file = dirname(__DIR__, 1) . DIRECTORY_SEPARATOR . '.env';
+    $force    = !empty($flags['force']);
+    $show     = !empty($flags['show']);
+
+    if (file_exists($env_file)) {
+        $env = file_get_contents($env_file);
+    } else {
+        $env = '';
+        echo "\033[0;33mNo .env file found. A new one will be created at {$env_file}\033[0m" . PHP_EOL;
+    }
+
+    foreach (['JWT_SECRET', 'REFRESH_TOKEN_KEY'] as $name) {
+        $current = env_file_get($env, $name);
+
+        if ($current !== null && $current !== '' && !$force) {
+            echo "\033[0;33m{$name} is already set. Skipped (use --force to overwrite).\033[0m" . PHP_EOL;
+            continue;
+        }
+
+        $value = bin2hex(random_bytes(32)); // 64-char hex key, generated separately for each name
+        $env   = env_file_set($env, $name, $value);
+
+        echo success("{$name} generated and saved to .env") . PHP_EOL;
+
+        if ($show) {
+            echo "  {$name}={$value}" . PHP_EOL;
+        }
+    }
+
+    if (file_put_contents($env_file, $env) === false) {
+        echo danger("Could not write to {$env_file}");
+        exit(1);
+    }
+
+    echo PHP_EOL . "Keep .env out of version control." . PHP_EOL;
+    echo "Tokens signed with a replaced key will stop working." . PHP_EOL;
+}
+
+/**
+ * Read a value from .env contents. Returns null when the key is absent.
+ *
+ * @param string $env
+ * @param string $name
+ * @return string|null
+ */
+function env_file_get($env, $name) {
+    if (preg_match('/^' . preg_quote($name, '/') . '[ \t]*=[ \t]*(.*?)[ \t]*\r?$/m', $env, $m)) {
+        return trim($m[1], " \t\"'");
+    }
+    return null;
+}
+
+/**
+ * Set a value in .env contents: replace the line if it exists, append it otherwise.
+ *
+ * @param string $env
+ * @param string $name
+ * @param string $value
+ * @return string
+ */
+function env_file_set($env, $name, $value) {
+    $pattern = '/^' . preg_quote($name, '/') . '[ \t]*=.*$/m';
+
+    if (preg_match($pattern, $env)) {
+        return preg_replace_callback($pattern, function () use ($name, $value) {
+            return "{$name}={$value}";
+        }, $env, 1);
+    }
+
+    if ($env !== '' && substr($env, -1) !== "\n") {
+        $env .= PHP_EOL;
+    }
+
+    return $env . "{$name}={$value}" . PHP_EOL;
+}
+
+/**
  * Handle Environment Check Command
  *
  * @return void
@@ -758,7 +854,7 @@ function help_text($commands) {
         'Server'    => ['serve', 'run'],
         'Cache'     => ['cache:clear'],
         'Makers'    => ['make:controller', 'make:model', 'make:middleware', 'make:helper', 'make:library', 'make:view', 'make:language', 'make:config', 'make:command'],
-        'Utilities' => ['route:list', 'key:generate', 'env:check'],
+        'Utilities' => ['route:list', 'key:generate', 'jwt:generate', 'env:check'],
     ];
 
     $all_built_in = array_merge(...array_values($built_in_groups));
@@ -802,7 +898,8 @@ function help_text($commands) {
     $help .= "  php lava make:model User\n";
     $help .= "  php lava cache:clear\n";
     $help .= "  php lava route:list\n";
-    $help .= "  php lava key:generate\n\n";
+    $help .= "  php lava key:generate\n";
+    $help .= "  php lava jwt:generate\n\n";
 
     return $help;
 }

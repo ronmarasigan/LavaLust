@@ -42,6 +42,22 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 class Api
 {
     /**
+     * Known Insecure Secrets
+     *
+     * Values that were published in earlier releases or example
+     * configurations. They are rejected regardless of their length,
+     * because anyone can read them from the public repository.
+     *
+     * @var array
+     */
+    /**
+     * Minimum Secret Length
+     *
+     * @var integer
+     */
+    private const MIN_SECRET_LENGTH = 32;
+
+    /**
      * LavaLust Super Object
      *
      * @var object
@@ -56,6 +72,26 @@ class Api
     protected $refresh_token_table;
 
     /**
+     * Api Users Table
+     *
+     * Table used to confirm that the token subject exists and to read
+     * the user's role on the server side.
+     *
+     * @var string
+     */
+    protected $users_table = 'users';
+
+    /**
+     * Verify User On Each Request
+     *
+     * When TRUE, require_jwt() checks that the user exists and takes
+     * role and scopes from the database instead of the token claims.
+     *
+     * @var boolean
+     */
+    protected $verify_user = true;
+
+    /**
      * Api Payload Token Expiration
      *
      * This is used for Payload Token Expiration.
@@ -63,7 +99,7 @@ class Api
      *
      * @var integer
      */
-    protected $payload_token_expiration;
+    protected $payload_token_expiration = 900;
 
     /**
      * Api Refresh Token Expiration
@@ -73,7 +109,7 @@ class Api
      *
      * @var integer
      */
-    protected $refresh_token_expiration;
+    protected $refresh_token_expiration = 604800;
 
     /**
      * Allow Origin
@@ -122,14 +158,14 @@ class Api
      *
      * @var integer
      */
-    protected $rate_limit_requests;
+    protected $rate_limit_requests = 60;
 
     /**
      * Rate Limit Seconds
      *
      * @var integer
      */
-    protected $rate_limit_seconds;
+    protected $rate_limit_seconds = 60;
 
     public function __construct()
     {
@@ -143,6 +179,8 @@ class Api
 
         // Load config
         $this->refresh_token_table      = config_item('refresh_token_table') ?? $this->refresh_token_table;
+        $this->users_table              = config_item('users_table') ?? $this->users_table;
+        $this->verify_user              = (bool) (config_item('jwt_verify_user') ?? $this->verify_user);
         $this->payload_token_expiration = (int) (config_item('payload_token_expiration') ?? $this->payload_token_expiration);
         $this->refresh_token_expiration = (int) (config_item('refresh_token_expiration') ?? $this->refresh_token_expiration);
         $this->jwt_secret               = config_item('jwt_secret');
@@ -158,14 +196,39 @@ class Api
         $this->rate_limit_requests  = (int)  (config_item('rate_limit_requests') ?? $this->rate_limit_requests);
         $this->rate_limit_seconds   = (int)  (config_item('rate_limit_seconds') ?? $this->rate_limit_seconds);
 
-        if (empty($this->jwt_secret) || strlen($this->jwt_secret) < 32) {
-            show_error('JWT secret is missing or too weak. Use at least 32 random characters.');
-        }
-        if (empty($this->refresh_token_key) || strlen($this->refresh_token_key) < 32) {
-            show_error('Refresh token key is missing or too weak.');
+        // Fail closed: refuse to start with a missing, weak or publicly known secret.
+        $this->assert_secret_is_safe($this->jwt_secret, 'jwt_secret');
+        $this->assert_secret_is_safe($this->refresh_token_key, 'refresh_token_key');
+
+        if (hash_equals((string) $this->jwt_secret, (string) $this->refresh_token_key)) {
+            show_error('jwt_secret and refresh_token_key must be different values.');
         }
 
         handle_cors();
+    }
+
+    /**
+     * assert_secret_is_safe
+     *
+     * Stops the request when a secret is missing, too short, has too little
+     * entropy, or is one of the publicly known default values.
+     *
+     * @param mixed  $secret
+     * @param string $name   Config key name, used in the error message
+     * @return void
+     */
+    private function assert_secret_is_safe($secret, $name)
+    {
+        $secret = (string) $secret;
+
+        if ($secret === '' || strlen($secret) < self::MIN_SECRET_LENGTH) {
+            show_error("{$name} is missing or too short. Use at least " . self::MIN_SECRET_LENGTH . " random characters.");
+        }
+
+        // Reject trivially low-entropy values such as "aaaaaaaa..." or "1234123412...".
+        if (count(array_unique(str_split($secret))) < 10) {
+            show_error("{$name} has too little entropy. Use a random value.");
+        }
     }
 
     /**
@@ -417,10 +480,15 @@ class Api
     /**
      * validate_jwt
      *
+     * Verifies signature, timestamps, issuer, audience and token type.
+     * Access tokens and refresh tokens are not interchangeable: pass
+     * 'refresh' as $expected_type to validate a refresh token.
+     *
      * @param string $token
+     * @param string $expected_type 'access' (default) or 'refresh'
      * @return array<string,mixed>|null
      */
-    public function validate_jwt($token)
+    public function validate_jwt($token, $expected_type = 'access')
     {
         $payload = $this->decode_jwt($token);
         if (!$payload) return null;
@@ -428,6 +496,7 @@ class Api
         if (!isset($payload['sub'], $payload['exp'], $payload['iat'])) return null;
         if ($payload['exp'] < time() || ($payload['iat'] ?? 0) > time()) return null;
         if (($payload['iss'] ?? '') !== $this->jwt_issuer || ($payload['aud'] ?? '') !== $this->jwt_audience) return null;
+        if (($payload['type'] ?? 'access') !== $expected_type) return null;
 
         return $payload;
     }
@@ -449,11 +518,34 @@ class Api
         return preg_match('/Bearer\s(\S+)/i', $header, $matches) ? $matches[1] : null;
     }
 
+    /**
+     * scopes_for_role
+     *
+     * Single source of truth for role to scope mapping. Scopes are always
+     * derived from the role stored in the database, never from token claims.
+     *
+     * @param string $role
+     * @return array
+     */
+    protected function scopes_for_role($role)
+    {
+        $role_scopes = [
+            'admin'  => ['read', 'write', 'delete'],
+            'editor' => ['read', 'write'],
+            'user'   => ['read'],
+        ];
+
+        return $role_scopes[$role] ?? ['read'];
+    }
 
     /**
      * require_jwt
      *
-     * @return void
+     * Validates the bearer token. When jwt_verify_user is enabled, the
+     * user must also exist in the users table, and the returned role and
+     * scopes come from the database instead of the token.
+     *
+     * @return array<string,mixed>
      */
     public function require_jwt()
     {
@@ -462,6 +554,22 @@ class Api
 
         if (!$payload) {
             $this->respond_error('Unauthorized', 401);
+        }
+
+        if ($this->verify_user) {
+            $stmt = $this->_lava->db->raw(
+                "SELECT id, role FROM {$this->users_table} WHERE id = ? LIMIT 1",
+                [$payload['sub']]
+            );
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$user) {
+                $this->respond_error('Unauthorized', 401);
+            }
+
+            // Server-side values win over whatever the token claims.
+            $payload['role']   = $user['role'];
+            $payload['scopes'] = $this->scopes_for_role($user['role']);
         }
 
         return $payload;
@@ -484,6 +592,7 @@ class Api
 
         $access_payload = [
             'sub'   => $user_id,
+            'type'  => 'access',
             'role'  => $user_data['role'] ?? 'user',
             'scopes'=> $scopes,
         ];
@@ -500,7 +609,7 @@ class Api
         // Hash for DB storage (secure + prevents exposure on DB breach)
         $hashed_refresh = hash_hmac('sha256', (string) $refresh_token, $this->refresh_token_key);
 
-        $this->cleanup_expired_refresh_tokens($user_id);
+        $this->cleanup_expired_refresh_tokens();
 
         $expires_at = date('Y-m-d H:i:s', $now + $this->refresh_token_expiration);
 
@@ -526,8 +635,9 @@ class Api
      */
     public function refresh_access_token($refresh_token)
     {
-        $payload = $this->validate_jwt($refresh_token);
-        if (!$payload || ($payload['type'] ?? '') !== 'refresh') {
+        // Only a token explicitly typed as "refresh" is accepted here.
+        $payload = $this->validate_jwt($refresh_token, 'refresh');
+        if (!$payload) {
             $this->respond_error('Invalid refresh token', 403);
         }
 
@@ -545,7 +655,7 @@ class Api
         }
 
         $user_stmt = $this->_lava->db->raw(
-            "SELECT id, role FROM users WHERE id = ? LIMIT 1",
+            "SELECT id, role FROM {$this->users_table} WHERE id = ? LIMIT 1",
             [$payload['sub']]
         );
         $user = $user_stmt->fetch(PDO::FETCH_ASSOC);
@@ -555,15 +665,11 @@ class Api
         }
 
         $this->revoke_refresh_token($refresh_token);
-        $role_scopes = [
-            'admin'  => ['read', 'write', 'delete'],
-            'editor' => ['read', 'write'],
-            'user'   => ['read'],
-        ];
+
         $new_tokens = $this->issue_tokens([
             'id'     => $user['id'],
             'role'   => $user['role'],
-            'scopes' => $role_scopes[$user['role']] ?? ['read'],
+            'scopes' => $this->scopes_for_role($user['role']),
         ]);
 
         $this->respond([
@@ -593,7 +699,7 @@ class Api
      * @param integer|null $user_id
      * @return void
      */
-    public function cleanup_expired_refresh_tokens($user_id = null)
+    public function cleanup_expired_refresh_tokens($user_id = null): void
     {
         $sql = "DELETE FROM {$this->refresh_token_table} WHERE expires_at < NOW()";
         $params = [];
