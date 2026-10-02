@@ -42,15 +42,6 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 class Api
 {
     /**
-     * Known Insecure Secrets
-     *
-     * Values that were published in earlier releases or example
-     * configurations. They are rejected regardless of their length,
-     * because anyone can read them from the public repository.
-     *
-     * @var array
-     */
-    /**
      * Minimum Secret Length
      *
      * @var integer
@@ -434,23 +425,25 @@ class Api
      * @param array $payload
      * @return array<string,mixed>|null
      */
-    public function encode_jwt($payload)
+    public function encode_jwt($payload, $ttl = null)
     {
         $header = ['alg' => 'HS256', 'typ' => 'JWT'];
         $headerEnc = $this->base64UrlEncode(json_encode($header));
 
+        $ttl = $ttl ?? $this->payload_token_expiration;
+
         $now = time();
         $payload = array_merge([
             'iat' => $now,
-            'exp' => $now + $this->payload_token_expiration,
+            'exp' => $now + $ttl,
             'iss' => $this->jwt_issuer,
             'aud' => $this->jwt_audience,
             'jti' => bin2hex(random_bytes(16))
         ], $payload);
 
         $payloadEnc = $this->base64UrlEncode(json_encode($payload));
-        $signature = hash_hmac('sha256', "$headerEnc.$payloadEnc", $this->jwt_secret, true);
-        $sigEnc = $this->base64UrlEncode($signature);
+        $signature  = hash_hmac('sha256', "$headerEnc.$payloadEnc", $this->jwt_secret, true);
+        $sigEnc     = $this->base64UrlEncode($signature);
 
         return "$headerEnc.$payloadEnc.$sigEnc";
     }
@@ -587,14 +580,14 @@ class Api
     public function issue_tokens($user_data)
     {
         $user_id = $user_data['id'];
-        $now = time();
-        $scopes = $user_data['scopes'] ?? ['read'];
+        $now     = time();
+        $scopes  = $user_data['scopes'] ?? ['read'];
 
         $access_payload = [
-            'sub'   => $user_id,
-            'type'  => 'access',
-            'role'  => $user_data['role'] ?? 'user',
-            'scopes'=> $scopes,
+            'sub'    => $user_id,
+            'type'   => 'access',
+            'role'   => $user_data['role'] ?? 'user',
+            'scopes' => $scopes,
         ];
 
         $refresh_payload = [
@@ -603,10 +596,10 @@ class Api
             'jti'  => bin2hex(random_bytes(16)),
         ];
 
-        $access_token  = $this->encode_jwt($access_payload);
-        $refresh_token = $this->encode_jwt($refresh_payload); // Raw for client
+        $access_token = $this->encode_jwt($access_payload);
 
-        // Hash for DB storage (secure + prevents exposure on DB breach)
+        $refresh_token = $this->encode_jwt($refresh_payload, $this->refresh_token_expiration);
+
         $hashed_refresh = hash_hmac('sha256', (string) $refresh_token, $this->refresh_token_key);
 
         $this->cleanup_expired_refresh_tokens();
@@ -615,15 +608,15 @@ class Api
 
         $this->_lava->db->raw(
             "INSERT INTO {$this->refresh_token_table} (user_id, token, expires_at, jti) 
-             VALUES (?, ?, ?, ?)",
+            VALUES (?, ?, ?, ?)",
             [$user_id, $hashed_refresh, $expires_at, $refresh_payload['jti']]
         );
 
         return [
-            'access_token' => $access_token,
+            'access_token'  => $access_token,
             'refresh_token' => $refresh_token,
-            'expires_in'   => $this->payload_token_expiration,
-            'token_type'   => 'Bearer'
+            'expires_in'    => $this->payload_token_expiration,  // 900, still correct
+            'token_type'    => 'Bearer'
         ];
     }
 
