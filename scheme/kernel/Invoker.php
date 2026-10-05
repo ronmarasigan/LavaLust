@@ -334,9 +334,14 @@ class Invoker {
 		$LAVA = lava_instance();
 
 		if (is_null($dbname)) {
-			
+
+			if (isset($LAVA->db)) {
+				return $LAVA->db;
+			}
+
 			$database = load_class('database', 'database');
 			$LAVA->db = $database::instance(NULL);
+
 			return $LAVA->db;
 		}
 
@@ -346,6 +351,7 @@ class Invoker {
 
 		$database = load_class('database', 'database');
 		$LAVA->properties[$dbname] = $database::instance($dbname);
+		
 		return $LAVA->properties[$dbname];
 	}
 

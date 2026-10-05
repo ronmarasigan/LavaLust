@@ -163,6 +163,7 @@ class Api
         $this->_lava = lava_instance();
         $this->_lava->call->library('cache');
         $this->_lava->config->load('api');
+        $this->_lava->database();
 
         if (!config_item('api_helper_enabled')) {
             show_error('Api Helper is disabled or set up incorrectly.');
