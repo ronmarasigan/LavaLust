@@ -42,6 +42,15 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 class Api
 {
     /**
+     * Known Insecure Secrets
+     *
+     * Values that were published in earlier releases or example
+     * configurations. They are rejected regardless of their length,
+     * because anyone can read them from the public repository.
+     *
+     * @var array
+     */
+    /**
      * Minimum Secret Length
      *
      * @var integer
@@ -103,13 +112,6 @@ class Api
     protected $refresh_token_expiration = 604800;
 
     /**
-     * Allow Origin
-     *
-     * @var string
-     */
-    protected $allow_origin;
-
-    /**
      * Secret Code
      *
      * @var string
@@ -163,7 +165,6 @@ class Api
         $this->_lava = lava_instance();
         $this->_lava->call->library('cache');
         $this->_lava->config->load('api');
-        $this->_lava->database();
 
         if (!config_item('api_helper_enabled')) {
             show_error('Api Helper is disabled or set up incorrectly.');
@@ -177,7 +178,6 @@ class Api
         $this->refresh_token_expiration = (int) (config_item('refresh_token_expiration') ?? $this->refresh_token_expiration);
         $this->jwt_secret               = config_item('jwt_secret');
         $this->refresh_token_key        = config_item('refresh_token_key');
-        $this->allow_origin             = config_item('allow_origin');
 
         // JWT config
         $this->jwt_issuer              = config_item('jwt_issuer') ?? $this->jwt_issuer;
@@ -196,7 +196,7 @@ class Api
             show_error('jwt_secret and refresh_token_key must be different values.');
         }
 
-        handle_cors();
+        $this->_lava->security_headers->apply_api()->api_guard();     
     }
 
     /**
@@ -233,16 +233,33 @@ class Api
         $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
 
         if (stripos($contentType, 'application/json') !== false) {
-            $input = json_decode(file_get_contents('php://input'), true);
-            return is_array($input) ? $this->sanitize_input($input) : [];
+            $raw = $this->read_raw_body();
+            if ($raw === '') return [];
+
+            $input = json_decode($raw, true, 32);
+            if (!is_array($input)) {
+                $this->respond_error('Invalid JSON body', 400);
+            }
+            return $this->sanitize_input($input);
         }
 
         if ($_POST) {
             return $this->sanitize_input($_POST);
         }
 
-        parse_str(file_get_contents('php://input'), $formData);
+        parse_str($this->read_raw_body(), $formData);
         return $this->sanitize_input($formData ?? []);
+    }
+
+    private function read_raw_body()
+    {
+        $max = $this->_lava->security_headers->max_body();
+        $raw = file_get_contents('php://input', false, null, 0, $max + 1);
+
+        if ($raw !== false && strlen($raw) > $max) {
+            $this->respond_error('Payload too large', 413);
+        }
+        return $raw === false ? '' : $raw;
     }
 
     /**
@@ -265,7 +282,7 @@ class Api
     {
         array_walk_recursive($data, function(&$value) {
             if (is_string($value)) {
-                $value = trim(htmlspecialchars($value, ENT_QUOTES, 'UTF-8'));
+                $value = trim($value);
             }
         });
         return $data;
@@ -377,6 +394,7 @@ class Api
     public function respond($data, $code = 200)
     {
         http_response_code($code);
+        header('Content-Type: application/json; charset=utf-8');
         echo json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         exit;
     }
@@ -463,12 +481,13 @@ class Api
         [$headerEnc, $payloadEnc, $sigEnc] = $parts;
 
         $header = json_decode($this->base64UrlDecode($headerEnc), true);
-        if (($header['alg'] ?? '') !== 'HS256') return null;
+        if (!is_array($header) || ($header['alg'] ?? '') !== 'HS256') return null;
 
         $validSig = hash_hmac('sha256', "$headerEnc.$payloadEnc", $this->jwt_secret, true);
         if (!hash_equals($this->base64UrlEncode($validSig), $sigEnc)) return null;
 
-        return json_decode($this->base64UrlDecode($payloadEnc), true);
+        $payload = json_decode($this->base64UrlDecode($payloadEnc), true);
+        return is_array($payload) ? $payload : null;
     }
 
     /**
@@ -616,7 +635,7 @@ class Api
         return [
             'access_token'  => $access_token,
             'refresh_token' => $refresh_token,
-            'expires_in'    => $this->payload_token_expiration,  // 900, still correct
+            'expires_in'    => $this->payload_token_expiration,
             'token_type'    => 'Bearer'
         ];
     }
@@ -721,7 +740,8 @@ class Api
     {
         $user = $_SERVER['PHP_AUTH_USER'] ?? '';
         $pass = $_SERVER['PHP_AUTH_PW'] ?? '';
-        return hash_equals($user, $valid_user) && hash_equals($pass, $valid_pass);
+        return hash_equals((string) $valid_user, (string) $user)
+            && hash_equals((string) $valid_pass, (string) $pass);
     }
 
     /**

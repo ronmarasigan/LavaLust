@@ -413,8 +413,7 @@ foreach ($traceFrames as $frame) {
         <div class="trace-list" id="traceList">
             <?php foreach ($allFrames as $i => $frame): ?>
             <div class="trace-item <?= $i === 0 ? 'active' : '' ?>"
-                 data-index="<?= $i ?>"
-                 onclick="activateFrame(<?= $i ?>)">
+                 data-index="<?= $i ?>">
                 <div class="trace-fn">
                     <?php if (!empty($frame['class'])): ?>
                         <?= htmlspecialchars($frame['class'] . ($frame['type'] ?? '->')) ?>
@@ -456,8 +455,7 @@ foreach ($traceFrames as $frame) {
                 $currentLine = $lineIdx + 1;
                 $isError = ($currentLine === $exception->getLine());
             ?>
-            <div class="code-line <?= $isError ? 'error-line' : '' ?>"
-                 id="src-line-<?= $currentLine ?>">
+            <div class="code-line <?= $isError ? 'error-line' : '' ?>">
                 <span class="ln"><?= $currentLine ?></span>
                 <span class="error-arrow"><?= $isError ? '&#9654;' : '&nbsp;' ?></span>
                 <span class="src" data-raw="<?= htmlspecialchars(rtrim($codeLine), ENT_QUOTES) ?>"></span>
@@ -474,10 +472,10 @@ foreach ($traceFrames as $frame) {
         <!-- INFO TABS -->
         <div class="info-section">
             <div class="tabs-bar">
-                <button class="tab-btn active" onclick="switchTab(this,'env')">Environment</button>
-                <button class="tab-btn" onclick="switchTab(this,'get')">GET</button>
-                <button class="tab-btn" onclick="switchTab(this,'post')">POST</button>
-                <button class="tab-btn" onclick="switchTab(this,'server')">Server</button>
+                <button class="tab-btn active" data-tab="env">Environment</button>
+                <button class="tab-btn" data-tab="get">GET</button>
+                <button class="tab-btn" data-tab="post">POST</button>
+                <button class="tab-btn" data-tab="server">Server</button>
             </div>
 
             <div class="tab-pane active" id="pane-env">
@@ -565,39 +563,32 @@ foreach ($allFrames as $i => $frame) {
         $args = print_r($frame['args'], true);
     }
     $jsFrames[] = [
-        'file'  => $file ?? '',
-        'line'  => $line ?? 0,
-        'code'  => $code,
-        'args'  => $args,
+        'file' => $file ?? '',
+        'line' => $line ?? 0,
+        'code' => $code,
+        'args' => $args,
     ];
 }
 echo json_encode($jsFrames, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 ?>;
 
 function hl(src) {
-    // 1. HTML-escape raw source
     src = src.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-
-    // 2. Extract strings + comments into frozen[], replace with safe placeholder
-    //    Placeholder: @@FROZEN_N@@ — cannot appear in PHP source code
     const frozen = [];
     let out = '', i = 0;
     while (i < src.length) {
-        // // line comment
         if (src[i]==='/' && src[i+1]==='/') {
             let e = src.indexOf('\n', i); if (e===-1) e = src.length;
             frozen.push('<span class="cmt">' + src.slice(i,e) + '</span>');
             out += '@@FROZEN_'+(frozen.length-1)+'@@';
             i = e; continue;
         }
-        // # line comment
         if (src[i]==='#') {
             let e = src.indexOf('\n', i); if (e===-1) e = src.length;
             frozen.push('<span class="cmt">' + src.slice(i,e) + '</span>');
             out += '@@FROZEN_'+(frozen.length-1)+'@@';
             i = e; continue;
         }
-        // single-quoted string
         if (src[i]==="'") {
             let j = i+1;
             while (j < src.length) {
@@ -609,7 +600,6 @@ function hl(src) {
             out += '@@FROZEN_'+(frozen.length-1)+'@@';
             i = j; continue;
         }
-        // double-quoted string
         if (src[i]==='"') {
             let j = i+1;
             while (j < src.length) {
@@ -625,28 +615,22 @@ function hl(src) {
     }
     src = out;
 
-    // 3. Highlight plain text — no HTML tags exist yet, placeholders are opaque
     src = src.replace(/\b(function|class|public|protected|private|static|return|new|if|else|elseif|foreach|for|while|switch|case|default|break|continue|throw|try|catch|finally|require|require_once|include|include_once|namespace|use|extends|implements|abstract|interface|trait|echo|print|list|array|null|true|false|void|OR|AND)\b/g,
         '<span class="kw">$1</span>');
-
     src = src.replace(/(\$[a-zA-Z_][a-zA-Z0-9_]*)/g,
         '<span class="var">$1</span>');
-
     src = src.replace(/\b([a-zA-Z_][a-zA-Z0-9_]*)\s*\(/g, function(m, name) {
         if (/^(if|else|elseif|for|foreach|while|switch|catch|list|array|function)$/.test(name)) return m;
         return '<span class="fn">' + name + '</span>(';
     });
-
     src = src.replace(/\b(\d+\.?\d*)\b/g, '<span class="num">$1</span>');
-
-    // 4. Restore frozen tokens
     src = src.replace(/@@FROZEN_(\d+)@@/g, (_, n) => frozen[+n]);
-
     return src;
 }
 
 function renderCode(frameIdx) {
     const f = FRAMES[frameIdx];
+    if (!f) return;
     document.getElementById('codeFilePath').textContent = f.file || '[internal]';
     document.getElementById('codeLineBadge').textContent = f.line ? 'line ' + f.line : '';
 
@@ -680,22 +664,35 @@ function activateFrame(idx) {
     renderCode(idx);
 }
 
-function switchTab(btn, id) {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('pane-' + id).classList.add('active');
-}
-
-// Initial render: highlight inline PHP-rendered code
-document.querySelectorAll('.src[data-raw]').forEach(el => {
-    el.innerHTML = hl(el.getAttribute('data-raw'));
-    el.removeAttribute('data-raw');
+/* ── Delegated click handlers — no inline JS, CSP-safe ── */
+document.addEventListener('click', function (e) {
+    const trace = e.target.closest('.trace-item');
+    if (trace) {
+        activateFrame(parseInt(trace.dataset.index, 10));
+        return;
+    }
+    const tab = e.target.closest('.tab-btn');
+    if (tab) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        const pane = document.getElementById('pane-' + tab.dataset.tab);
+        if (pane) pane.classList.add('active');
+    }
 });
 
-// Scroll error line into view on load
-const initErr = document.querySelector('.code-line.error-line');
-if (initErr) initErr.scrollIntoView({ block: 'center' });
+/* ── Initial render: let JS draw frame 0 the same way it draws the rest ── */
+if (FRAMES.length) {
+    activateFrame(0);
+} else {
+    // Fallback: no frames captured — highlight whatever PHP already rendered.
+    document.querySelectorAll('.src[data-raw]').forEach(el => {
+        el.innerHTML = hl(el.getAttribute('data-raw'));
+        el.removeAttribute('data-raw');
+    });
+    const initErr = document.querySelector('.code-line.error-line');
+    if (initErr) initErr.scrollIntoView({ block: 'center' });
+}
 </script>
 </body>
 </html>

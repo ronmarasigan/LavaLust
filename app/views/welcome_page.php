@@ -9,8 +9,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
     <title>Welcome to LavaLust</title>
     <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700;800&family=Unbounded:wght@400;500&display=swap" rel="stylesheet">
-    <style>
+    <style nonce="<?php echo defined('CSP_NONCE') ? CSP_NONCE : ''; ?>">
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
@@ -26,7 +27,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
             --text: #f4f4f5;
             --text-muted: #71717a;
             --text-dim: #3f3f46;
-            --mono: 'JetBrains Mono', monospace;
+            --mono: 'Fira Code', monospace;
             --sans: 'Unbounded', sans-serif;
         }
 
@@ -39,6 +40,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
             min-height: 100vh;
             overflow-x: hidden;
         }
+
+        .code-block-spaced { margin-bottom: 1rem; }
+        .dev-flag { color: var(--lava); }
 
         /* ── NOISE TEXTURE ── */
         body::before {
@@ -730,7 +734,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
             </div>
 
             <div>
-                <div class="code-block" style="margin-bottom:1rem;">
+                <div class="code-block code-block-spaced">
                     <div class="code-header">
                         <div class="dot dot-r"></div>
                         <div class="dot dot-y"></div>
@@ -814,7 +818,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
             <span>memory <span><?php echo lava_instance()->performance->memory_usage(); ?></span></span>
             <?php if(config_item('environment') === 'development'): ?>
             <span>version <span><?php echo config_item('version'); ?></span></span>
-            <span style="color: #dd4814;">● development</span>
+            <span class="dev-flag">● development</span>
             <?php endif; ?>
         </div>
         <div class="footer-links">

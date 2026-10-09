@@ -291,7 +291,7 @@ class Profiler
         $html .= '<div id="' . $id . '" class="llp-wrap">';
 
         // ── Toggle bar ──
-        $html .= '<div class="llp-bar" onclick="llpToggle(\'' . $id . '\')">';
+        $html .= '<div class="llp-bar" data-llp-toggle="' . $id . '">';
         $html .= '<span class="llp-logo">LavaLust Profiler</span>';
         $html .= '<span class="llp-bar-meta">';
 
@@ -449,15 +449,15 @@ class Profiler
         $html .= '<div class="llp-tabs" id="' . $id . '_tabs">';
         foreach ($tabs as $i => $tab) {
             $active = $i === 0 ? ' llp-tab-active' : '';
-            $html .= '<button class="llp-tab' . $active . '" onclick="llpTab(\'' . $id . '\',\'' . $tab['id'] . '\',this)">' . $tab['label'] . '</button>';
+            $html .= '<button type="button" class="llp-tab' . $active . '" data-llp-wrap="' . $id . '" data-llp-tab="' . $tab['id'] . '">' . $tab['label'] . '</button>';
         }
         $html .= '</div>';
 
         // Render panels
         $html .= '<div class="llp-panels">';
         foreach ($panels as $i => $panel) {
-            $active = $i === 0 ? '' : ' style="display:none"';
-            $html .= '<div class="llp-panel" id="' . $id . '_panel_' . $panel['id'] . '"' . $active . '>';
+            $hidden = $i === 0 ? '' : ' llp-hide';
+            $html .= '<div class="llp-panel' . $hidden . '" id="' . $id . '_panel_' . $panel['id'] . '">';
             $html .= $panel['content'];
             $html .= '</div>';
         }
@@ -568,6 +568,7 @@ class Profiler
 .llp-tab-active{color:var(--llp-blue);border-bottom-color:var(--llp-blue)}
 .llp-panels{overflow-y:auto;flex:1;padding:12px 16px}
 .llp-panel{}
+.llp-hide{display:none!important}
 .llp-table{width:100%;border-collapse:collapse;font-size:12px}
 .llp-table th{color:var(--llp-muted);text-transform:uppercase;font-size:10px;letter-spacing:.08em;padding:6px 10px;border-bottom:1px solid var(--llp-border);text-align:left;font-weight:600}
 .llp-table td{padding:6px 10px;border-bottom:1px solid #1a1b26;vertical-align:top}
@@ -592,30 +593,37 @@ class Profiler
 .llp-query-table td{font-size:12px}
 </style>
 CSS;
-        }
+        
 
         $css .= <<<JS
 <script nonce="{$nonce}">
-function llpToggle(id){
-  var b=document.getElementById(id+'_body');
-  var i=document.getElementById(id+'_icon');
-  if(!b)return;
-  var hidden=b.style.display==='none';
-  b.style.display=hidden?'flex':'none';
-  if(i)i.textContent=hidden?'▲':'▼';
-}
-function llpTab(wid,tab,btn){
-  var wrap=document.getElementById(wid);
-  if(!wrap)return;
-  wrap.querySelectorAll('.llp-panel').forEach(function(p){p.style.display='none';});
-  wrap.querySelectorAll('.llp-tab').forEach(function(t){t.classList.remove('llp-tab-active');});
-  var panel=document.getElementById(wid+'_panel_'+tab);
-  if(panel)panel.style.display='block';
-  if(btn)btn.classList.add('llp-tab-active');
-}
+document.addEventListener('click', function (e) {
+  var tab = e.target.closest('[data-llp-tab]');
+  if (tab) {
+    var wrap = document.getElementById(tab.getAttribute('data-llp-wrap'));
+    if (!wrap) return;
+    var wid = wrap.id;
+    wrap.querySelectorAll('.llp-panel').forEach(function (p) { p.classList.add('llp-hide'); });
+    wrap.querySelectorAll('.llp-tab').forEach(function (t) { t.classList.remove('llp-tab-active'); });
+    var panel = document.getElementById(wid + '_panel_' + tab.getAttribute('data-llp-tab'));
+    if (panel) panel.classList.remove('llp-hide');
+    tab.classList.add('llp-tab-active');
+    return;
+  }
+
+  var bar = e.target.closest('[data-llp-toggle]');
+  if (bar) {
+    var id = bar.getAttribute('data-llp-toggle');
+    var body = document.getElementById(id + '_body');
+    var icon = document.getElementById(id + '_icon');
+    if (!body) return;
+    var nowHidden = body.classList.toggle('llp-hide');
+    if (icon) icon.textContent = nowHidden ? '▼' : '▲';
+  }
+});
 </script>
 JS;
-
         return $css;
+    }
     }
 }

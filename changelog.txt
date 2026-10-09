@@ -1,3 +1,10 @@
+LavaLust 4.7.0
+
+#Changelog
+
+1. Add Security_headers class in kernel. Can be turn on and off inside config/config.php.
+2. Updated Profiler class, error messages and welcome_page to fix bugs when csp enabled in config.
+
 LavaLust 4.6.0
 
 #Changelog

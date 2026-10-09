@@ -56,7 +56,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 | LavaLust Version
 | -------------------------------------------------------------------
 */
-$config['version']                 = '4.6.0';
+$config['version']                 = '4.7.0';
 
 /*
 | -------------------------------------------------------------------
@@ -347,4 +347,63 @@ $config['csrf_token_name']         = 'csrf_test_name';
 $config['csrf_cookie_name']        = 'csrf_cookie_name';
 $config['csrf_expire']             = 7200;
 $config['csrf_regenerate']         = FALSE;
+
+/*
+|--------------------------------------------------------------------------
+| Security Headers
+|--------------------------------------------------------------------------
+| Settings for Security Headers
+| Default:
+|   $config['security_headers'] = [
+|       'script_src' => ['https://cdn.jsdelivr.net', 'https://cdnjs.cloudflare.com'],
+|       'style_src'  => ['https://cdn.jsdelivr.net', 'https://fonts.googleapis.com'],
+|       'font_src'   => ['https://fonts.gstatic.com'],
+|       'cors' => [
+|           'allowed_origins' => ['https://myfrontend.example.com'],
+|           'credentials'     => false,   // Bearer tokens don't need it
+|       ],
+|   ];
+|
+*/
+$config['security_headers'] = [
+    // ── CSP ──
+    'csp_enabled' => false,
+
+    // ── CSP sources ──
+    'script_src'  => ['https://cdn.jsdelivr.net', 'https://cdnjs.cloudflare.com'],
+    'style_src'   => ['https://cdn.jsdelivr.net', 'https://fonts.googleapis.com'],
+    'font_src'    => ['https://fonts.gstatic.com'],
+    'img_src'     => [],
+    'connect_src' => [],
+    'frame_src'   => [],
+    
+    // ── CSP rollout ──
+    'csp_report_only' => false,
+    'report_uri'      => '',
+
+    // ── CSP strictness ──
+    'allow_inline_style_attr'  => true,
+    'allow_inline_script_attr' => false,
+
+    // ── Transport ──
+    'hsts_max_age'    => 31536000,
+    'hsts_subdomains' => true,
+    'trust_proxy'     => false,
+
+    // ── Browser features ──
+    'permissions_policy' => 'geolocation=(), microphone=(), camera=(), payment=(), usb=(), '
+                          . 'bluetooth=(), serial=(), accelerometer=(), gyroscope=(), magnetometer=()',
+    'referrer_policy'    => 'strict-origin-when-cross-origin',
+    'coop'               => 'same-origin',
+
+    // ── API ──
+    'api_max_body' => 1048576,
+    'cors' => [
+        'allowed_origins' => [],
+        'credentials'     => false,
+        'methods'         => 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+        'headers'         => 'Authorization, Content-Type, X-Requested-With',
+        'max_age'         => 600,
+    ],
+];
 ?>

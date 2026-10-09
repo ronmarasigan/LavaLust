@@ -163,6 +163,12 @@ $logger = load_class('logger', 'kernel');
 $security = load_class('security', 'kernel');
 
 /**
+ * Instantiate the Security_headers class
+ */
+$security_headers = load_class('security_headers', 'kernel');
+$security_headers->apply();
+
+/**
  * Instantiate the Input/Ouput class (deprecate in v4.7.0)
  */
 $io = load_class('io', 'kernel');

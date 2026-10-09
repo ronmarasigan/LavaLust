@@ -347,8 +347,7 @@ if (isset($trace) && is_array($trace)) {
         <div class="trace-list" id="traceList">
             <?php foreach ($allFrames as $i => $frame): ?>
             <div class="trace-item <?= $i === 0 ? 'active' : '' ?>"
-                 data-index="<?= $i ?>"
-                 onclick="activateFrame(<?= $i ?>)">
+                 data-index="<?= $i ?>">
                 <div class="trace-fn">
                     <?php if (!empty($frame['class'])): ?>
                         <?= htmlspecialchars($frame['class'] . ($frame['type'] ?? '->')) ?>
@@ -402,10 +401,10 @@ if (isset($trace) && is_array($trace)) {
         <!-- INFO TABS -->
         <div class="info-section">
             <div class="tabs-bar">
-                <button class="tab-btn active" onclick="switchTab(this,'env')">Environment</button>
-                <button class="tab-btn" onclick="switchTab(this,'get')">GET</button>
-                <button class="tab-btn" onclick="switchTab(this,'post')">POST</button>
-                <button class="tab-btn" onclick="switchTab(this,'server')">Server</button>
+                <button class="tab-btn active" data-tab="env">Environment</button>
+                <button class="tab-btn" data-tab="get">GET</button>
+                <button class="tab-btn" data-tab="post">POST</button>
+                <button class="tab-btn" data-tab="server">Server</button>
             </div>
 
             <div class="tab-pane active" id="pane-env">
@@ -542,6 +541,8 @@ function hl(src) {
 
 function renderCode(frameIdx) {
     const f = FRAMES[frameIdx];
+    if (!f) return;
+
     document.getElementById('codeFilePath').textContent = f.file || '[internal]';
     document.getElementById('codeLineBadge').textContent = f.line ? 'line ' + f.line : '';
 
@@ -568,26 +569,41 @@ function renderCode(frameIdx) {
 }
 
 function activateFrame(idx) {
-    document.querySelectorAll('.trace-item').forEach((el, i) => el.classList.toggle('active', i === idx));
+    document.querySelectorAll('.trace-item').forEach((el, i) =>
+        el.classList.toggle('active', i === idx)
+    );
     renderCode(idx);
 }
 
-function switchTab(btn, id) {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('pane-' + id).classList.add('active');
-}
-
-// Highlight initial PHP-rendered code lines
-document.querySelectorAll('.src[data-raw]').forEach(el => {
-    el.innerHTML = hl(el.getAttribute('data-raw'));
-    el.removeAttribute('data-raw');
+/* ── Delegated click handler — replaces every inline onclick ── */
+document.addEventListener('click', function (e) {
+    const trace = e.target.closest('.trace-item');
+    if (trace) {
+        activateFrame(parseInt(trace.dataset.index, 10));
+        return;
+    }
+    const tab = e.target.closest('.tab-btn');
+    if (tab) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        const pane = document.getElementById('pane-' + tab.dataset.tab);
+        if (pane) pane.classList.add('active');
+    }
 });
 
-// Scroll error line into view
-const initErr = document.querySelector('.code-line.error-line');
-if (initErr) initErr.scrollIntoView({ block: 'center' });
+/* ── Initial render ── */
+if (FRAMES.length) {
+    activateFrame(0);
+} else {
+    // Fallback: no frames captured — highlight whatever PHP rendered.
+    document.querySelectorAll('.src[data-raw]').forEach(el => {
+        el.innerHTML = hl(el.getAttribute('data-raw'));
+        el.removeAttribute('data-raw');
+    });
+    const initErr = document.querySelector('.code-line.error-line');
+    if (initErr) initErr.scrollIntoView({ block: 'center' });
+}
 </script>
 </body>
 </html>

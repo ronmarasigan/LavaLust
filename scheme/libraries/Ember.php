@@ -124,7 +124,6 @@ class Ember
                 show_error('Unable to create template cache directory.');
             }
         }
-        load_class('Security_headers', 'libraries/Ember');
         // Register built-in filters and functions
         $registrar = load_class('Ember_registrar', 'libraries/Ember');
         $registrar->register($this);

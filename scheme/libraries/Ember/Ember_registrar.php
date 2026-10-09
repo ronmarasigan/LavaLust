@@ -63,8 +63,7 @@ class Ember_registrar
         $engine->add_global('site_url', site_url());
 
         // CSP nonce (if you implemented the Security_headers)
-        $csp_nonce = $_SESSION['csp_nonce'] ?? base64_encode(random_bytes(16));
-        $engine->add_global('csp_nonce', $csp_nonce);
+        $engine->add_global('csp_nonce', csp_nonce());
 
         /** ----------------------------------------------------------
          *  FILTERS
@@ -173,7 +172,7 @@ class Ember_registrar
         });
 
         // CSP support
-        $engine->add_function('nonce', fn() => $engine->globals['csp_nonce'] ?? '');
+        $engine->add_function('nonce', fn() => csp_nonce());
 
         // Extra useful functions
         $engine->add_function('asset_version', function($path) {

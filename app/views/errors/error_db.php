@@ -355,8 +355,7 @@ $plainTrace = (!empty($trace) && is_string($trace)) ? $trace : null;
         <div class="trace-list" id="traceList">
             <?php foreach ($allFrames as $i => $frame): ?>
             <div class="trace-item <?= $i === 0 ? 'active' : '' ?>"
-                 data-index="<?= $i ?>"
-                 onclick="activateFrame(<?= $i ?>)">
+                 data-index="<?= $i ?>">
                 <div class="trace-fn">
                     <?php if (!empty($frame['class'])): ?>
                         <?= htmlspecialchars($frame['class'] . ($frame['type'] ?? '->')) ?>
@@ -391,8 +390,8 @@ $plainTrace = (!empty($trace) && is_string($trace)) ? $trace : null;
         <!-- SQL / BINDINGS STRIP -->
         <div class="sql-strip">
             <div class="sql-tabs-bar">
-                <button class="sql-tab active" onclick="switchSqlTab(this,'sql')">SQL Query</button>
-                <button class="sql-tab" onclick="switchSqlTab(this,'bindings')">Bindings</button>
+                <button class="sql-tab active" data-sql-tab="sql">SQL Query</button>
+                <button class="sql-tab" data-sql-tab="bindings">Bindings</button>
             </div>
             <div class="sql-pane active" id="spane-sql">
                 <?php if (!empty($query)): ?>
@@ -439,10 +438,10 @@ $plainTrace = (!empty($trace) && is_string($trace)) ? $trace : null;
         <!-- INFO TABS -->
         <div class="info-section">
             <div class="tabs-bar">
-                <button class="tab-btn active" onclick="switchTab(this,'env')">Environment</button>
-                <button class="tab-btn" onclick="switchTab(this,'get')">GET</button>
-                <button class="tab-btn" onclick="switchTab(this,'post')">POST</button>
-                <button class="tab-btn" onclick="switchTab(this,'server')">Server</button>
+                <button class="tab-btn active" data-tab="env">Environment</button>
+                <button class="tab-btn" data-tab="get">GET</button>
+                <button class="tab-btn" data-tab="post">POST</button>
+                <button class="tab-btn" data-tab="server">Server</button>
             </div>
 
             <div class="tab-pane active" id="pane-env">
@@ -508,7 +507,7 @@ foreach ($allFrames as $frame) {
 echo json_encode($jsFrames, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 ?>;
 
-/* PHP syntax highlighter (freeze/restore pattern) */
+/* ─────────── PHP highlighter (unchanged) ─────────── */
 function hl(src) {
     src = src.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     const frozen = [];
@@ -550,7 +549,7 @@ function hl(src) {
     return src;
 }
 
-/* SQL keyword highlighter */
+/* ─────────── SQL highlighter (unchanged) ─────────── */
 function hlSql(src) {
     src = src.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     const SQL_KW = /\b(SELECT|INSERT|UPDATE|DELETE|FROM|WHERE|JOIN|LEFT|RIGHT|INNER|OUTER|ON|AS|AND|OR|NOT|IN|IS|NULL|LIKE|BETWEEN|ORDER|BY|GROUP|HAVING|LIMIT|OFFSET|SET|VALUES|INTO|CREATE|DROP|ALTER|TABLE|INDEX|DISTINCT|COUNT|SUM|AVG|MIN|MAX|CASE|WHEN|THEN|ELSE|END|UNION|ALL|EXISTS|RETURNING)\b/gi;
@@ -560,8 +559,11 @@ function hlSql(src) {
     return src;
 }
 
+/* ─────────── Render a frame ─────────── */
 function renderCode(frameIdx) {
     const f = FRAMES[frameIdx];
+    if (!f) return;
+
     document.getElementById('codeFilePath').textContent = f.file || '[internal]';
     document.getElementById('codeLineBadge').textContent = f.line ? 'line ' + f.line : '';
 
@@ -588,37 +590,58 @@ function renderCode(frameIdx) {
 }
 
 function activateFrame(idx) {
-    document.querySelectorAll('.trace-item').forEach((el,i) => el.classList.toggle('active', i===idx));
+    document.querySelectorAll('.trace-item').forEach((el,i) =>
+        el.classList.toggle('active', i === idx)
+    );
     renderCode(idx);
 }
 
-function switchTab(btn, id) {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('pane-'+id).classList.add('active');
-}
+/* ─────────── Delegated click handlers (no inline JS) ─────────── */
+document.addEventListener('click', function (e) {
+    // Trace frame items
+    const trace = e.target.closest('.trace-item');
+    if (trace) {
+        activateFrame(parseInt(trace.dataset.index, 10));
+        return;
+    }
+    // SQL sub-tabs
+    const sqlTab = e.target.closest('.sql-tab');
+    if (sqlTab) {
+        document.querySelectorAll('.sql-tab').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.sql-pane').forEach(p => p.classList.remove('active'));
+        sqlTab.classList.add('active');
+        const pane = document.getElementById('spane-' + sqlTab.dataset.sqlTab);
+        if (pane) pane.classList.add('active');
+        return;
+    }
+    // Info tabs
+    const tab = e.target.closest('.tab-btn');
+    if (tab) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        const pane = document.getElementById('pane-' + tab.dataset.tab);
+        if (pane) pane.classList.add('active');
+    }
+});
 
-function switchSqlTab(btn, id) {
-    document.querySelectorAll('.sql-tab').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.sql-pane').forEach(p => p.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('spane-'+id).classList.add('active');
-}
-
-// Highlight SQL query
+/* ─────────── Initialise ─────────── */
+// Highlight SQL
 const sqlEl = document.getElementById('sqlContent');
 if (sqlEl) sqlEl.innerHTML = hlSql(sqlEl.textContent);
 
-// Highlight initial PHP code lines
-document.querySelectorAll('.src[data-raw]').forEach(el => {
-    el.innerHTML = hl(el.getAttribute('data-raw'));
-    el.removeAttribute('data-raw');
-});
-
-// Scroll error line into view
-const initErr = document.querySelector('.code-line.error-line');
-if (initErr) initErr.scrollIntoView({block:'center'});
+// Render the first frame immediately (the current one).
+if (FRAMES.length) {
+    activateFrame(0);
+} else {
+    // No frames — fall back to the PHP-rendered excerpt if present.
+    document.querySelectorAll('.src[data-raw]').forEach(el => {
+        el.innerHTML = hl(el.getAttribute('data-raw'));
+        el.removeAttribute('data-raw');
+    });
+    const initErr = document.querySelector('.code-line.error-line');
+    if (initErr) initErr.scrollIntoView({block:'center'});
+}
 </script>
 </body>
 </html>

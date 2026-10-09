@@ -78,7 +78,7 @@ $config['refresh_token_expiration'] = 604800;
 | default value: a secret that ships with the framework is public and
 | lets anyone forge valid tokens.
 |
-| Provide it through the environment variable LAVALUST_JWT_SECRET.
+| Provide it through the environment variable JWT_SECRET.
 | It must be at least 32 random characters. Generate one with:
 |
 |   php -r "echo bin2hex(random_bytes(32));"
@@ -100,7 +100,7 @@ $config['jwt_secret'] = getenv('JWT_SECRET') ?: '';
 | default value. It is used to hash refresh tokens before they are stored
 | in the database and must be different from jwt_secret.
 |
-| Provide it through the environment variable LAVALUST_REFRESH_TOKEN_KEY.
+| Provide it through the environment variable REFRESH_TOKEN_KEY.
 | It must be at least 32 random characters. Generate one with:
 |
 |   php -r "echo bin2hex(random_bytes(32));"
@@ -134,18 +134,6 @@ $config['jwt_verify_user'] = TRUE;
 |
 */
 $config['users_table'] = 'users';
-
-/*
-|--------------------------------------------------------------------------
-| Access-Control-Allow-Origin
-|--------------------------------------------------------------------------
-|
-| Access-Control-Allow-Origin - change this to your domain if
-| already deployed. '*' allows any website to call your API from
-| a browser, so set your real domain in production.
-|
-*/
-$config['allow_origin'] = '*';
 
 /*
 |--------------------------------------------------------------------------
