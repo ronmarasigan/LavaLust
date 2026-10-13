@@ -46,6 +46,21 @@ class Form_validation {
     private $LAVA;
 
     /**
+     * Raw data
+     *
+     * @var string
+     */
+    private $field;
+    
+    /**
+     * Array of field names that have been validated
+     * 
+     * @var array
+     */
+
+    private $validated = array();
+
+    /**
      * Error message for required field
      *
      * @var string
@@ -804,12 +819,13 @@ class Form_validation {
     public function validate(array $fields, array $custom_errors = [])
     {
         $this->errors = [];
+        $validated = [];
 
         foreach ($fields as $field => $rules)
         {
             if (strpos($field, '|') !== false)
             {
-                $parts = explode('|', $field);
+                $parts       = explode('|', $field);
                 $field_name  = $parts[0];
                 $field_label = $parts[1];
             }
@@ -820,14 +836,48 @@ class Form_validation {
             }
 
             $this->name($field_name);
+            $this->name  = $field_label;
+            $this->field = $field_name;
 
-            $this->name = $field_label;
+            $validated[$field_name] = $this->value;
 
-            $field_errors = $custom_errors[$field_name] ?? [];
-
-            $this->rules($rules, $field_errors);
+            $this->rules($rules, $custom_errors[$field_name] ?? []);
         }
 
-        return $this->run();
+        if ($this->run())
+        {
+            $this->validated = $validated;
+            return $validated;
+        }
+
+        return FALSE;
+    }
+
+    /**
+     * Validated data
+     * 
+     * @return array
+     */
+    public function validated()
+    {
+        return $this->validated;
+    }
+
+    /**
+     * Confirmed
+     *
+     * @param string $custom_error
+     * 
+     * @return void
+     */
+    public function confirmed($custom_error = '')
+    {
+        $other = $this->post_arrays[$this->field . '_confirmation'] ?? null;
+
+        if ($this->value !== $other)
+        {
+            $this->set_error_message($custom_error, self::$err_matches, $this->name);
+        }
+        return $this;
     }
 }
