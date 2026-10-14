@@ -1,0 +1,23 @@
+{
+    "next_id": 5,
+    "rows": {
+        "1": {
+            "id": 1,
+            "name": "Alice Updated",
+            "email": "alice2@example.com",
+            "role": "admin"
+        },
+        "2": {
+            "id": 2,
+            "name": "Bob",
+            "email": "bob-new@example.com",
+            "role": "user"
+        },
+        "3": {
+            "id": 3,
+            "name": "Carol",
+            "email": "carol@example.com",
+            "role": "user"
+        }
+    }
+}
