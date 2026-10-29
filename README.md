@@ -31,7 +31,7 @@ Whether you are building a simple web application, a REST API, or a teaching pro
 
 ## Requirements
 
-- PHP 7.4 or higher
+- PHP 8.2 or higher
 - A web server with URL rewriting support (Apache `.htaccess` or Nginx config)
 - Composer (optional, for dependency management)
 

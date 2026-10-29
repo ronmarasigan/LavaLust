@@ -56,7 +56,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 | LavaLust Version
 | -------------------------------------------------------------------
 */
-$config['version']                 = '4.7.0';
+$config['version']                 = '4.7.1';
 
 /*
 | -------------------------------------------------------------------
@@ -114,7 +114,7 @@ $config['proxy_enabled']           = FALSE;
 |
 */
 $config['log_threshold']            = 0;
-$config['log_dir']                  = 'runtime/logs/';
+$config['log_dir']                  = ROOT_DIR . 'runtime/logs/';
 
 /*
 |--------------------------------------------------------------------------

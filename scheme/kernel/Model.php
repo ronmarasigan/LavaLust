@@ -72,6 +72,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * @method static mixed        soft_delete(int $id)
  * @method static mixed        delete(int $id)
  * @method static mixed        filter(array $conditions = [], bool $with_deleted = false)
+ * @method static mixed        where(string $column, string $operator, mixed $value)
  * @method static mixed        group_by(string $column)
  * @method static mixed        having(string $column, string $operator, mixed $value)
  * @method static mixed        raw(string $sql, array $params = [])
@@ -803,6 +804,17 @@ class Model {
         $this->apply_soft_delete($with_deleted);
         $this->db->where($conditions);
         return $this;
+    }
+
+    /**
+     * Alias for _filter
+     *
+     * @param array $conditions
+     * @param boolean $with_deleted
+     * @return void
+     */
+    public function _where($conditions = [], $with_deleted = false) {
+        return $this->_filter($conditions, $with_deleted);
     }
 
     /**
