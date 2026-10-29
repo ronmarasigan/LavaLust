@@ -36,96 +36,47 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 
 class Session {
 
-	/**
-	 * Configuration array
-	 *
-	 * @var array
-	 */
+	/** @var array */
 	private $config;
 
-	/**
-	 * IP match flag
-	 *
-	 * @var bool
-	 */
+	/** @var bool */
 	private $match_ip;
 
-	/**
-	 * Fingerprint match flag
-	 *
-	 * @var bool
-	 */
+	/** @var bool */
 	private $match_fingerprint;
 
-	/**
-	 * User data array
-	 *
-	 * @var array
-	 */
+	/** @var array */
 	private $userdata;
-	
-	/**
-	 * Number of allowed invalid attempts before locking
-	 *
-	 * @var integer
-	 */
+
+	/** @var int Invalid attempts allowed before locking */
 	private $max_invalid_attempts;
-	
-	/**
-	 * Time window to track invalid attempts (in seconds)
-	 *
-	 * @var integer
-	 */
+
+	/** @var int Window for counting invalid attempts (seconds) */
 	private $invalid_window;
-	
-	/**
-	 * Lock duration after exceeding invalid attempts (in seconds)
-	 *
-	 * @var integer
-	 */
+
+	/** @var int Lock duration after too many invalid attempts (seconds) */
 	private $lock_duration_invalid;
 
-	/**
-	 * Maximum session creations allowed within a time window
-	 *
-	 * @var integer
-	 */
+	/** @var int Max session creations per IP within the window */
 	private $max_session_creations;
-	
-	/**
-	 * Time window to track session creations (in seconds)
-	 *
-	 * @var integer
-	 */
+
+	/** @var int Window for counting session creations (seconds) */
 	private $creation_window;
-	
-	/**
-	 * Lock duration after exceeding session creation limit (in seconds)
-	 *
-	 * @var integer
-	 */
+
+	/** @var int Lock duration after creation flood (seconds) */
 	private $lock_duration_creation;
 
-	/**
-	 * Path to the session security log file
-	 *
-	 * @var string
-	 */
+	/** @var string Path to the security JSON store */
 	private $security_file;
 
-	/**
-	 * Inactivity timeout duration (in seconds)
-	 * 
-	 * @var integer
-	 */
+	/** @var int Inactivity timeout (seconds) */
 	private $inactivity_timeout;
 
-	/**
-	 * HMAC secret key for session data integrity (if used)
-	 * 
-	 * @var string
-	 */
-    private $hmac_secret;
+	/** @var string HMAC secret for fingerprinting */
+	private $hmac_secret;
+
+	/** @var bool Set when the previous session was dropped for inactivity */
+	private $inactivity_expired = false;
 
 	/**
 	 * Class constructor
@@ -133,286 +84,261 @@ class Session {
 	 * @throws RuntimeException
 	 */
 	public function __construct()
-    {
-        $this->config = get_config();
+	{
+		$this->config = get_config();
+		$production = strtolower((string) config_item('environment')) === 'production';
 
-        // Database session handler support
-        if ($this->config['sess_driver'] === 'database') {
-            $handler = load_class('Database_session_handler', 'libraries/Session');
-            session_set_save_handler($handler, true);
-        }
+		// Database session handler support
+		if (($this->config['sess_driver'] ?? '') === 'database') {
+			$handler = load_class('Database_session_handler', 'libraries/Session');
+			session_set_save_handler($handler, true);
+		}
 
-        // Load security config with safe defaults
-        $this->max_invalid_attempts   = (int)($this->config['max_invalid_attempts'] ?? 5);
-        $this->invalid_window         = (int)($this->config['invalid_window'] ?? 600);        // 10 min
-        $this->lock_duration_invalid  = (int)($this->config['lock_duration_invalid'] ?? 900); // 15 min
+		// Security config with safe defaults
+		$this->max_invalid_attempts   = (int)($this->config['max_invalid_attempts'] ?? 5);
+		$this->invalid_window         = (int)($this->config['invalid_window'] ?? 600);
+		$this->lock_duration_invalid  = (int)($this->config['lock_duration_invalid'] ?? 900);
+		$this->max_session_creations  = (int)($this->config['max_session_creations'] ?? 8);
+		$this->creation_window        = (int)($this->config['creation_window'] ?? 60);
+		$this->lock_duration_creation = (int)($this->config['lock_duration_creation'] ?? 180);
+		$this->inactivity_timeout     = (int)($this->config['sess_inactivity_timeout'] ?? 1800);
+		$this->match_ip               = (bool)($this->config['sess_match_ip'] ?? false);
+		$this->match_fingerprint      = (bool)($this->config['sess_match_fingerprint'] ?? true);
 
-        $this->max_session_creations  = (int)($this->config['max_session_creations'] ?? 8);
-        $this->creation_window        = (int)($this->config['creation_window'] ?? 60);        // 1 min
-        $this->lock_duration_creation = (int)($this->config['lock_duration_creation'] ?? 180);// 3 min
+		$this->security_file = $this->config['security_file']
+			?? (ROOT_DIR . 'runtime/session/session_security.json');
+		$this->_security_init();
 
-        $this->inactivity_timeout     = (int)($this->config['sess_inactivity_timeout'] ?? 1800); // 30 min default
-
-        $this->security_file          = $this->config['security_file'] 
-            ?? (ROOT_DIR . 'runtime/session/session_security.json');
-
-        $this->match_ip          = (bool)($this->config['sess_match_ip'] ?? false);
-        $this->match_fingerprint = (bool)($this->config['sess_match_fingerprint'] ?? true);
-
-        // Stronger HMAC secret (fallback to a generated one if not set)
-		if (empty($this->config['session_hmac_secret']))
-		{
-			if (strtolower(config_item('environment')) === 'production')
-			{
-				throw new Exception('Session security requires an encryption key. Please set session_hmac_secret in your config file.');
+		// HMAC secret
+		$secret = (string)($this->config['session_hmac_secret'] ?? '');
+		if ($secret === '') {
+			if ($production) {
+				throw new Exception('Session security requires a secret. Please set session_hmac_secret in your config file.');
 			}
-
-			$this->hmac_secret = bin2hex(random_bytes(32));
+			// Non-production: persist a generated secret so fingerprints stay
+			// valid across requests (a per-request random key breaks every session).
+			$secret = $this->_dev_secret();
+		} elseif ($production && strlen($secret) < 32) {
+			throw new Exception('session_hmac_secret must be at least 32 characters in production.');
 		}
-		else
-		{
-			$this->hmac_secret = $this->config['session_hmac_secret'];
+		$this->hmac_secret = $secret;
+
+		// PHP2Shell / CVE-2026-115560 hygiene: this can only be turned off in
+		// php.ini / .user.ini / pool config (PHP_INI_PERDIR), not at runtime.
+		if (filter_var(ini_get('session.upload_progress.enabled'), FILTER_VALIDATE_BOOLEAN)) {
+			error_log('[Session Security] session.upload_progress.enabled is ON. Set session.upload_progress.enabled=0 in php.ini (see PHP advisories for CVE-2026-109619 / CVE-2026-115560).');
 		}
-         
-        // Cookie name setup
-        $prefix = $this->config['cookie_prefix'] ?? '';
-        $this->config['cookie_name'] = $prefix 
-            ? $prefix . ($this->config['sess_cookie_name'] ?? 'lavalust_session')
-            : ($this->config['sess_cookie_name'] ?? ini_get('session.name'));
 
-        ini_set('session.name', $this->config['cookie_name']);
+		// Cookie name
+		$prefix = $this->config['cookie_prefix'] ?? '';
+		$this->config['cookie_name'] = $prefix
+			? $prefix . ($this->config['sess_cookie_name'] ?? 'lavalust_session')
+			: ($this->config['sess_cookie_name'] ?? ini_get('session.name'));
+		ini_set('session.name', $this->config['cookie_name']);
 
-        // Expiration
-        $this->config['sess_expiration'] = (int)($this->config['sess_expiration'] ?? ini_get('session.gc_maxlifetime') ?: 7200);
-        ini_set('session.gc_maxlifetime', $this->config['sess_expiration']);
+		// Expiration
+		$this->config['sess_expiration'] = (int)($this->config['sess_expiration'] ?? ini_get('session.gc_maxlifetime') ?: 7200);
+		ini_set('session.gc_maxlifetime', $this->config['sess_expiration']);
 
-        $this->config['cookie_expiration'] = isset($this->config['cookie_expiration'])
-            ? (int)$this->config['cookie_expiration']
-            : (($this->config['sess_expire_on_close'] ?? false) ? 0 : $this->config['sess_expiration']);
+		$this->config['cookie_expiration'] = isset($this->config['cookie_expiration'])
+			? (int)$this->config['cookie_expiration']
+			: (($this->config['sess_expire_on_close'] ?? false) ? 0 : $this->config['sess_expiration']);
 
-        // Secure cookie params (2026 best practices)
-        session_set_cookie_params([
-            'lifetime' => $this->config['cookie_expiration'],
-            'path'     => $this->config['cookie_path'] ?? '/',
-            'domain'   => $this->config['cookie_domain'] ?? '',
-            'secure'   => $this->config['cookie_secure'] ?? false,   // Set true in production + HTTPS
-            'httponly' => true,
-            'samesite' => $this->config['cookie_samesite'] ?? 'Strict'  // Strict is safer
-        ]);
+		// Cookie params. "secure" defaults to the actual transport instead of false.
+		$secure = $this->config['cookie_secure'] ?? $this->_is_https();
+		$this->config['cookie_secure'] = (bool) $secure;
 
-        // Hardened PHP session settings
-        ini_set('session.use_trans_sid', 0);
-        ini_set('session.use_strict_mode', 1);
-        ini_set('session.use_cookies', 1);
-        ini_set('session.use_only_cookies', 1);
-        ini_set('session.cookie_httponly', 1);
-        
+		session_set_cookie_params([
+			'lifetime' => $this->config['cookie_expiration'],
+			'path'     => $this->config['cookie_path'] ?? '/',
+			'domain'   => $this->config['cookie_domain'] ?? '',
+			'secure'   => $this->config['cookie_secure'],
+			'httponly' => true,
+			'samesite' => $this->config['cookie_samesite'] ?? 'Strict'
+		]);
+
+		// Hardened PHP session settings
+		ini_set('session.use_trans_sid', 0);
+		ini_set('session.use_strict_mode', 1);
+		ini_set('session.use_cookies', 1);
+		ini_set('session.use_only_cookies', 1);
+		ini_set('session.cookie_httponly', 1);
+
 		if (version_compare(PHP_VERSION, '8.4.0', '<')) {
 			ini_set('session.sid_length', $this->_get_sid_length());
 			ini_set('session.sid_bits_per_character', 6);
 		}
 
-        // Security initialization
-        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-        $fingerprint = $this->generate_fingerprint();
+		// NOTE: never change session.serialize_handler at runtime (ini_set) before
+		// session_start(); that is the pattern CVE-2026-115560 abuses.
 
-        $this->_security_init();
+		$ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+		$fingerprint = $this->generate_fingerprint();
 
-		//check lock
-        $this->security_check_lock($ip, $fingerprint);
+		// Enforce locks BEFORE a session is started
+		$lock_msg = $this->security_check_lock($ip, $fingerprint);
+		if ($lock_msg !== null) {
+			throw new RuntimeException($lock_msg, 429);
+		}
 
-        // Start session
-        $existing_session = !empty($_COOKIE[$this->config['cookie_name']]);
-        session_start();
+		session_start();
 
-        if (!$existing_session && empty($_SESSION)) {
-            $creation_msg = $this->security_track_session_creation($ip, $fingerprint);
-            if ($creation_msg) {
-                // Soft block for creation flood - do not throw, just destroy and continue
-                session_destroy();
-                $_SESSION = [];
-                // We will detect this via get_security_status() later
-            }
-        }
+		// Brand-new session? (keyed on our own marker, not on the cookie,
+		// so sending random cookie values can't dodge the flood counter)
+		if (empty($_SESSION['fingerprint'])) {
+			$creation_msg = $this->security_track_session_creation($ip, $fingerprint);
+			if ($creation_msg !== null) {
+				session_destroy();
+				$_SESSION = [];
+				throw new RuntimeException($creation_msg, 429);
+			}
+			$this->_init_session_markers($fingerprint);
+		} elseif ($this->match_fingerprint && !hash_equals($_SESSION['fingerprint'], $fingerprint)) {
+			$this->security_log_attempt($ip, $fingerprint, 'Fingerprint mismatch');
+			$this->sess_destroy();
+			throw new RuntimeException('Session terminated: Fingerprint mismatch detected.');
+		}
 
-        // Fingerprint & IP validation
-        if (empty($_SESSION['fingerprint'])) {
-            $_SESSION['fingerprint'] = $fingerprint;
-            $_SESSION['created_at']   = time();
-            $_SESSION['last_activity'] = time();
-        } 
-        elseif ($this->match_fingerprint && $_SESSION['fingerprint'] !== $fingerprint) {
-            $this->security_log_attempt($ip, $fingerprint, 'Fingerprint mismatch');
-            session_destroy();
-            throw new RuntimeException('Session terminated: Fingerprint mismatch detected.'); // Real attack
-        }
+		if ($this->match_ip && isset($_SESSION['ip_address']) && !hash_equals((string)$_SESSION['ip_address'], $ip)) {
+			$this->security_log_attempt($ip, $fingerprint, 'IP mismatch');
+			$this->sess_destroy();
+			throw new RuntimeException('Session terminated: IP address mismatch detected.');
+		}
+		$_SESSION['ip_address'] = $ip;
 
-        if (isset($_SESSION['ip_address']) && $this->match_ip && $_SESSION['ip_address'] !== $ip) {
-            $this->security_log_attempt($ip, $fingerprint, 'IP mismatch');
-            session_destroy();
-            throw new RuntimeException('Session terminated: IP address mismatch detected.');
-        }
+		// Inactivity: drop the old session AND start a clean one, otherwise the
+		// rest of the request would write into a session that is never saved.
+		if (isset($_SESSION['last_activity'])
+			&& (time() - $_SESSION['last_activity']) > $this->inactivity_timeout) {
 
-        $_SESSION['ip_address'] = $ip;
+			$this->sess_destroy();
+			$this->_start_fresh_session($fingerprint);
+			$this->inactivity_expired = true;
+		} else {
+			$_SESSION['last_activity'] = time();
+		}
 
-        // Inactivity check
-        $inactivity_expired = false;
-        if (isset($_SESSION['last_activity']) && 
-            (time() - $_SESSION['last_activity']) > $this->inactivity_timeout) {
-            
-            $this->sess_destroy();
-            $inactivity_expired = true;
-        } else {
-            $_SESSION['last_activity'] = time();
-        }
+		// Periodic regeneration (skip AJAX, which can race with other requests)
+		$regenerate_time = (int)($this->config['sess_time_to_update'] ?? 300);
+		$is_ajax = strtolower($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'xmlhttprequest';
+		if (!$is_ajax && $regenerate_time > 0
+			&& (!isset($_SESSION['last_regenerate']) || $_SESSION['last_regenerate'] < (time() - $regenerate_time))) {
+			$this->sess_regenerate((bool)($this->config['sess_regenerate_destroy'] ?? false));
+		}
 
-        // Periodic regeneration (skip AJAX)
-        $regenerate_time = (int)($this->config['sess_time_to_update'] ?? 300);
-        if ((empty($_SERVER['HTTP_X_REQUESTED_WITH']) || 
-             strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') 
-            && $regenerate_time > 0) {
+		// Sliding cookie expiration
+		if (isset($_COOKIE[$this->config['cookie_name']])
+			&& hash_equals(session_id(), (string)$_COOKIE[$this->config['cookie_name']])
+			&& !headers_sent()) {
 
-            if (!isset($_SESSION['last_regenerate']) || 
-                $_SESSION['last_regenerate'] < (time() - $regenerate_time)) {
-                $this->sess_regenerate((bool)($this->config['sess_regenerate_destroy'] ?? false));
-            }
-        }
+			setcookie($this->config['cookie_name'], session_id(), [
+				'expires'  => $this->config['cookie_expiration'] ? time() + $this->config['cookie_expiration'] : 0,
+				'path'     => $this->config['cookie_path'] ?? '/',
+				'domain'   => $this->config['cookie_domain'] ?? '',
+				'secure'   => $this->config['cookie_secure'],
+				'httponly' => true,
+				'samesite' => $this->config['cookie_samesite'] ?? 'Strict'
+			]);
+		}
 
-        // Refresh cookie
-        if (isset($_COOKIE[$this->config['cookie_name']]) && 
-            $_COOKIE[$this->config['cookie_name']] === session_id()) {
+		$this->_lava_init_vars();
+	}
 
-            $exp = $this->config['cookie_expiration'] ? time() + $this->config['cookie_expiration'] : 0;
-            setcookie(
-                $this->config['cookie_name'],
-                session_id(),
-                [
-                    'expires'  => $exp,
-                    'path'     => $this->config['cookie_path'] ?? '/',
-                    'domain'   => $this->config['cookie_domain'] ?? '',
-                    'secure'   => $this->config['cookie_secure'] ?? false,
-                    'httponly' => true,
-                    'samesite' => $this->config['cookie_samesite'] ?? 'Strict'
-                ]
-            );
-        }
-
-        $this->_lava_init_vars();
-    }
-	
 	/**
-	 * Get current security status for the session (for demo/debug purposes)
+	 * Current security status (debug/admin use only - do not expose publicly)
 	 *
 	 * @return array
 	 */
-	public function get_security_status(): array
-    {
-        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-        $fingerprint = $this->generate_fingerprint();
-        $key = $ip . '_' . $fingerprint;
+	public function get_security_status()
+	{
+		$ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+		$fingerprint = $this->generate_fingerprint();
+		$data = $this->_security_load();
 
-        $data = $this->_security_load();
+		$key = $ip . '_' . $fingerprint;
+		$locked_until = (int)($data[$key]['locked_until'] ?? 0);
+		$remaining = max($locked_until - time(), 0);
 
-        // Invalid attempts lock
-        $locked_until = $data[$key]['locked_until'] ?? 0;
-        $remaining    = max($locked_until - time(), 0);
+		$creation_locked_until = (int)($data['creation_' . $ip]['locked_until'] ?? 0);
+		$creation_remaining = max($creation_locked_until - time(), 0);
 
-        // Session creation flood lock
-        $creation_key = 'creation_' . $ip . '_' . $fingerprint;
-        $creation_locked_until = $data[$creation_key]['locked_until'] ?? 0;
-        $creation_remaining = max($creation_locked_until - time(), 0);
-
-        // Inactivity check (safe even if session was destroyed)
-        $inactivity_expired = false;
-        if (isset($_SESSION) && isset($_SESSION['last_activity'])) {
-            $inactivity_expired = (time() - $_SESSION['last_activity']) > $this->inactivity_timeout;
-        }
-
-        return [
-            'locked'                    => $remaining > 0,
-            'locked_until'              => $locked_until,
-            'remaining'                 => $remaining,
-            'remaining_minutes'         => $remaining > 0 ? (int)ceil($remaining / 60) : 0,
-            'attempts'                  => $data[$key]['attempts'] ?? 0,
-            'max_attempts'              => $this->max_invalid_attempts,
-
-            'creation_locked'           => $creation_remaining > 0,
-            'creation_remaining'        => $creation_remaining,
-            'creation_remaining_minutes'=> $creation_remaining > 0 ? (int)ceil($creation_remaining / 60) : 0,
-
-            'inactivity_expired'        => $inactivity_expired,
-
-            'ip'                        => $ip,
-            'fingerprint'               => $fingerprint
-        ];
-    }
+		return [
+			'locked'                     => $remaining > 0,
+			'locked_until'               => $locked_until,
+			'remaining'                  => $remaining,
+			'remaining_minutes'          => $remaining > 0 ? (int)ceil($remaining / 60) : 0,
+			'attempts'                   => (int)($data[$key]['attempts'] ?? 0),
+			'max_attempts'               => $this->max_invalid_attempts,
+			'creation_locked'            => $creation_remaining > 0,
+			'creation_remaining'         => $creation_remaining,
+			'creation_remaining_minutes' => $creation_remaining > 0 ? (int)ceil($creation_remaining / 60) : 0,
+			'inactivity_expired'         => $this->inactivity_expired,
+			'upload_progress_enabled'    => filter_var(ini_get('session.upload_progress.enabled'), FILTER_VALIDATE_BOOLEAN),
+			'ip'                         => $ip
+		];
+	}
 
 	/**
-	 * Validate session id (to mitigate session fixation attacks)
+	 * Validate session id format
 	 *
 	 * @param string $id
 	 * @return bool
 	 */
 	public function is_valid_sid($id)
-    {
-        return is_string($id) && preg_match('/^[a-zA-Z0-9,-]{40,128}$/', $id);
-    }
+	{
+		return is_string($id) && preg_match('/^[a-zA-Z0-9,-]{40,128}$/', $id) === 1;
+	}
 
 	/**
-	 * Generates key as protection against Session Hijacking & Fixation.
-	 * 
+	 * Key used as a (weak) defense-in-depth check against cookie theft.
+	 * It only binds headers an attacker can copy, so it is NOT a substitute
+	 * for HTTPS + HttpOnly + XSS prevention. IP is handled by sess_match_ip.
+	 *
 	 * @return string
 	 */
 	public function generate_fingerprint()
-    {
-        $data = [
-            $_SERVER['HTTP_USER_AGENT'] ?? '',
-            $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '',
-            $_SERVER['HTTP_ACCEPT_ENCODING'] ?? '',
-            $_SERVER['HTTP_ACCEPT_CHARSET'] ?? '',
-            // Optional: first two octets of IP to reduce mobile false positives
-            $this->match_ip ? substr($_SERVER['REMOTE_ADDR'] ?? '', 0, strrpos($_SERVER['REMOTE_ADDR'] ?? '', '.') * 2) : ''
-        ];
+	{
+		$data = [
+			$_SERVER['HTTP_USER_AGENT'] ?? '',
+			$_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '',
+		];
 
-        return hash_hmac('sha256', implode("\0", $data), $this->hmac_secret);
-    }
+		return hash_hmac('sha256', implode("\0", $data), $this->hmac_secret);
+	}
 
 	/**
 	 * Regenerate session ID on login to prevent session fixation
 	 *
-	 * @param bool $destroy_old Whether to destroy old session data
+	 * @param bool $destroy_old
 	 */
 	public function regenerate_on_login($destroy_old = true)
-    {
-        $this->sess_regenerate($destroy_old);
-        $_SESSION['created_at'] = time();
-        $_SESSION['last_activity'] = time();
-        // Optionally reset security counters on successful login
-        $this->reset_attempts();
-    }
+	{
+		$this->sess_regenerate($destroy_old);
+		$_SESSION['created_at'] = time();
+		$_SESSION['last_activity'] = time();
+		$this->reset_attempts();
+	}
 
 	/**
-	 * Internal method that initializes "flash" variables and
-	 * populates $this->userdata with all session data except flash vars.
+	 * Initialize flash vars and populate $this->userdata
 	 */
 	protected function _lava_init_vars()
-    {
-        // Original flash handling logic (kept intact with minor improvements)
-        if (!empty($_SESSION['__lava_vars'])) {
-            $now = time();
-            foreach ($_SESSION['__lava_vars'] as $key => &$value) {
-                if ($value === 'new') {
-                    $value = 'old';
-                } elseif ($value === 'old' || (is_int($value) && $value < $now)) {
-                    unset($_SESSION[$key], $_SESSION['__lava_vars'][$key]);
-                }
-            }
-            if (empty($_SESSION['__lava_vars'])) {
-                unset($_SESSION['__lava_vars']);
-            }
-        }
-        $this->userdata = $_SESSION ?? [];
-    }
+	{
+		if (!empty($_SESSION['__lava_vars'])) {
+			$now = time();
+			foreach ($_SESSION['__lava_vars'] as $key => $value) {
+				if ($value === 'new') {
+					$_SESSION['__lava_vars'][$key] = 'old';
+				} elseif ($value === 'old' || (is_int($value) && $value < $now)) {
+					unset($_SESSION[$key], $_SESSION['__lava_vars'][$key]);
+				}
+			}
+			if (empty($_SESSION['__lava_vars'])) {
+				unset($_SESSION['__lava_vars']);
+			}
+		}
+		$this->userdata = $_SESSION ?? [];
+	}
 
 	/**
 	 * Get the session ID length
@@ -436,15 +362,15 @@ class Session {
 	 * @param bool $destroy
 	 */
 	public function sess_regenerate(bool $destroy = false)
-    {
-        if (session_status() !== PHP_SESSION_ACTIVE) {
-            return false;
-        }
+	{
+		if (session_status() !== PHP_SESSION_ACTIVE || headers_sent()) {
+			return false;
+		}
 
-        $_SESSION['last_regenerate'] = time();
-        
-        return @session_regenerate_id((bool)$destroy);
-    }
+		$_SESSION['last_regenerate'] = time();
+
+		return session_regenerate_id($destroy);
+	}
 
 	/**
 	 * Mark a session variable as flashdata
@@ -484,13 +410,13 @@ class Session {
 	}
 
 	/**
-	 * Use native session_id, do not invent our own here
+	 * Native session id
 	 */
 	public function session_id()
 	{
 		return session_id();
 	}
-	
+
 	/**
 	 * Check if session key exists
 	 *
@@ -499,21 +425,22 @@ class Session {
 	 */
 	public function has_userdata($key = null)
 	{
-		if(! is_null($key)) {
+		if (! is_null($key)) {
 			return isset($_SESSION[$key]);
 		}
 		return FALSE;
 	}
 
-	/** Set session data
+	/**
+	 * Set session data
 	 *
 	 * @param string|array $keys
 	 * @param mixed $value
 	 */
 	public function set_userdata($keys, $value = NULL)
 	{
-		if(is_array($keys)) {
-			foreach($keys as $key => $val) {
+		if (is_array($keys)) {
+			foreach ($keys as $key => $val) {
 				$_SESSION[$key] = $val;
 			}
 		} else {
@@ -528,16 +455,8 @@ class Session {
 	 */
 	public function unset_userdata($keys)
 	{
-		if(is_array($keys)) {
-			foreach ($keys as $key) {
-				if($this->has_userdata($key)) {
-					unset($_SESSION[$key]);
-				}
-			}
-		} else {
-			if($this->has_userdata($keys)) {
-				unset($_SESSION[$keys]);
-			}
+		foreach ((array) $keys as $key) {
+			unset($_SESSION[$key]);
 		}
 	}
 
@@ -552,14 +471,14 @@ class Session {
 			return array();
 		}
 		$keys = array();
-		foreach (array_keys($_SESSION['__lava_vars']) as $key) {
-			if (!is_int($_SESSION['__lava_vars'][$key])) $keys[] = $key;
+		foreach ($_SESSION['__lava_vars'] as $key => $val) {
+			if (!is_int($val)) $keys[] = $key;
 		}
 		return $keys;
 	}
 
 	/**
-	 * Unmark flashdata so it won't be deleted on next request
+	 * Unmark flashdata
 	 *
 	 * @param string|array $key
 	 */
@@ -587,7 +506,7 @@ class Session {
 	 */
 	public function userdata($key = NULL)
 	{
-		if(isset($key)) {
+		if (isset($key)) {
 			return isset($_SESSION[$key]) ? $_SESSION[$key] : NULL;
 		} elseif (empty($_SESSION)) {
 			return array();
@@ -603,27 +522,27 @@ class Session {
 	}
 
 	/**
-	 * Destroy the current session
-	 */	
+	 * Destroy the current session and expire its cookie
+	 */
 	public function sess_destroy()
-    {
-        $_SESSION = [];
+	{
+		$_SESSION = [];
 
-        if (session_status() === PHP_SESSION_ACTIVE) {
-            $params = session_get_cookie_params();
-            setcookie(
-                session_name(),
-                '',
-                time() - 42000,
-                $params['path'] ?? '/',
-                $params['domain'] ?? '',
-                $params['secure'] ?? false,
-                $params['httponly'] ?? true
-            );
-
-            session_destroy();
-        }
-    }
+		if (session_status() === PHP_SESSION_ACTIVE) {
+			if (!headers_sent()) {
+				$params = session_get_cookie_params();
+				setcookie(session_name(), '', [
+					'expires'  => time() - 42000,
+					'path'     => $params['path'] ?? '/',
+					'domain'   => $params['domain'] ?? '',
+					'secure'   => $params['secure'] ?? false,
+					'httponly' => true,
+					'samesite' => $params['samesite'] ?? 'Strict'
+				]);
+			}
+			session_destroy();
+		}
+	}
 
 	/**
 	 * Fetch flashdata
@@ -640,7 +559,7 @@ class Session {
 		}
 		$flashdata = array();
 		if (! empty($_SESSION['__lava_vars'])) {
-			foreach ($_SESSION['__lava_vars'] as $k => &$value) {
+			foreach ($_SESSION['__lava_vars'] as $k => $value) {
 				if (!is_int($value) && isset($_SESSION[$k])) $flashdata[$k] = $_SESSION[$k];
 			}
 		}
@@ -660,170 +579,235 @@ class Session {
 	}
 
 	/**
-	 * Initialize security storage and ensure directory exists
-	 *
-	 * @return void
+	 * Initialize session markers
+	 * 	
+	 * @param string $fingerprint
 	 */
-	private function _security_init()
-    {
-        $dir = dirname($this->security_file);
-        if (!is_dir($dir)) {
-            mkdir($dir, 0700, true);   // More restrictive permissions
-        }
-
-        if (!file_exists($this->security_file)) {
-            file_put_contents($this->security_file, json_encode([], JSON_PRETTY_PRINT));
-            chmod($this->security_file, 0600);
-        }
-    }
+	private function _init_session_markers($fingerprint)
+	{
+		$_SESSION['fingerprint']   = $fingerprint;
+		$_SESSION['created_at']    = time();
+		$_SESSION['last_activity'] = time();
+	}
 
 	/**
-	 * Load the security log file
+	 * Start fresh session
+	 * 
+	 * @param string $fingerprint
+	 */
+	private function _start_fresh_session($fingerprint)
+	{
+		session_id(session_create_id());
+		session_start();
+		$_SESSION = [];
+		$this->_init_session_markers($fingerprint);
+		$_SESSION['ip_address'] = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+	}
+
+	private function _is_https()
+	{
+		return (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off')
+			|| (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443);
+	}
+
+	/**
+	 * Persistent random secret for non-production environments
+	 */
+	private function _dev_secret()
+	{
+		$file = dirname($this->security_file) . '/.dev_hmac_secret';
+		$secret = is_file($file) ? trim((string) @file_get_contents($file)) : '';
+		if (strlen($secret) < 32) {
+			$secret = bin2hex(random_bytes(32));
+			$old = umask(0077);
+			file_put_contents($file, $secret, LOCK_EX);
+			umask($old);
+		}
+		return $secret;
+	}
+
+	/**
+	 * Initialize security storage and ensure directory exists.
+	 * Keep this directory OUTSIDE the web root (or deny web access to it).
+	 */
+	private function _security_init()
+	{
+		$dir = dirname($this->security_file);
+		if (!is_dir($dir)) {
+			mkdir($dir, 0700, true);
+		}
+
+		if (!file_exists($this->security_file)) {
+			$old = umask(0077);
+			file_put_contents($this->security_file, '{}', LOCK_EX);
+			umask($old);
+		}
+	}
+
+	/**
+	 * Read-only load (shared lock)
 	 *
 	 * @return array
 	 */
 	private function _security_load()
-    {
-        $fp = @fopen($this->security_file, 'r');
-        if (!$fp) return [];
+	{
+		$fp = @fopen($this->security_file, 'r');
+		if (!$fp) return [];
 
-        if (!flock($fp, LOCK_SH)) {  // Shared lock for read
-            fclose($fp);
-            return [];
-        }
+		if (!flock($fp, LOCK_SH)) {
+			fclose($fp);
+			return [];
+		}
 
-        $json = stream_get_contents($fp);
-        flock($fp, LOCK_UN);
-        fclose($fp);
+		$json = stream_get_contents($fp);
+		flock($fp, LOCK_UN);
+		fclose($fp);
 
-        $data = $json ? json_decode($json, true) : [];
-        return is_array($data) ? $data : [];
-    }
+		$data = $json ? json_decode($json, true) : [];
+		return is_array($data) ? $data : [];
+	}
 
 	/**
-	 * Save updates to the security log file
+	 * Atomic read-modify-write under ONE exclusive lock (no lost updates).
+	 * Also prunes expired entries so the file cannot grow without bound.
 	 *
-	 * @param array $data
-	 * @return void
+	 * @param callable $fn function(array &$data, int $now): mixed
+	 * @return mixed Whatever $fn returns
 	 */
-	private function _security_save($data)
-    {
-        $fp = @fopen($this->security_file, 'c+');
-        if (!$fp) return;
+	private function _security_update(callable $fn)
+	{
+		$fp = @fopen($this->security_file, 'c+');
+		if (!$fp) return null;
 
-        if (!flock($fp, LOCK_EX)) {  // Exclusive lock for write
-            fclose($fp);
-            return;
-        }
+		if (!flock($fp, LOCK_EX)) {
+			fclose($fp);
+			return null;
+		}
 
-        ftruncate($fp, 0);
-        fwrite($fp, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-        fflush($fp);
-        flock($fp, LOCK_UN);
-        fclose($fp);
-    }
+		$json = stream_get_contents($fp);
+		$data = $json ? json_decode($json, true) : [];
+		if (!is_array($data)) $data = [];
+
+		$now = time();
+		$result = $fn($data, $now);
+
+		// Prune dead entries
+		$horizon = max($this->invalid_window, $this->creation_window);
+		foreach ($data as $k => $entry) {
+			$locked = isset($entry['locked_until']) && $entry['locked_until'] > $now;
+			$recent = false;
+			foreach (['timestamps', 'creations'] as $f) {
+				if (!empty($entry[$f]) && max($entry[$f]) > $now - $horizon) $recent = true;
+			}
+			if (!$locked && !$recent) unset($data[$k]);
+		}
+
+		ftruncate($fp, 0);
+		rewind($fp);
+		fwrite($fp, json_encode($data, JSON_UNESCAPED_SLASHES));
+		fflush($fp);
+		flock($fp, LOCK_UN);
+		fclose($fp);
+
+		return $result;
+	}
 
 	/**
-	 * Check if the current IP or fingerprint is locked
+	 * Check whether the IP/fingerprint is locked (read-only, no disk write)
 	 *
 	 * @param string $ip
 	 * @param string $fingerprint
-	 * @return string|null  Returns an error message if locked, otherwise null
+	 * @return string|null Error message if locked
 	 */
 	public function security_check_lock($ip, $fingerprint)
-    {
-        $data = $this->_security_load();
-        $key = $ip . '_' . $fingerprint;
+	{
+		$data = $this->_security_load();
+		$now = time();
 
-        if (isset($data[$key]['locked_until']) && time() < $data[$key]['locked_until']) {
-            $remaining = $data[$key]['locked_until'] - time();
-            return "Access locked. Try again in {$remaining} seconds.";
-        }
-
-        // Cleanup expired locks
-        foreach ($data as $k => $entry) {
-            if (isset($entry['locked_until']) && time() > $entry['locked_until']) {
-                unset($data[$k]['locked_until']);
-                $data[$k]['attempts'] = 0;
-            }
-        }
-
-        $this->_security_save($data);
-        return null;
-    }
+		foreach ([$ip . '_' . $fingerprint, 'creation_' . $ip] as $key) {
+			if (isset($data[$key]['locked_until']) && $now < $data[$key]['locked_until']) {
+				$remaining = $data[$key]['locked_until'] - $now;
+				return "Access locked. Try again in {$remaining} seconds.";
+			}
+		}
+		return null;
+	}
 
 	/**
-	 * Log invalid session attempt (e.g., fingerprint/IP mismatch)
+	 * Log an invalid session attempt (fingerprint/IP mismatch)
 	 *
 	 * @param string $ip
 	 * @param string $fingerprint
 	 * @param string $reason
-	 * @return void
 	 */
 	public function security_log_attempt($ip, $fingerprint, $reason = 'Unknown')
-    {
-        $data = $this->_security_load();
-        $key = $ip . '_' . $fingerprint;
-        $time = time();
-
-        $data[$key] ??= ['attempts' => 0, 'timestamps' => []];
-
-        $data[$key]['attempts']++;
-        $data[$key]['timestamps'][] = $time;
-
-        // Prune old timestamps
-        $data[$key]['timestamps'] = array_filter(
-            $data[$key]['timestamps'],
-            fn($t) => $t > $time - $this->invalid_window
-        );
-
-        if ($data[$key]['attempts'] >= $this->max_invalid_attempts) {
-            $data[$key]['locked_until'] = $time + $this->lock_duration_invalid;
-            error_log("[Session Security] {$ip} locked - {$reason} - Attempts: {$data[$key]['attempts']}");
-        }
-
-        $this->_security_save($data);
-    }
-
-	/**
-	 * Track session creation rate and apply lock if too frequent
-	 *
-	 * @param string $ip
-	 * @param string $fingerprint
-	 * @return string|null  Returns an error message if locked, otherwise null
-	 */
-	public function security_track_session_creation($ip, $fingerprint)
 	{
-		$data = $this->_security_load();
-		$key = 'creation_' . $ip . '_' . $fingerprint;
-		$time = time();
+		$key = $ip . '_' . $fingerprint;
+		$window = $this->invalid_window;
+		$max = $this->max_invalid_attempts;
+		$duration = $this->lock_duration_invalid;
 
-		if (!isset($data[$key])) {
-			$data[$key] = ['creations' => []];
+		$locked = $this->_security_update(function (&$data, $now) use ($key, $window, $max, $duration) {
+			$data[$key] ??= ['attempts' => 0, 'timestamps' => []];
+			$data[$key]['timestamps'][] = $now;
+			$data[$key]['timestamps'] = array_values(array_filter(
+				$data[$key]['timestamps'],
+				fn($t) => $t > $now - $window
+			));
+			// Attempts are counted inside the window only (previously never decayed)
+			$data[$key]['attempts'] = count($data[$key]['timestamps']);
+
+			if ($data[$key]['attempts'] >= $max) {
+				$data[$key]['locked_until'] = $now + $duration;
+				return true;
+			}
+			return false;
+		});
+
+		if ($locked) {
+			error_log("[Session Security] {$ip} locked - {$reason}");
 		}
-
-		$data[$key]['creations'][] = $time;
-		$data[$key]['creations'] = array_filter(
-			$data[$key]['creations'],
-			fn($t) => $t > $time - $this->creation_window
-		);
-
-		if (count($data[$key]['creations']) > $this->max_session_creations) {
-			$data[$key]['locked_until'] = $time + $this->lock_duration_creation;
-			$this->_security_save($data);
-			error_log("[Session Security] IP {$ip} locked for session creation flood.");
-			return 'Too many session creations. Please wait before trying again.';
-		}
-
-		$this->_security_save($data);
 	}
 
 	/**
-	 * Reset failed login attempts and unlock session for a given IP/fingerprint
+	 * Track session creation rate per IP (not per fingerprint, so changing the
+	 * User-Agent can't be used to dodge the limit).
 	 *
-	 * @param string|null $ip
-	 * @param string|null $fingerprint
-	 * @return void
+	 * @param string $ip
+	 * @param string|null $fingerprint Unused, kept for backward compatibility
+	 * @return string|null Error message if locked
+	 */
+	public function security_track_session_creation($ip, $fingerprint = null)
+	{
+		$key = 'creation_' . $ip;
+		$window = $this->creation_window;
+		$max = $this->max_session_creations;
+		$duration = $this->lock_duration_creation;
+
+		$blocked = $this->_security_update(function (&$data, $now) use ($key, $window, $max, $duration) {
+			$data[$key] ??= ['creations' => []];
+			$data[$key]['creations'][] = $now;
+			$data[$key]['creations'] = array_values(array_filter(
+				$data[$key]['creations'],
+				fn($t) => $t > $now - $window
+			));
+
+			if (count($data[$key]['creations']) > $max) {
+				$data[$key]['locked_until'] = $now + $duration;
+				return true;
+			}
+			return false;
+		});
+
+		if ($blocked) {
+			error_log("[Session Security] IP {$ip} locked for session creation flood.");
+			return 'Too many session creations. Please wait before trying again.';
+		}
+		return null;
+	}
+
+	/**
+	 * Reset failed attempts for an IP/fingerprint
 	 */
 	public function reset_attempts($ip = null, $fingerprint = null)
 	{
@@ -831,22 +815,15 @@ class Session {
 		$fingerprint = $fingerprint ?? $this->generate_fingerprint();
 		$key = $ip . '_' . $fingerprint;
 
-		$data = $this->_security_load();
-
-		$data[$key] = [
-			'attempts' => 0,
-			'timestamps' => [],
-		];
-
-		$this->_security_save($data);
+		$this->_security_update(function (&$data) use ($key) {
+			$data[$key] = ['attempts' => 0, 'timestamps' => []];
+		});
 	}
 
 	/**
-	 * Check current lock status for a given IP/fingerprint
+	 * Current lock status for an IP/fingerprint
 	 *
-	 * @param string|null $ip
-	 * @param string|null $fingerprint
-	 * @return array  Returns an array with 'locked', 'attempts', 'max', and 'remaining' keys
+	 * @return array 'locked', 'attempts', 'max', 'remaining'
 	 */
 	public function check_lock_status($ip = null, $fingerprint = null)
 	{
@@ -855,30 +832,21 @@ class Session {
 		$key = $ip . '_' . $fingerprint;
 
 		$data = $this->_security_load();
-
-		$attempts = $data[$key]['attempts'] ?? 0;
-		$locked_until = $data[$key]['locked_until'] ?? 0;
+		$locked_until = (int)($data[$key]['locked_until'] ?? 0);
 		$remaining = max($locked_until - time(), 0);
 
-		if ($remaining === 0 && isset($data[$key]['locked_until'])) {
-			unset($data[$key]['locked_until']);
-			$this->_security_save($data);
-		}
-
 		return [
-			'locked' => $remaining > 0,
-			'attempts' => $attempts,
-			'max' => $this->max_invalid_attempts,
+			'locked'    => $remaining > 0,
+			'attempts'  => (int)($data[$key]['attempts'] ?? 0),
+			'max'       => $this->max_invalid_attempts,
 			'remaining' => $remaining
 		];
 	}
 
 	/**
-	 * Manually unlock a locked user (admin override)
+	 * Manually unlock one user (admin override)
 	 *
-	 * @param string|null $ip
-	 * @param string|null $fingerprint
-	 * @return bool True if unlocked, false if no lock was found
+	 * @return bool True if an entry was found and cleared
 	 */
 	public function unlock_attempts($ip = null, $fingerprint = null)
 	{
@@ -886,64 +854,42 @@ class Session {
 		$fingerprint = $fingerprint ?? $this->generate_fingerprint();
 		$key = $ip . '_' . $fingerprint;
 
-		$data = $this->_security_load();
-
-		if (isset($data[$key])) {
-			// Remove lock if it exists
-			if (isset($data[$key]['locked_until'])) {
-				unset($data[$key]['locked_until']);
-			}
-
-			// Reset attempts
+		return (bool) $this->_security_update(function (&$data) use ($key) {
+			if (!isset($data[$key])) return false;
+			unset($data[$key]['locked_until']);
 			$data[$key]['attempts'] = 0;
 			$data[$key]['timestamps'] = [];
-
-			$this->_security_save($data);
 			return true;
-		}
-
-		return false;
+		});
 	}
 
 	/**
-	 * Unlock all users and reset all failed login attempts
+	 * Unlock everyone (including creation-flood locks)
 	 *
-	 * @return int Number of records unlocked
+	 * @return int Number of records cleared
 	 */
 	public function unlock_all_attempts()
 	{
-		$data = $this->_security_load();
-		$count = 0;
-
-		foreach ($data as $key => &$info) {
-			if (!is_array($info)) {
-				continue;
+		return (int) $this->_security_update(function (&$data) {
+			$count = 0;
+			foreach ($data as $key => $info) {
+				if (!is_array($info)) continue;
+				if (isset($info['locked_until']) || ($info['attempts'] ?? 0) > 0 || !empty($info['creations'])) {
+					unset($data[$key]);
+					$count++;
+				}
 			}
-
-			$wasLocked = isset($info['locked_until']);
-			if ($wasLocked || ($info['attempts'] ?? 0) > 0) {
-				// Remove lock + reset attempts
-				unset($info['locked_until']);
-				$info['attempts'] = 0;
-				$info['timestamps'] = [];
-				$count++;
-			}
-		}
-
-		$this->_security_save($data);
-
-		return $count;
+			return $count;
+		});
 	}
 
 	/**
-	 * Regenerate session ID on successful login to prevent session fixation
-	 *
-	 * @return void
+	 * Regenerate session ID on successful login
 	 */
-	public function after_successful_login(): void
-    {
-        $this->regenerate_on_login(true);
-    }
+	public function after_successful_login()
+	{
+		$this->regenerate_on_login(true);
+	}
 
 }
 

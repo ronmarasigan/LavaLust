@@ -114,7 +114,7 @@ $config['proxy_enabled']           = FALSE;
 |
 */
 $config['log_threshold']            = 0;
-$config['log_dir']                  = 'runtime/logs/';
+$config['log_dir']                  = ROOT_DIR . 'runtime/logs/';
 
 /*
 |--------------------------------------------------------------------------
