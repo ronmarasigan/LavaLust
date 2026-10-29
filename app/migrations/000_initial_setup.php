@@ -28,6 +28,10 @@ class Initial_setup {
                     'type'     => 'INT',
                     'null'     => FALSE,
                 ],
+                'batch' => [
+                    'type'     => 'INT',
+                    'null'     => FALSE,
+                ],
                 'applied_at' => [
                     'type'    => 'DATETIME',
                     'null'    => FALSE,
