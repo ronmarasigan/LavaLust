@@ -42,7 +42,8 @@ class Security_headers
 {
     /** @var array */
     protected $config = [
-        'csp_enabled'        => false, // enable/disable Content-Security-Policy
+        'csp_enabled'        => false,
+        'api_csp_enabled'    => null,
         'csp_report_only'    => false,
         'report_uri'         => '',
         'trust_proxy'        => false,
@@ -62,21 +63,20 @@ class Security_headers
         'frame_options'      => 'DENY',
         'referrer_policy'    => 'strict-origin-when-cross-origin',
         'permissions_policy' => 'geolocation=(), microphone=(), camera=(), payment=()',
-        'coop'               => 'same-origin',   // '' to skip (e.g. OAuth popups)
+        'coop'               => 'same-origin',
 
         'api_max_body'       => 1048576,
 
         'cors' => [
-            // exact origins. Leave empty to fall back to config_item('allow_origin')
             'allowed_origins' => [],
             'methods'         => 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
             'headers'         => 'Authorization, Content-Type, X-Requested-With',
             'expose_headers'  => 'X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, Retry-After',
-            'credentials'     => false,          // only needed for cookie auth
+            'credentials'     => false,
             'max_age'         => 600,
         ],
 
-        'frame_ancestors' => "'none'",     // or "'self'" to allow framing your own pages
+        'frame_ancestors' => "'none'",
         'extra_headers'   => [],
     ];
 
@@ -168,7 +168,15 @@ class Security_headers
     {
         if (headers_sent()) return $this;
 
-        header("Content-Security-Policy: default-src 'none'; frame-ancestors 'none'");
+        $csp_on = $this->config['api_csp_enabled'] ?? $this->config['csp_enabled'];
+
+        if ($csp_on) {
+            $name = $this->config['csp_report_only']
+                ? 'Content-Security-Policy-Report-Only'
+                : 'Content-Security-Policy';
+            header($name . ": default-src 'none'; frame-ancestors 'none'");
+        }
+
         header('Cache-Control: no-store, max-age=0');
         header('Pragma: no-cache');
         header('X-Frame-Options: DENY');

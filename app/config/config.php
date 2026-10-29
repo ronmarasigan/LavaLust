@@ -56,7 +56,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 | LavaLust Version
 | -------------------------------------------------------------------
 */
-$config['version']                 = '4.7.1';
+$config['version']                 = '4.7.2';
 
 /*
 | -------------------------------------------------------------------
@@ -405,5 +405,9 @@ $config['security_headers'] = [
         'headers'         => 'Authorization, Content-Type, X-Requested-With',
         'max_age'         => 600,
     ],
+
+    // ── Other ──
+    'frame_ancestors' => "'none'",
+    'extra_headers'   => [],
 ];
 ?>

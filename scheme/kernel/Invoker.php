@@ -87,38 +87,35 @@ class Invoker {
 	 */
 	public function controller($class, $method = 'index', $params = [])
 	{
-		$parts = explode('/', $class);
-		$ctrl = ucfirst(array_pop($parts));
-		$module = !empty($parts) ? array_shift($parts) : null;
-		$nested = implode('/', $parts);
+		$parts  = explode('/', trim($class, '/'));
+		$ctrl   = ucfirst(array_pop($parts));
+		$subdir = implode('/', $parts);
 
-		// Module path
-		if ($module) {
-			$path = APP_DIR . "modules/{$module}/controllers/" . ($nested ? "{$nested}/" : '') . "{$ctrl}.php";
-			if (file_exists($path)) {
-				require_once $path;
+		$candidates = [];
 
-				if (!class_exists($ctrl)) {
-					throw new Exception("Controller class {$ctrl} not found in module {$module}");
-				}
-
-				$instance = new $ctrl();
-
-				if (!method_exists($instance, $method)) {
-					throw new Exception("Method {$method} not found in controller {$ctrl}");
-				}
-
-				return call_user_func_array([$instance, $method], $params);
-			}
+		if (!empty($parts)) {
+			$module = $parts[0];
+			$nested = implode('/', array_slice($parts, 1));
+			$candidates[] = [
+				'path'  => APP_DIR . "modules/{$module}/controllers/" . ($nested ? "{$nested}/" : '') . "{$ctrl}.php",
+				'where' => "module {$module}" . ($nested ? "/{$nested}" : ''),
+			];
 		}
 
-		// App path
-		$path = APP_DIR . "controllers/" . ($nested ? "{$nested}/" : '') . "{$ctrl}.php";
-		if (file_exists($path)) {
-			require_once $path;
+		$candidates[] = [
+			'path'  => APP_DIR . 'controllers/' . ($subdir ? "{$subdir}/" : '') . "{$ctrl}.php",
+			'where' => 'app/controllers' . ($subdir ? "/{$subdir}" : ''),
+		];
 
-			if (!class_exists($ctrl)) {
-				throw new Exception("Controller class {$ctrl} not found");
+		foreach ($candidates as $candidate) {
+			if (!file_exists($candidate['path'])) {
+				continue;
+			}
+
+			require_once $candidate['path'];
+
+			if (!class_exists($ctrl, false)) {
+				throw new Exception("Controller class {$ctrl} not found in {$candidate['where']}");
 			}
 
 			$instance = new $ctrl();
@@ -130,8 +127,8 @@ class Invoker {
 			return call_user_func_array([$instance, $method], $params);
 		}
 
-		$location = $module ? "module {$module}" . ($nested ? "/{$nested}" : '') : "app/controllers";
-		throw new Exception("Controller {$ctrl} not found in {$location}");
+		$tried = implode(', ', array_column($candidates, 'where'));
+		throw new Exception("Controller {$ctrl} not found. Looked in: {$tried}");
 	}
 
 	/**
@@ -159,40 +156,48 @@ class Invoker {
 			return;
 		}
 
-		$parts = explode('/', $class);
+		$parts       = explode('/', trim($class, '/'));
 		$this->class = array_pop($parts);
-		$module = null;
-		$nested = '';
-
-		if (count($parts) > 0) {
-			$module = array_shift($parts);
-			$nested = implode('/', $parts);
-		}
-
-		$obj_name = $object_name ?? $this->class;
+		$subdir      = implode('/', $parts);
+		$obj_name    = $object_name ?? $this->class;
 
 		if (isset($LAVA->properties[$obj_name])) {
 			return $LAVA->properties[$obj_name];
 		}
 
-		if ($module) {
-			$path = APP_DIR . "modules/{$module}/models/" . ($nested ? "{$nested}/" : '') . "{$this->class}.php";
-			if (file_exists($path)) {
-				require_once $path;
-				$LAVA->properties[$obj_name] = new $this->class();
-				return $LAVA->properties[$obj_name];
-			}
+		$candidates = [];
+
+		if (!empty($parts)) {
+			$module = $parts[0];
+			$nested = implode('/', array_slice($parts, 1));
+			$candidates[] = [
+				'path'  => APP_DIR . "modules/{$module}/models/" . ($nested ? "{$nested}/" : '') . "{$this->class}.php",
+				'where' => "module {$module}" . ($nested ? "/{$nested}" : ''),
+			];
 		}
 
-		$path = APP_DIR . "models/" . ($nested ? "{$nested}/" : '') . "{$this->class}.php";
-		if (file_exists($path)) {
-			require_once $path;
+		$candidates[] = [
+			'path'  => APP_DIR . 'models/' . ($subdir ? "{$subdir}/" : '') . "{$this->class}.php",
+			'where' => 'app/models' . ($subdir ? "/{$subdir}" : ''),
+		];
+
+		foreach ($candidates as $candidate) {
+			if (!file_exists($candidate['path'])) {
+				continue;
+			}
+
+			require_once $candidate['path'];
+
+			if (!class_exists($this->class, false)) {
+				throw new Exception("Model class {$this->class} not found in {$candidate['where']}");
+			}
+
 			$LAVA->properties[$obj_name] = new $this->class();
 			return $LAVA->properties[$obj_name];
 		}
 
-		$location = $module ? "module {$module}" : "app/models";
-		throw new Exception("Model {$this->class} not found in {$location}" . ($nested ? "/{$nested}" : ''));
+		$tried = implode(', ', array_column($candidates, 'where'));
+		throw new Exception("Model {$this->class} not found. Looked in: {$tried}");
 	}
 
 
@@ -215,37 +220,45 @@ class Invoker {
 		if (!is_null($data)) {
 			if (is_array($data)) {
 				extract($data, EXTR_SKIP);
-			} elseif (is_string($data)) {
-				$$data = $data;
-			} else {
+			} elseif (!is_string($data)) {
 				throw new RuntimeException('View parameter only accepts array or string types');
 			}
 		}
 
-		ob_start();
-
 		$view_file = str_replace('\\', '/', trim($view_file, '/'));
 
-		$parts = explode('/', $view_file);
-		$file = array_pop($parts);
-		$module_or_nested = array_shift($parts);
-		$nested = implode('/', $parts);
-
-		$has_extension = pathinfo($file, PATHINFO_EXTENSION) !== '';
-		$file_name = $has_extension ? $file : "{$file}.php";
-
-		$app_dir = rtrim(APP_DIR, '/\\') . '/';
-
-		$module_path = $app_dir . "modules/{$module_or_nested}/views/" . ($nested ? "{$nested}/" : '') . $file_name;
-		if (file_exists($module_path)) {
-			require $module_path;
-			echo ob_get_clean();
-			return;
+		if (strpos($view_file, '..') !== false) {
+			throw new RuntimeException("Invalid view path: {$view_file}");
 		}
 
-		$app_path = $app_dir . "views/" . ($nested ? "{$module_or_nested}/{$nested}/" : "{$module_or_nested}/") . $file_name;
-		if (file_exists($app_path)) {
-			require $app_path;
+		$parts     = explode('/', $view_file);
+		$file      = array_pop($parts);
+		$subdir    = implode('/', $parts);
+		$file_name = pathinfo($file, PATHINFO_EXTENSION) !== '' ? $file : "{$file}.php";
+		$app_dir   = rtrim(APP_DIR, '/\\') . '/';
+
+		$candidates = [];
+
+		if (!empty($parts)) {
+			$module = $parts[0];
+			$nested = implode('/', array_slice($parts, 1));
+			$candidates[] = $app_dir . "modules/{$module}/views/" . ($nested ? "{$nested}/" : '') . $file_name;
+		}
+
+		$candidates[] = $app_dir . 'views/' . ($subdir ? "{$subdir}/" : '') . $file_name;
+
+		foreach ($candidates as $path) {
+			if (!file_exists($path)) {
+				continue;
+			}
+
+			ob_start();
+			try {
+				require $path;
+			} catch (Throwable $e) {
+				ob_end_clean();
+				throw $e;
+			}
 			echo ob_get_clean();
 			return;
 		}

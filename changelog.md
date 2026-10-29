@@ -2,6 +2,15 @@
 
 This document records the changes, improvements, bug fixes, security updates, and migration notes for each LavaLust PHP Framework release.
 
+## Version 4.7.2
+
+### Changelog
+
+- Fixed bug in Error class affects migration run.
+- Fixed bug accessing controller from routes when inside subdirectory (404 not found).
+- Fixed bug in loading controller and model from inside subdirectory.
+- Fixed bug in Security_headers class. Always enforcing even turned off in config while Api class was loaded. 
+
 ## Version 4.7.1
 
 ### Changelog
