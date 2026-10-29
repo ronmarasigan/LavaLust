@@ -320,6 +320,74 @@ class Router
     }
 
     /**
+     * Resolve a controller reference to a file and class name.
+     * Accepts: 'MyController', 'Api/MyController', 'Api\MyController'
+     *
+     * @param string $controller
+     * @return array [file path, class name]
+     */
+    private function resolve_controller($controller)
+    {
+        $controller = trim(str_replace('\\', '/', $controller), '/');
+
+        if (strpos($controller, '..') !== false) {
+            throw new RuntimeException("Invalid controller path: {$controller}");
+        }
+
+        $parts   = explode('/', $controller);
+        $class   = ucfirst(array_pop($parts));
+        $subdir  = implode('/', $parts);
+        $base    = rtrim(APP_DIR, '/\\') . '/controllers/';
+
+        $candidates = [
+            $base . ($subdir ? "{$subdir}/" : '') . "{$class}.php",
+        ];
+
+        if ($subdir) {
+            $candidates[] = $base . "{$class}.php";
+        }
+
+        foreach ($candidates as $path) {
+            if (file_exists($path)) {
+                return [$path, $class];
+            }
+        }
+
+        throw new RuntimeException("Controller {$controller} does not exist.");
+    }
+
+    /**
+     * Load a controller and call one of its methods
+     *
+     * @param string $controller
+     * @param string $method
+     * @param array  $params
+     * @return void
+     */
+    private function run_controller($controller, $method, $params)
+    {
+        [$file, $class] = $this->resolve_controller($controller);
+
+        require_once $file;
+
+        $fqcn = str_replace('/', '\\', trim(str_replace('\\', '/', $controller), '/'));
+
+        if (class_exists($fqcn, false)) {
+            $class = $fqcn;
+        } elseif (!class_exists($class, false)) {
+            throw new RuntimeException("Controller class {$class} not found in {$file}.");
+        }
+
+        $instance = new $class();
+
+        if (!method_exists($instance, $method)) {
+            throw new RuntimeException("Method {$class}->{$method} does not exist.");
+        }
+
+        call_user_func_array([$instance, $method], $params);
+    }
+
+    /**
      * Call controller from callback
      *
      * @param mixed $callback
@@ -330,64 +398,33 @@ class Router
     {
         if (is_array($callback) && count($callback) === 2) {
             $controller = is_object($callback[0]) ? get_class($callback[0]) : $callback[0];
-            $method     = $callback[1];
-
-            // Strip namespace if fully qualified (e.g. App\Controllers\UserController → UserController)
-            $controller = basename(str_replace('\\', '/', $controller));
-
-            $controller_file = APP_DIR . 'controllers/' . ucfirst($controller) . '.php';
-
-            if (!file_exists($controller_file)) {
-                throw new RuntimeException("Controller {$controller} does not exist.");
-            }
-
-            require_once($controller_file);
-
-            $instance = new $controller();
-
-            if (!method_exists($instance, $method)) {
-                throw new RuntimeException("Method {$controller}->{$method} does not exist.");
-            }
-
-            call_user_func_array([$instance, $method], $matches);
+            $this->run_controller($controller, $callback[1], $matches);
             return;
         }
+
         if (is_string($callback)) {
-            $controller = '';
             $method = 'index';
 
             if (strpos($callback, '::') !== false) {
-                [$controller, $method] = explode('::', $callback);
+                [$controller, $method] = explode('::', $callback, 2);
             } elseif (strpos($callback, '->') !== false) {
-                [$controller, $method] = explode('->', $callback);
+                [$controller, $method] = explode('->', $callback, 2);
             } elseif (strpos($callback, '@') !== false) {
-                [$controller, $method] = explode('@', $callback);
+                [$controller, $method] = explode('@', $callback, 2);
             } else {
                 $controller = $callback;
-                $method = 'index';
             }
 
-            $controller_file = APP_DIR . 'controllers/' . ucfirst($controller) . '.php';
-
-            if (!file_exists($controller_file)) {
-                throw new RuntimeException("Controller {$controller} does not exist.");
-            }
-
-            require_once($controller_file);
-
-            $instance = new $controller();
-
-            if (!method_exists($instance, $method)) {
-                throw new RuntimeException("Method {$controller}->{$method} does not exist.");
-            }
-
-            call_user_func_array([$instance, $method], $matches);
-
-        } elseif (is_callable($callback)) {
-            call_user_func_array($callback, array_values($matches));
-        } else {
-            throw new RuntimeException('Invalid callback.');
+            $this->run_controller($controller, $method, $matches);
+            return;
         }
+
+        if (is_callable($callback)) {
+            call_user_func_array($callback, array_values($matches));
+            return;
+        }
+
+        throw new RuntimeException('Invalid callback.');
     }
 
 
@@ -408,7 +445,7 @@ class Router
             $middlewares = $route['middleware'] ?? [];
 
             if (!empty($middlewares)) {
-                $runner = load_class('Middleware', 'kernel'); // make sure kernel middleware class exists
+                $runner = load_class('Middleware', 'kernel');
                 $runner->run($middlewares, function () use ($callback, $matches) {
                     $this->call_controller_from_callback($callback, $matches);
                 });
@@ -443,7 +480,6 @@ class Router
             exit;
         }
 
-        // Security check for permitted characters
         $url_segments = explode('/', $url);
         array_shift($url_segments);
         foreach($url_segments as $uri)
@@ -569,7 +605,7 @@ class Router
      */
     public function middleware($middleware)
     {
-        $index = count($this->routes) - 1; // always last route
+        $index = count($this->routes) - 1;
         if ($index >= 0) {
             $this->routes[$index]['middleware'] = array_merge(
                 $this->routes[$index]['middleware'],
