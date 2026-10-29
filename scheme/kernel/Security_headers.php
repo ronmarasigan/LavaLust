@@ -42,7 +42,7 @@ class Security_headers
 {
     /** @var array */
     protected $config = [
-        'csp_enabled' => false, // enable/disable Content-Security-Policy
+        'csp_enabled'        => false, // enable/disable Content-Security-Policy
         'csp_report_only'    => false,
         'report_uri'         => '',
         'trust_proxy'        => false,

@@ -136,10 +136,29 @@ class Errors
 	 */
 	public function show_database_error($message, $sql = '', $bindings = [], $exception = null, $template = 'error_db')
 	{
-		http_response_code(500);
-		
+		$is_cli = PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg';
+
+		if (!$is_cli && !headers_sent()) {
+			http_response_code(500);
+		}
+
 		if (config_item('environment') !== 'development') {
-			exit();
+			exit($is_cli ? 1 : 0);
+		}
+
+		// CLI: print plain text instead of loading the HTML error view
+		if ($is_cli) {
+			fwrite(STDERR, "Database Error: {$message}\n");
+			if (!empty($sql)) {
+				fwrite(STDERR, "Query: {$sql}\n");
+			}
+			if (!empty($bindings)) {
+				fwrite(STDERR, 'Bindings: ' . json_encode($bindings) . "\n");
+			}
+			if ($exception) {
+				fwrite(STDERR, $exception->getFile() . ':' . $exception->getLine() . "\n");
+			}
+			exit(1);
 		}
 
 		$template_path = config_item('error_view_path');
